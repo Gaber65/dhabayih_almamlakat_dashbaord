@@ -1,3 +1,5 @@
+import os
+import socket
 from typing import Optional
 import smtplib
 from email.mime.text import MIMEText
@@ -175,16 +177,18 @@ The JABIN Team
                 )
             )
 
-            # Connect to SMTP server
+            # Connect to SMTP server with a 10-second timeout
             if smtp["ssl"]:
                 server = smtplib.SMTP_SSL(
                     smtp["host"],
-                    smtp["port"]
+                    smtp["port"],
+                    timeout=10
                 )
             else:
                 server = smtplib.SMTP(
                     smtp["host"],
-                    smtp["port"]
+                    smtp["port"],
+                    timeout=10
                 )
 
             # Start TLS if configured
@@ -217,9 +221,18 @@ The JABIN Team
 
             return True
 
+        except (OSError, socket.error, smtplib.SMTPException) as exc:
+            _logger.error(
+                "SMTP email failed (%s): %s",
+                exc.__class__.__name__,
+                exc
+            )
+            raise ValidationError(
+                "Failed to send verification email. Please try again later."
+            )
         except Exception as exc:
-            _logger.exception(
-                "SMTP email failed: %s",
+            _logger.error(
+                "Unexpected error sending email: %s",
                 exc
             )
             raise ValidationError(
@@ -233,49 +246,40 @@ The JABIN Team
     @staticmethod
     def _smtp_config() -> dict:
         """
-        Get SMTP configuration from Odoo config.
+        Get SMTP configuration from environment variables or Odoo config.
 
         Returns:
             dict: SMTP configuration
         """
-        # Get config values with proper type handling
-        tls_value = config.get("smtp_tls", "True")
-        ssl_value = config.get("smtp_ssl", "False")
+        env_server = os.getenv("SMTP_SERVER")
+        env_port = os.getenv("SMTP_PORT")
+        env_user = os.getenv("SMTP_USER")
+        env_password = os.getenv("SMTP_PASSWORD")
+        env_tls = os.getenv("SMTP_TLS")
+        env_ssl = os.getenv("SMTP_SSL")
 
-        # Convert to boolean safely
+        tls_value = env_tls if env_tls is not None else config.get("smtp_tls", "True")
+        ssl_value = env_ssl if env_ssl is not None else config.get("smtp_ssl", "False")
+
         if isinstance(tls_value, bool):
             tls_enabled = tls_value
         elif isinstance(tls_value, str):
-            tls_enabled = tls_value.lower() == "true"
+            tls_enabled = tls_value.lower() in ("true", "1", "yes")
         else:
             tls_enabled = bool(tls_value)
 
         if isinstance(ssl_value, bool):
             ssl_enabled = ssl_value
         elif isinstance(ssl_value, str):
-            ssl_enabled = ssl_value.lower() == "true"
+            ssl_enabled = ssl_value.lower() in ("true", "1", "yes")
         else:
             ssl_enabled = bool(ssl_value)
 
         return {
-            "host": config.get(
-                "smtp_server",
-                "smtp.gmail.com"
-            ),
-            "port": int(
-                config.get(
-                    "smtp_port",
-                    587
-                )
-            ),
-            "username": config.get(
-                "smtp_user",
-                ""
-            ),
-            "password": config.get(
-                "smtp_password",
-                ""
-            ),
+            "host": env_server or config.get("smtp_server", "smtp.gmail.com"),
+            "port": int(env_port or config.get("smtp_port", 587)),
+            "username": env_user or config.get("smtp_user", ""),
+            "password": env_password or config.get("smtp_password", ""),
             "tls": tls_enabled,
             "ssl": ssl_enabled,
-        }
+        }
