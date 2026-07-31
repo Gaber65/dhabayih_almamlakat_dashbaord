@@ -21,4 +21,24 @@ COPY . .
 # Add non-root user
 RUN useradd -m -u 1000 odoo && chown -R odoo:odoo /app
 USER odoo
+
+# Create odoo.conf with env vars at runtime
+RUN cat > /app/odoo.conf << 'EOF'
+[options]
+addons_path = odoo/addons,odoo/custom_addons,addons
+db_host = $PGHOST
+db_port = $PGPORT
+db_user = $PGUSER
+db_password = $PGPASSWORD
+db_name = railway
+admin_passwd = Gaber@1907
+smtp_server = smtp.gmail.com
+smtp_port = 587
+smtp_user = gaberfares66@gmail.com
+smtp_password = rofg skzv jwrg bcjg
+smtp_tls = True
+smtp_ssl = False
+email_from = gaberfares66@gmail.com
+EOF
+
 CMD ["python", "odoo-bin", "-c", "odoo.conf"]
