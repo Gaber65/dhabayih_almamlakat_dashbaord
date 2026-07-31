@@ -1,0 +1,974 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ==================== ORDER NUMBERING SEQUENCE ==================== -->
+        <record id="sequence_jabin_order" model="ir.sequence">
+            <field name="name">JABIN Order Sequence</field>
+            <field name="code">jabin.order</field>
+            <field name="prefix">JAB-ORD-</field>
+            <field name="padding">6</field>
+            <field name="number_next">1</field>
+            <field name="number_increment">1</field>
+        </record>
+
+        <!-- ==================== DEFAULT PAYMENT METHODS ==================== -->
+        <record id="payment_method_cod" model="jabin.payment.method">
+            <field name="name">Cash on Delivery</field>
+            <field name="code">cod</field>
+            <field name="payment_type">cash</field>
+            <field name="provider">manual</field>
+            <field name="is_installment" eval="False"/>
+        </record>
+
+        <record id="payment_method_visa" model="jabin.payment.method">
+            <field name="name">Visa / Mastercard</field>
+            <field name="code">card</field>
+            <field name="payment_type">card</field>
+            <field name="provider">stripe</field>
+            <field name="is_installment" eval="False"/>
+        </record>
+
+        <record id="payment_method_mada" model="jabin.payment.method">
+            <field name="name">Mada</field>
+            <field name="code">mada</field>
+            <field name="payment_type">card</field>
+            <field name="provider">mada</field>
+            <field name="is_installment" eval="False"/>
+        </record>
+
+        <record id="payment_method_stc" model="jabin.payment.method">
+            <field name="name">STC Pay</field>
+            <field name="code">stc_pay</field>
+            <field name="payment_type">wallet</field>
+            <field name="provider">stc_pay</field>
+            <field name="is_installment" eval="False"/>
+        </record>
+
+        <record id="payment_method_apple_pay" model="jabin.payment.method">
+            <field name="name">Apple Pay</field>
+            <field name="code">apple_pay</field>
+            <field name="payment_type">wallet</field>
+            <field name="provider">stripe</field>
+            <field name="is_installment" eval="False"/>
+        </record>
+
+        <record id="payment_method_tamara" model="jabin.payment.method">
+            <field name="name">Tamara</field>
+            <field name="code">tamara</field>
+            <field name="payment_type">installment</field>
+            <field name="provider">tamara</field>
+            <field name="is_installment" eval="True"/>
+            <field name="max_installments">4</field>
+        </record>
+
+        <record id="payment_method_tabby" model="jabin.payment.method">
+            <field name="name">Tabby</field>
+            <field name="code">tabby</field>
+            <field name="payment_type">installment</field>
+            <field name="provider">tabby</field>
+            <field name="is_installment" eval="True"/>
+            <field name="max_installments">4</field>
+        </record>
+
+        <!-- ==================== CUSTOMER USERS ==================== -->
+        <record id="customer_john" model="res.users">
+            <field name="name">John Doe</field>
+            <field name="login">john.doe@email.com</field>
+            <field name="email">john.doe@email.com</field>
+            <field name="user_type">individual</field>
+            <field name="status">active</field>
+            <field name="profile_completed">True</field>
+            <field name="balance">250.50</field>
+            <field name="verified_at">2026-01-15 10:30:00</field>
+            <field name="last_login">2026-07-15 14:20:00</field>
+        </record>
+
+        <record id="customer_sarah" model="res.users">
+            <field name="name">Sarah Ahmed</field>
+            <field name="login">sarah.ahmed@email.com</field>
+            <field name="email">sarah.ahmed@email.com</field>
+            <field name="user_type">individual</field>
+            <field name="status">active</field>
+            <field name="profile_completed">True</field>
+            <field name="balance">0.00</field>
+            <field name="verified_at">2026-02-20 09:15:00</field>
+            <field name="last_login">2026-07-14 18:45:00</field>
+        </record>
+
+        <record id="customer_mohammed" model="res.users">
+            <field name="name">Mohammed Al-Fahd</field>
+            <field name="login">mohammed.fahd@email.com</field>
+            <field name="email">mohammed.fahd@email.com</field>
+            <field name="user_type">business</field>
+            <field name="status">active</field>
+            <field name="profile_completed">True</field>
+            <field name="balance">1200.00</field>
+            <field name="verified_at">2026-03-01 11:00:00</field>
+            <field name="last_login">2026-07-13 09:30:00</field>
+        </record>
+
+        <record id="customer_emily" model="res.users">
+            <field name="name">Emily Wilson</field>
+            <field name="login">emily.wilson@email.com</field>
+            <field name="email">emily.wilson@email.com</field>
+            <field name="user_type">individual</field>
+            <field name="status">pending</field>
+            <field name="profile_completed">False</field>
+            <field name="balance">0.00</field>
+            <field name="verified_at" eval="False"/>
+            <field name="last_login" eval="False"/>
+        </record>
+
+        <record id="customer_omar" model="res.users">
+            <field name="name">Omar Al-Saud</field>
+            <field name="login">omar.saud@email.com</field>
+            <field name="email">omar.saud@email.com</field>
+            <field name="user_type">business</field>
+            <field name="status">suspended</field>
+            <field name="profile_completed">True</field>
+            <field name="balance">-50.00</field>
+            <field name="verified_at">2026-01-05 08:00:00</field>
+            <field name="last_login">2026-06-28 16:10:00</field>
+        </record>
+
+        <record id="customer_ahmed" model="res.users">
+            <field name="name">Ahmed Al-Hassan</field>
+            <field name="login">ahmed.hassan@email.com</field>
+            <field name="email">ahmed.hassan@email.com</field>
+            <field name="user_type">individual</field>
+            <field name="status">active</field>
+            <field name="profile_completed">True</field>
+            <field name="balance">75.00</field>
+            <field name="verified_at">2026-04-10 13:00:00</field>
+            <field name="last_login">2026-07-12 11:15:00</field>
+        </record>
+
+        <record id="customer_fatima" model="res.users">
+            <field name="name">Fatima Al-Nasser</field>
+            <field name="login">fatima.nasser@email.com</field>
+            <field name="email">fatima.nasser@email.com</field>
+            <field name="user_type">business</field>
+            <field name="status">active</field>
+            <field name="profile_completed">True</field>
+            <field name="balance">500.00</field>
+            <field name="verified_at">2026-05-20 08:30:00</field>
+            <field name="last_login">2026-07-10 16:00:00</field>
+        </record>
+
+        <!-- ==================== USER ADDRESSES ==================== -->
+        <record id="address_john_home" model="res.users.address">
+            <field name="user_id" ref="customer_john"/>
+            <field name="title">Home</field>
+            <field name="recipient_name">John Doe</field>
+            <field name="recipient_phone">+966501234567</field>
+            <field name="country_id" ref="base.sa"/>
+            <field name="city">Riyadh</field>
+            <field name="street">123 King Fahd Road, Al Olaya District</field>
+            <field name="latitude">24.7136</field>
+            <field name="longitude">46.6753</field>
+            <field name="is_default">True</field>
+        </record>
+
+        <record id="address_john_office" model="res.users.address">
+            <field name="user_id" ref="customer_john"/>
+            <field name="title">Office</field>
+            <field name="recipient_name">John Doe - Work</field>
+            <field name="recipient_phone">+966501234568</field>
+            <field name="country_id" ref="base.sa"/>
+            <field name="city">Riyadh</field>
+            <field name="street">456 Business Tower, King Abdullah Road</field>
+            <field name="latitude">24.7550</field>
+            <field name="longitude">46.6750</field>
+            <field name="is_default">False</field>
+        </record>
+
+        <record id="address_john_vacation" model="res.users.address">
+            <field name="user_id" ref="customer_john"/>
+            <field name="title">Vacation Home</field>
+            <field name="recipient_name">John Doe - Summer House</field>
+            <field name="recipient_phone">+966501234569</field>
+            <field name="country_id" ref="base.sa"/>
+            <field name="city">Jeddah</field>
+            <field name="street">789 Corniche Road, Al-Shateea District</field>
+            <field name="latitude">21.5750</field>
+            <field name="longitude">39.1800</field>
+            <field name="is_default">False</field>
+        </record>
+
+        <record id="address_sarah_home" model="res.users.address">
+            <field name="user_id" ref="customer_sarah"/>
+            <field name="title">Home</field>
+            <field name="recipient_name">Sarah Ahmed</field>
+            <field name="recipient_phone">+966505987654</field>
+            <field name="country_id" ref="base.sa"/>
+            <field name="city">Jeddah</field>
+            <field name="street">789 Al-Madinah Road, Al-Rawdah District</field>
+            <field name="latitude">21.5433</field>
+            <field name="longitude">39.1728</field>
+            <field name="is_default">True</field>
+        </record>
+
+        <record id="address_mohammed_business" model="res.users.address">
+            <field name="user_id" ref="customer_mohammed"/>
+            <field name="title">Business HQ</field>
+            <field name="recipient_name">Al-Fahd Enterprises</field>
+            <field name="recipient_phone">+966550123456</field>
+            <field name="country_id" ref="base.sa"/>
+            <field name="city">Dammam</field>
+            <field name="street">1001 King Abdulaziz Road, Al-Shatea District</field>
+            <field name="latitude">26.4207</field>
+            <field name="longitude">50.0888</field>
+            <field name="is_default">True</field>
+        </record>
+
+        <record id="address_mohammed_warehouse" model="res.users.address">
+            <field name="user_id" ref="customer_mohammed"/>
+            <field name="title">Warehouse</field>
+            <field name="recipient_name">Al-Fahd Enterprises - Warehouse</field>
+            <field name="recipient_phone">+966550123457</field>
+            <field name="country_id" ref="base.sa"/>
+            <field name="city">Dammam</field>
+            <field name="street">2002 Industrial Area, Street 45</field>
+            <field name="latitude">26.4200</field>
+            <field name="longitude">50.1000</field>
+            <field name="is_default">False</field>
+        </record>
+
+        <record id="address_ahmed_home" model="res.users.address">
+            <field name="user_id" ref="customer_ahmed"/>
+            <field name="title">Home</field>
+            <field name="recipient_name">Ahmed Al-Hassan</field>
+            <field name="recipient_phone">+966558765432</field>
+            <field name="country_id" ref="base.sa"/>
+            <field name="city">Riyadh</field>
+            <field name="street">789 Al-Malik Road, Al-Nuzha District</field>
+            <field name="latitude">24.7000</field>
+            <field name="longitude">46.7000</field>
+            <field name="is_default">True</field>
+        </record>
+
+        <record id="address_fatima_business" model="res.users.address">
+            <field name="user_id" ref="customer_fatima"/>
+            <field name="title">Office</field>
+            <field name="recipient_name">Al-Nasser Trading Co.</field>
+            <field name="recipient_phone">+966554433221</field>
+            <field name="country_id" ref="base.sa"/>
+            <field name="city">Jeddah</field>
+            <field name="street">500 Al-Madinah Road, Al-Hamra District</field>
+            <field name="latitude">21.5000</field>
+            <field name="longitude">39.1600</field>
+            <field name="is_default">True</field>
+        </record>
+
+        <!-- ==================== ORDERS ==================== -->
+        <!-- Order 1: John Doe - Delivered -->
+        <record id="order_john_001" model="jabin.order">
+            <field name="name">JAB-ORD-20260701-0001</field>
+            <field name="customer_id" ref="customer_john"/>
+            <field name="date">2026-07-01 10:30:00</field>
+            <field name="state">delivered</field>
+            <field name="payment_status">paid</field>
+            <field name="payment_method_id" ref="payment_method_visa"/>
+            <field name="tax_amount">150.00</field>
+            <field name="internal_notes">Customer requested express delivery</field>
+        </record>
+
+        <!-- Order 2: John Doe - Preparing -->
+        <record id="order_john_002" model="jabin.order">
+            <field name="name">JAB-ORD-20260710-0002</field>
+            <field name="customer_id" ref="customer_john"/>
+            <field name="date">2026-07-10 14:20:00</field>
+            <field name="state">preparing</field>
+            <field name="payment_status">authorized</field>
+            <field name="payment_method_id" ref="payment_method_mada"/>
+            <field name="tax_amount">45.00</field>
+            <field name="internal_notes">Special packaging required</field>
+        </record>
+
+        <!-- Order 3: Sarah Ahmed - Delivered -->
+        <record id="order_sarah_001" model="jabin.order">
+            <field name="name">JAB-ORD-20260705-0003</field>
+            <field name="customer_id" ref="customer_sarah"/>
+            <field name="date">2026-07-05 09:15:00</field>
+            <field name="state">delivered</field>
+            <field name="payment_status">paid</field>
+            <field name="payment_method_id" ref="payment_method_cod"/>
+            <field name="tax_amount">22.50</field>
+            <field name="internal_notes">Delivered to reception</field>
+        </record>
+
+        <!-- Order 4: Sarah Ahmed - Pending Payment -->
+        <record id="order_sarah_002" model="jabin.order">
+            <field name="name">JAB-ORD-20260715-0004</field>
+            <field name="customer_id" ref="customer_sarah"/>
+            <field name="date">2026-07-15 16:45:00</field>
+            <field name="state">pending_payment</field>
+            <field name="payment_status">pending</field>
+            <field name="payment_method_id" ref="payment_method_stc"/>
+            <field name="tax_amount">30.00</field>
+            <field name="internal_notes">Waiting for payment confirmation</field>
+        </record>
+
+        <!-- Order 5: Mohammed Al-Fahd - Confirmed -->
+        <record id="order_mohammed_001" model="jabin.order">
+            <field name="name">JAB-ORD-20260708-0005</field>
+            <field name="customer_id" ref="customer_mohammed"/>
+            <field name="date">2026-07-08 11:00:00</field>
+            <field name="state">confirmed</field>
+            <field name="payment_status">paid</field>
+            <field name="payment_method_id" ref="payment_method_tamara"/>
+            <field name="tax_amount">275.00</field>
+            <field name="internal_notes">Bulk order for corporate gifting</field>
+        </record>
+
+        <!-- Order 6: Mohammed Al-Fahd - Out for Delivery -->
+        <record id="order_mohammed_002" model="jabin.order">
+            <field name="name">JAB-ORD-20260712-0006</field>
+            <field name="customer_id" ref="customer_mohammed"/>
+            <field name="date">2026-07-12 13:30:00</field>
+            <field name="state">out_delivery</field>
+            <field name="payment_status">paid</field>
+            <field name="payment_method_id" ref="payment_method_tabby"/>
+            <field name="tax_amount">180.00</field>
+            <field name="internal_notes">Delivery to business address</field>
+        </record>
+
+        <!-- Order 7: Omar Al-Saud - Cancelled -->
+        <record id="order_omar_001" model="jabin.order">
+            <field name="name">JAB-ORD-20260703-0007</field>
+            <field name="customer_id" ref="customer_omar"/>
+            <field name="date">2026-07-03 08:00:00</field>
+            <field name="state">cancelled</field>
+            <field name="payment_status">cancelled</field>
+            <field name="payment_method_id" ref="payment_method_apple_pay"/>
+            <field name="tax_amount">67.50</field>
+            <field name="internal_notes">Customer cancelled due to delivery delay</field>
+        </record>
+
+        <!-- Order 8: Ahmed Al-Hassan - Ready for Pickup -->
+        <record id="order_ahmed_001" model="jabin.order">
+            <field name="name">JAB-ORD-20260714-0008</field>
+            <field name="customer_id" ref="customer_ahmed"/>
+            <field name="date">2026-07-14 10:00:00</field>
+            <field name="state">ready_pickup</field>
+            <field name="payment_status">paid</field>
+            <field name="payment_method_id" ref="payment_method_cod"/>
+            <field name="tax_amount">12.50</field>
+            <field name="internal_notes">Customer will pick up from store</field>
+        </record>
+
+        <!-- Order 9: Fatima Al-Nasser - Delivered -->
+        <record id="order_fatima_001" model="jabin.order">
+            <field name="name">JAB-ORD-20260709-0009</field>
+            <field name="customer_id" ref="customer_fatima"/>
+            <field name="date">2026-07-09 15:00:00</field>
+            <field name="state">delivered</field>
+            <field name="payment_status">paid</field>
+            <field name="payment_method_id" ref="payment_method_visa"/>
+            <field name="tax_amount">95.00</field>
+            <field name="internal_notes">Corporate order for office supplies</field>
+        </record>
+
+        <!-- ==================== ORDER LINES ==================== -->
+        <!-- Order 1 Lines -->
+        <record id="order_john_001_line_1" model="jabin.order.line">
+            <field name="order_id" ref="order_john_001"/>
+            <field name="name">Premium Laptop</field>
+            <field name="price_unit">1299.99</field>
+            <field name="quantity">1</field>
+            <field name="discount">10.0</field>
+        </record>
+
+        <record id="order_john_001_line_2" model="jabin.order.line">
+            <field name="order_id" ref="order_john_001"/>
+            <field name="name">Wireless Headphones</field>
+            <field name="price_unit">199.99</field>
+            <field name="quantity">2</field>
+            <field name="discount">5.0</field>
+        </record>
+
+        <!-- Order 2 Lines -->
+        <record id="order_john_002_line_1" model="jabin.order.line">
+            <field name="order_id" ref="order_john_002"/>
+            <field name="name">Smartphone Pro</field>
+            <field name="price_unit">899.99</field>
+            <field name="quantity">1</field>
+            <field name="discount">0.0</field>
+        </record>
+
+        <!-- Order 3 Lines -->
+        <record id="order_sarah_001_line_1" model="jabin.order.line">
+            <field name="order_id" ref="order_sarah_001"/>
+            <field name="name">Premium Cotton Shirt</field>
+            <field name="price_unit">39.99</field>
+            <field name="quantity">3</field>
+            <field name="discount">20.0</field>
+        </record>
+
+        <record id="order_sarah_001_line_2" model="jabin.order.line">
+            <field name="order_id" ref="order_sarah_001"/>
+            <field name="name">Premium Notebook</field>
+            <field name="price_unit">14.99</field>
+            <field name="quantity">5</field>
+            <field name="discount">0.0</field>
+        </record>
+
+        <!-- Order 4 Lines -->
+        <record id="order_sarah_002_line_1" model="jabin.order.line">
+            <field name="order_id" ref="order_sarah_002"/>
+            <field name="name">Specialty Coffee</field>
+            <field name="price_unit">24.99</field>
+            <field name="quantity">4</field>
+            <field name="discount">10.0</field>
+        </record>
+
+        <record id="order_sarah_002_line_2" model="jabin.order.line">
+            <field name="order_id" ref="order_sarah_002"/>
+            <field name="name">Gourmet Pizza</field>
+            <field name="price_unit">18.99</field>
+            <field name="quantity">2</field>
+            <field name="discount">15.0</field>
+        </record>
+
+        <!-- Order 5 Lines -->
+        <record id="order_mohammed_001_line_1" model="jabin.order.line">
+            <field name="order_id" ref="order_mohammed_001"/>
+            <field name="name">Modern Dining Table</field>
+            <field name="price_unit">499.99</field>
+            <field name="quantity">3</field>
+            <field name="discount">5.0</field>
+        </record>
+
+        <record id="order_mohammed_001_line_2" model="jabin.order.line">
+            <field name="order_id" ref="order_mohammed_001"/>
+            <field name="name">Luxury Sofa</field>
+            <field name="price_unit">1299.99</field>
+            <field name="quantity">1</field>
+            <field name="discount">15.0</field>
+        </record>
+
+        <!-- Order 6 Lines -->
+        <record id="order_mohammed_002_line_1" model="jabin.order.line">
+            <field name="order_id" ref="order_mohammed_002"/>
+            <field name="name">Premium Laptop</field>
+            <field name="price_unit">1299.99</field>
+            <field name="quantity">2</field>
+            <field name="discount">10.0</field>
+        </record>
+
+        <!-- Order 7 Lines -->
+        <record id="order_omar_001_line_1" model="jabin.order.line">
+            <field name="order_id" ref="order_omar_001"/>
+            <field name="name">Smartphone Pro</field>
+            <field name="price_unit">899.99</field>
+            <field name="quantity">1</field>
+            <field name="discount">0.0</field>
+        </record>
+
+        <!-- Order 8 Lines -->
+        <record id="order_ahmed_001_line_1" model="jabin.order.line">
+            <field name="order_id" ref="order_ahmed_001"/>
+            <field name="name">Gaming Mouse Pro</field>
+            <field name="price_unit">69.99</field>
+            <field name="quantity">1</field>
+            <field name="discount">15.0</field>
+        </record>
+
+        <record id="order_ahmed_001_line_2" model="jabin.order.line">
+            <field name="order_id" ref="order_ahmed_001"/>
+            <field name="name">Mystery Novel</field>
+            <field name="price_unit">19.99</field>
+            <field name="quantity">2</field>
+            <field name="discount">0.0</field>
+        </record>
+
+        <!-- Order 9 Lines -->
+        <record id="order_fatima_001_line_1" model="jabin.order.line">
+            <field name="order_id" ref="order_fatima_001"/>
+            <field name="name">Ergonomic Office Chair</field>
+            <field name="price_unit">299.99</field>
+            <field name="quantity">3</field>
+            <field name="discount">10.0</field>
+        </record>
+
+        <record id="order_fatima_001_line_2" model="jabin.order.line">
+            <field name="order_id" ref="order_fatima_001"/>
+            <field name="name">Premium Notebook</field>
+            <field name="price_unit">14.99</field>
+            <field name="quantity">10</field>
+            <field name="discount">0.0</field>
+        </record>
+
+        <!-- ==================== ORDER TIMELINES ==================== -->
+        <record id="timeline_john_001_1" model="jabin.order.timeline">
+            <field name="order_id" ref="order_john_001"/>
+            <field name="status_from">draft</field>
+            <field name="status_to">confirmed</field>
+            <field name="description">Order confirmed by customer</field>
+            <field name="timestamp">2026-07-01 10:35:00</field>
+            <field name="triggered_by_id" ref="customer_john"/>
+        </record>
+
+        <record id="timeline_john_001_2" model="jabin.order.timeline">
+            <field name="order_id" ref="order_john_001"/>
+            <field name="status_from">confirmed</field>
+            <field name="status_to">preparing</field>
+            <field name="description">Order preparation started</field>
+            <field name="timestamp">2026-07-01 11:00:00</field>
+            <field name="triggered_by_id" ref="base.user_root"/>
+        </record>
+
+        <record id="timeline_john_001_3" model="jabin.order.timeline">
+            <field name="order_id" ref="order_john_001"/>
+            <field name="status_from">preparing</field>
+            <field name="status_to">ready_pickup</field>
+            <field name="description">Order ready for pickup/delivery</field>
+            <field name="timestamp">2026-07-01 14:30:00</field>
+            <field name="triggered_by_id" ref="base.user_root"/>
+        </record>
+
+        <record id="timeline_john_001_4" model="jabin.order.timeline">
+            <field name="order_id" ref="order_john_001"/>
+            <field name="status_from">ready_pickup</field>
+            <field name="status_to">out_delivery</field>
+            <field name="description">Order out for delivery</field>
+            <field name="timestamp">2026-07-02 09:00:00</field>
+            <field name="triggered_by_id" ref="base.user_root"/>
+        </record>
+
+        <record id="timeline_john_001_5" model="jabin.order.timeline">
+            <field name="order_id" ref="order_john_001"/>
+            <field name="status_from">out_delivery</field>
+            <field name="status_to">delivered</field>
+            <field name="description">Order delivered successfully</field>
+            <field name="timestamp">2026-07-02 11:30:00</field>
+            <field name="triggered_by_id" ref="base.user_root"/>
+        </record>
+
+        <record id="timeline_john_002_1" model="jabin.order.timeline">
+            <field name="order_id" ref="order_john_002"/>
+            <field name="status_from">draft</field>
+            <field name="status_to">confirmed</field>
+            <field name="description">Order confirmed</field>
+            <field name="timestamp">2026-07-10 14:25:00</field>
+            <field name="triggered_by_id" ref="customer_john"/>
+        </record>
+
+        <record id="timeline_john_002_2" model="jabin.order.timeline">
+            <field name="order_id" ref="order_john_002"/>
+            <field name="status_from">confirmed</field>
+            <field name="status_to">preparing</field>
+            <field name="description">Order preparation started</field>
+            <field name="timestamp">2026-07-11 08:00:00</field>
+            <field name="triggered_by_id" ref="base.user_root"/>
+        </record>
+
+        <record id="timeline_mohammed_001_1" model="jabin.order.timeline">
+            <field name="order_id" ref="order_mohammed_001"/>
+            <field name="status_from">draft</field>
+            <field name="status_to">pending_payment</field>
+            <field name="description">Awaiting payment verification</field>
+            <field name="timestamp">2026-07-08 11:05:00</field>
+            <field name="triggered_by_id" ref="customer_mohammed"/>
+        </record>
+
+        <record id="timeline_mohammed_001_2" model="jabin.order.timeline">
+            <field name="order_id" ref="order_mohammed_001"/>
+            <field name="status_from">pending_payment</field>
+            <field name="status_to">confirmed</field>
+            <field name="description">Payment confirmed via Tamara</field>
+            <field name="timestamp">2026-07-08 11:30:00</field>
+            <field name="triggered_by_id" ref="base.user_root"/>
+        </record>
+
+        <record id="timeline_mohammed_002_1" model="jabin.order.timeline">
+            <field name="order_id" ref="order_mohammed_002"/>
+            <field name="status_from">draft</field>
+            <field name="status_to">confirmed</field>
+            <field name="description">Order confirmed via Tabby</field>
+            <field name="timestamp">2026-07-12 13:35:00</field>
+            <field name="triggered_by_id" ref="customer_mohammed"/>
+        </record>
+
+        <record id="timeline_mohammed_002_2" model="jabin.order.timeline">
+            <field name="order_id" ref="order_mohammed_002"/>
+            <field name="status_from">confirmed</field>
+            <field name="status_to">preparing</field>
+            <field name="description">Preparation started</field>
+            <field name="timestamp">2026-07-13 09:00:00</field>
+            <field name="triggered_by_id" ref="base.user_root"/>
+        </record>
+
+        <record id="timeline_mohammed_002_3" model="jabin.order.timeline">
+            <field name="order_id" ref="order_mohammed_002"/>
+            <field name="status_from">preparing</field>
+            <field name="status_to">ready_pickup</field>
+            <field name="description">Ready for delivery</field>
+            <field name="timestamp">2026-07-13 12:00:00</field>
+            <field name="triggered_by_id" ref="base.user_root"/>
+        </record>
+
+        <record id="timeline_mohammed_002_4" model="jabin.order.timeline">
+            <field name="order_id" ref="order_mohammed_002"/>
+            <field name="status_from">ready_pickup</field>
+            <field name="status_to">out_delivery</field>
+            <field name="description">Out for delivery</field>
+            <field name="timestamp">2026-07-14 08:30:00</field>
+            <field name="triggered_by_id" ref="base.user_root"/>
+        </record>
+
+        <record id="timeline_omar_001_1" model="jabin.order.timeline">
+            <field name="order_id" ref="order_omar_001"/>
+            <field name="status_from">draft</field>
+            <field name="status_to">confirmed</field>
+            <field name="description">Order confirmed</field>
+            <field name="timestamp">2026-07-03 08:05:00</field>
+            <field name="triggered_by_id" ref="customer_omar"/>
+        </record>
+
+        <record id="timeline_omar_001_2" model="jabin.order.timeline">
+            <field name="order_id" ref="order_omar_001"/>
+            <field name="status_from">confirmed</field>
+            <field name="status_to">preparing</field>
+            <field name="description">Preparation started</field>
+            <field name="timestamp">2026-07-03 09:00:00</field>
+            <field name="triggered_by_id" ref="base.user_root"/>
+        </record>
+
+        <record id="timeline_omar_001_3" model="jabin.order.timeline">
+            <field name="order_id" ref="order_omar_001"/>
+            <field name="status_from">preparing</field>
+            <field name="status_to">cancelled</field>
+            <field name="description">Order cancelled due to delivery delay</field>
+            <field name="timestamp">2026-07-03 10:30:00</field>
+            <field name="triggered_by_id" ref="customer_omar"/>
+        </record>
+
+        <record id="timeline_ahmed_001_1" model="jabin.order.timeline">
+            <field name="order_id" ref="order_ahmed_001"/>
+            <field name="status_from">draft</field>
+            <field name="status_to">confirmed</field>
+            <field name="description">Order confirmed</field>
+            <field name="timestamp">2026-07-14 10:05:00</field>
+            <field name="triggered_by_id" ref="customer_ahmed"/>
+        </record>
+
+        <record id="timeline_ahmed_001_2" model="jabin.order.timeline">
+            <field name="order_id" ref="order_ahmed_001"/>
+            <field name="status_from">confirmed</field>
+            <field name="status_to">preparing</field>
+            <field name="description">Preparation started</field>
+            <field name="timestamp">2026-07-14 10:30:00</field>
+            <field name="triggered_by_id" ref="base.user_root"/>
+        </record>
+
+        <record id="timeline_ahmed_001_3" model="jabin.order.timeline">
+            <field name="order_id" ref="order_ahmed_001"/>
+            <field name="status_from">preparing</field>
+            <field name="status_to">ready_pickup</field>
+            <field name="description">Ready for pickup</field>
+            <field name="timestamp">2026-07-14 13:00:00</field>
+            <field name="triggered_by_id" ref="base.user_root"/>
+        </record>
+
+        <record id="timeline_fatima_001_1" model="jabin.order.timeline">
+            <field name="order_id" ref="order_fatima_001"/>
+            <field name="status_from">draft</field>
+            <field name="status_to">confirmed</field>
+            <field name="description">Order confirmed</field>
+            <field name="timestamp">2026-07-09 15:05:00</field>
+            <field name="triggered_by_id" ref="customer_fatima"/>
+        </record>
+
+        <record id="timeline_fatima_001_2" model="jabin.order.timeline">
+            <field name="order_id" ref="order_fatima_001"/>
+            <field name="status_from">confirmed</field>
+            <field name="status_to">preparing</field>
+            <field name="description">Preparation started</field>
+            <field name="timestamp">2026-07-10 08:00:00</field>
+            <field name="triggered_by_id" ref="base.user_root"/>
+        </record>
+
+        <record id="timeline_fatima_001_3" model="jabin.order.timeline">
+            <field name="order_id" ref="order_fatima_001"/>
+            <field name="status_from">preparing</field>
+            <field name="status_to">ready_pickup</field>
+            <field name="description">Ready for delivery</field>
+            <field name="timestamp">2026-07-10 12:00:00</field>
+            <field name="triggered_by_id" ref="base.user_root"/>
+        </record>
+
+        <record id="timeline_fatima_001_4" model="jabin.order.timeline">
+            <field name="order_id" ref="order_fatima_001"/>
+            <field name="status_from">ready_pickup</field>
+            <field name="status_to">out_delivery</field>
+            <field name="description">Out for delivery</field>
+            <field name="timestamp">2026-07-11 09:00:00</field>
+            <field name="triggered_by_id" ref="base.user_root"/>
+        </record>
+
+        <record id="timeline_fatima_001_5" model="jabin.order.timeline">
+            <field name="order_id" ref="order_fatima_001"/>
+            <field name="status_from">out_delivery</field>
+            <field name="status_to">delivered</field>
+            <field name="description">Delivered to office</field>
+            <field name="timestamp">2026-07-11 10:30:00</field>
+            <field name="triggered_by_id" ref="base.user_root"/>
+        </record>
+
+        <!-- ==================== PAYMENT TRANSACTIONS ==================== -->
+        <record id="payment_tx_john_001" model="jabin.payment.transaction">
+            <field name="order_id" ref="order_john_001"/>
+            <field name="customer_id" ref="customer_john"/>
+            <field name="payment_method_id" ref="payment_method_visa"/>
+            <field name="amount">1569.97</field>
+            <field name="status">paid</field>
+            <field name="transaction_ref">TX-VISA-20260701-001</field>
+            <field name="paid_date">2026-07-01 10:32:00</field>
+            <field name="refund_status">none</field>
+            <field name="is_installment">False</field>
+        </record>
+
+        <record id="payment_tx_john_002" model="jabin.payment.transaction">
+            <field name="order_id" ref="order_john_002"/>
+            <field name="customer_id" ref="customer_john"/>
+            <field name="payment_method_id" ref="payment_method_mada"/>
+            <field name="amount">899.99</field>
+            <field name="status">authorized</field>
+            <field name="transaction_ref">TX-MADA-20260710-002</field>
+            <field name="paid_date" eval="False"/>
+            <field name="refund_status">none</field>
+            <field name="is_installment">False</field>
+        </record>
+
+        <record id="payment_tx_sarah_001" model="jabin.payment.transaction">
+            <field name="order_id" ref="order_sarah_001"/>
+            <field name="customer_id" ref="customer_sarah"/>
+            <field name="payment_method_id" ref="payment_method_cod"/>
+            <field name="amount">119.97</field>
+            <field name="status">paid</field>
+            <field name="transaction_ref">TX-COD-20260705-003</field>
+            <field name="paid_date">2026-07-05 14:30:00</field>
+            <field name="refund_status">none</field>
+            <field name="is_installment">False</field>
+        </record>
+
+        <record id="payment_tx_sarah_002" model="jabin.payment.transaction">
+            <field name="order_id" ref="order_sarah_002"/>
+            <field name="customer_id" ref="customer_sarah"/>
+            <field name="payment_method_id" ref="payment_method_stc"/>
+            <field name="amount">137.95</field>
+            <field name="status">pending</field>
+            <field name="transaction_ref">TX-STC-20260715-004</field>
+            <field name="paid_date" eval="False"/>
+            <field name="refund_status">none</field>
+            <field name="is_installment">False</field>
+        </record>
+
+        <record id="payment_tx_mohammed_001" model="jabin.payment.transaction">
+            <field name="order_id" ref="order_mohammed_001"/>
+            <field name="customer_id" ref="customer_mohammed"/>
+            <field name="payment_method_id" ref="payment_method_tamara"/>
+            <field name="amount">2799.96</field>
+            <field name="status">paid</field>
+            <field name="transaction_ref">TX-TAMARA-20260708-005</field>
+            <field name="paid_date">2026-07-08 11:28:00</field>
+            <field name="refund_status">none</field>
+            <field name="is_installment">True</field>
+            <field name="installment_status">settled</field>
+            <field name="installment_provider">tamara</field>
+            <field name="num_installments">4</field>
+        </record>
+
+        <record id="payment_tx_mohammed_002" model="jabin.payment.transaction">
+            <field name="order_id" ref="order_mohammed_002"/>
+            <field name="customer_id" ref="customer_mohammed"/>
+            <field name="payment_method_id" ref="payment_method_tabby"/>
+            <field name="amount">2599.98</field>
+            <field name="status">paid</field>
+            <field name="transaction_ref">TX-TABBY-20260712-006</field>
+            <field name="paid_date">2026-07-12 13:33:00</field>
+            <field name="refund_status">none</field>
+            <field name="is_installment">True</field>
+            <field name="installment_status">approved</field>
+            <field name="installment_provider">tabby</field>
+            <field name="num_installments">3</field>
+        </record>
+
+        <record id="payment_tx_omar_001" model="jabin.payment.transaction">
+            <field name="order_id" ref="order_omar_001"/>
+            <field name="customer_id" ref="customer_omar"/>
+            <field name="payment_method_id" ref="payment_method_apple_pay"/>
+            <field name="amount">899.99</field>
+            <field name="status">cancelled</field>
+            <field name="transaction_ref">TX-APPLE-20260703-007</field>
+            <field name="paid_date" eval="False"/>
+            <field name="failure_reason">Payment cancelled by customer</field>
+            <field name="refund_status">none</field>
+            <field name="is_installment">False</field>
+        </record>
+
+        <record id="payment_tx_ahmed_001" model="jabin.payment.transaction">
+            <field name="order_id" ref="order_ahmed_001"/>
+            <field name="customer_id" ref="customer_ahmed"/>
+            <field name="payment_method_id" ref="payment_method_cod"/>
+            <field name="amount">109.97</field>
+            <field name="status">paid</field>
+            <field name="transaction_ref">TX-COD-20260714-008</field>
+            <field name="paid_date">2026-07-14 13:30:00</field>
+            <field name="refund_status">none</field>
+            <field name="is_installment">False</field>
+        </record>
+
+        <record id="payment_tx_fatima_001" model="jabin.payment.transaction">
+            <field name="order_id" ref="order_fatima_001"/>
+            <field name="customer_id" ref="customer_fatima"/>
+            <field name="payment_method_id" ref="payment_method_visa"/>
+            <field name="amount">1049.87</field>
+            <field name="status">paid</field>
+            <field name="transaction_ref">TX-VISA-20260709-009</field>
+            <field name="paid_date">2026-07-09 15:10:00</field>
+            <field name="refund_status">none</field>
+            <field name="is_installment">False</field>
+        </record>
+
+        <!-- ==================== CUSTOMER ACTIVITIES ==================== -->
+        <record id="activity_john_registered" model="jabin.customer.activity">
+            <field name="user_id" ref="customer_john"/>
+            <field name="action">registered</field>
+            <field name="related_record" eval="'res.users,%s' % customer_john"/>
+            <field name="timestamp">2026-01-15 10:30:00</field>
+            <field name="triggered_by_id" ref="customer_john"/>
+        </record>
+
+        <record id="activity_john_created_order" model="jabin.customer.activity">
+            <field name="user_id" ref="customer_john"/>
+            <field name="action">created_order</field>
+            <field name="related_record" eval="'jabin.order,%s' % order_john_001"/>
+            <field name="timestamp">2026-07-01 10:30:00</field>
+            <field name="triggered_by_id" ref="customer_john"/>
+        </record>
+
+        <record id="activity_john_paid_order" model="jabin.customer.activity">
+            <field name="user_id" ref="customer_john"/>
+            <field name="action">paid_order</field>
+            <field name="related_record" eval="'jabin.order,%s' % order_john_001"/>
+            <field name="timestamp">2026-07-01 10:32:00</field>
+            <field name="triggered_by_id" ref="customer_john"/>
+        </record>
+
+        <record id="activity_john_created_order2" model="jabin.customer.activity">
+            <field name="user_id" ref="customer_john"/>
+            <field name="action">created_order</field>
+            <field name="related_record" eval="'jabin.order,%s' % order_john_002"/>
+            <field name="timestamp">2026-07-10 14:20:00</field>
+            <field name="triggered_by_id" ref="customer_john"/>
+        </record>
+
+        <record id="activity_sarah_registered" model="jabin.customer.activity">
+            <field name="user_id" ref="customer_sarah"/>
+            <field name="action">registered</field>
+            <field name="related_record" eval="'res.users,%s' % customer_sarah"/>
+            <field name="timestamp">2026-02-20 09:15:00</field>
+            <field name="triggered_by_id" ref="customer_sarah"/>
+        </record>
+
+        <record id="activity_sarah_created_order" model="jabin.customer.activity">
+            <field name="user_id" ref="customer_sarah"/>
+            <field name="action">created_order</field>
+            <field name="related_record" eval="'jabin.order,%s' % order_sarah_001"/>
+            <field name="timestamp">2026-07-05 09:15:00</field>
+            <field name="triggered_by_id" ref="customer_sarah"/>
+        </record>
+
+        <record id="activity_sarah_created_order2" model="jabin.customer.activity">
+            <field name="user_id" ref="customer_sarah"/>
+            <field name="action">created_order</field>
+            <field name="related_record" eval="'jabin.order,%s' % order_sarah_002"/>
+            <field name="timestamp">2026-07-15 16:45:00</field>
+            <field name="triggered_by_id" ref="customer_sarah"/>
+        </record>
+
+        <record id="activity_mohammed_registered" model="jabin.customer.activity">
+            <field name="user_id" ref="customer_mohammed"/>
+            <field name="action">registered</field>
+            <field name="related_record" eval="'res.users,%s' % customer_mohammed"/>
+            <field name="timestamp">2026-03-01 11:00:00</field>
+            <field name="triggered_by_id" ref="customer_mohammed"/>
+        </record>
+
+        <record id="activity_mohammed_created_order" model="jabin.customer.activity">
+            <field name="user_id" ref="customer_mohammed"/>
+            <field name="action">created_order</field>
+            <field name="related_record" eval="'jabin.order,%s' % order_mohammed_001"/>
+            <field name="timestamp">2026-07-08 11:00:00</field>
+            <field name="triggered_by_id" ref="customer_mohammed"/>
+        </record>
+
+        <record id="activity_mohammed_created_order2" model="jabin.customer.activity">
+            <field name="user_id" ref="customer_mohammed"/>
+            <field name="action">created_order</field>
+            <field name="related_record" eval="'jabin.order,%s' % order_mohammed_002"/>
+            <field name="timestamp">2026-07-12 13:30:00</field>
+            <field name="triggered_by_id" ref="customer_mohammed"/>
+        </record>
+
+        <record id="activity_omar_registered" model="jabin.customer.activity">
+            <field name="user_id" ref="customer_omar"/>
+            <field name="action">registered</field>
+            <field name="related_record" eval="'res.users,%s' % customer_omar"/>
+            <field name="timestamp">2026-01-05 08:00:00</field>
+            <field name="triggered_by_id" ref="customer_omar"/>
+        </record>
+
+        <record id="activity_omar_created_order" model="jabin.customer.activity">
+            <field name="user_id" ref="customer_omar"/>
+            <field name="action">created_order</field>
+            <field name="related_record" eval="'jabin.order,%s' % order_omar_001"/>
+            <field name="timestamp">2026-07-03 08:00:00</field>
+            <field name="triggered_by_id" ref="customer_omar"/>
+        </record>
+
+        <record id="activity_omar_cancelled_order" model="jabin.customer.activity">
+            <field name="user_id" ref="customer_omar"/>
+            <field name="action">cancelled_order</field>
+            <field name="related_record" eval="'jabin.order,%s' % order_omar_001"/>
+            <field name="timestamp">2026-07-03 10:30:00</field>
+            <field name="triggered_by_id" ref="customer_omar"/>
+        </record>
+
+        <record id="activity_ahmed_registered" model="jabin.customer.activity">
+            <field name="user_id" ref="customer_ahmed"/>
+            <field name="action">registered</field>
+            <field name="related_record" eval="'res.users,%s' % customer_ahmed"/>
+            <field name="timestamp">2026-04-10 13:00:00</field>
+            <field name="triggered_by_id" ref="customer_ahmed"/>
+        </record>
+
+        <record id="activity_ahmed_created_order" model="jabin.customer.activity">
+            <field name="user_id" ref="customer_ahmed"/>
+            <field name="action">created_order</field>
+            <field name="related_record" eval="'jabin.order,%s' % order_ahmed_001"/>
+            <field name="timestamp">2026-07-14 10:00:00</field>
+            <field name="triggered_by_id" ref="customer_ahmed"/>
+        </record>
+
+        <record id="activity_fatima_registered" model="jabin.customer.activity">
+            <field name="user_id" ref="customer_fatima"/>
+            <field name="action">registered</field>
+            <field name="related_record" eval="'res.users,%s' % customer_fatima"/>
+            <field name="timestamp">2026-05-20 08:30:00</field>
+            <field name="triggered_by_id" ref="customer_fatima"/>
+        </record>
+
+        <record id="activity_fatima_created_order" model="jabin.customer.activity">
+            <field name="user_id" ref="customer_fatima"/>
+            <field name="action">created_order</field>
+            <field name="related_record" eval="'jabin.order,%s' % order_fatima_001"/>
+            <field name="timestamp">2026-07-09 15:00:00</field>
+            <field name="triggered_by_id" ref="customer_fatima"/>
+        </record>
+
+    </data>
+</odoo>

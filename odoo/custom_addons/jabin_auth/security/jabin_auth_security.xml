@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- ============================================================ -->
+        <!-- Access Rights for JABIN Auth Models                            -->
+        <!-- ============================================================ -->
+
+        <!-- jabin.otp access - using base.group_user -->
+        <record id="access_jabin_otp_user" model="ir.model.access">
+            <field name="name">jabin.otp user</field>
+            <field name="model_id" ref="model_jabin_otp"/>
+            <field name="group_id" ref="base.group_user"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <!-- jabin.otp manager access -->
+        <record id="access_jabin_otp_manager" model="ir.model.access">
+            <field name="name">jabin.otp manager</field>
+            <field name="model_id" ref="model_jabin_otp"/>
+            <field name="group_id" ref="base.group_system"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+        </record>
+
+        <!-- ============================================================ -->
+        <!-- Record Rules for JABIN Auth Models                            -->
+        <!-- ============================================================ -->
+
+        <!-- OTP record rule - users can only see their own OTPs -->
+        <record id="rule_jabin_otp_user" model="ir.rule">
+            <field name="name">jabin.otp: user own records</field>
+            <field name="model_id" ref="model_jabin_otp"/>
+            <field name="domain_force">[('user_id','=',user.id)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <!-- OTP manager rule - can see all OTPs -->
+        <record id="rule_jabin_otp_manager" model="ir.rule">
+            <field name="name">jabin.otp: manager all records</field>
+            <field name="model_id" ref="model_jabin_otp"/>
+            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_system'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+        </record>
+
+    </data>
+</odoo>

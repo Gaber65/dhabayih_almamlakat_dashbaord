@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Category Tree View -->
+    <record id="view_jabin_category_tree" model="ir.ui.view">
+        <field name="name">jabin.category.tree</field>
+        <field name="model">jabin.category</field>
+        <field name="arch" type="xml">
+            <tree string="Categories" decoration-info="active==False">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="description"/>
+                <field name="product_count" sum="Total Products"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Category Form View -->
+    <record id="view_jabin_category_form" model="ir.ui.view">
+        <field name="name">jabin.category.form</field>
+        <field name="model">jabin.category</field>
+        <field name="arch" type="xml">
+            <form string="Category">
+                <header>
+                    <button name="toggle_active" string="Toggle Active" type="object" class="oe_highlight"/>
+                </header>
+                <sheet>
+
+                    <div class="oe_title">
+                        <label for="name" string="Category Name"/>
+                        <h1>
+                            <field name="name" placeholder="Category Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                            <field name="description" colspan="2"/>
+                        </group>
+                        <group>
+                            <field name="image" widget="image" class="oe_avatar"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Products">
+                            <field name="product_ids" context="{'default_category_id': active_id}">
+                                <tree string="Products" editable="bottom">
+                                    <field name="name"/>
+                                    <field name="sku"/>
+                                    <field name="selling_price"/>
+                                    <field name="stock_quantity"/>
+                                    <field name="is_on_offer"/>
+                                    <field name="active"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Category Search View -->
+    <record id="view_jabin_category_search" model="ir.ui.view">
+        <field name="name">jabin.category.search</field>
+        <field name="model">jabin.category</field>
+        <field name="arch" type="xml">
+            <search string="Search Categories">
+                <field name="name" string="Category Name"/>
+                <field name="description"/>
+                <filter name="active" string="Active" domain="[('active','=',True)]"/>
+                <filter name="inactive" string="Inactive" domain="[('active','=',False)]"/>
+                <separator/>
+                <filter name="has_products" string="Has Products" domain="[('product_count','>',0)]"/>
+                <filter name="no_products" string="No Products" domain="[('product_count','=',0)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_active" string="Active" domain="[]" context="{'group_by':'active'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Category Action -->
+    <record id="action_jabin_category" model="ir.actions.act_window">
+        <field name="name">Categories</field>
+        <field name="res_model">jabin.category</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create and manage product categories
+            </p>
+            <p>
+                Categories help organize your products for easier management and browsing.
+            </p>
+        </field>
+    </record>
+</odoo>

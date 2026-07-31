@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Cutting Option Tree View -->
+    <record id="view_jabin_cutting_option_tree" model="ir.ui.view">
+        <field name="name">jabin.cutting.option.tree</field>
+        <field name="model">jabin.cutting.option</field>
+        <field name="arch" type="xml">
+            <tree string="Cutting Options" decoration-info="active==False">
+                <field name="name"/>
+                <field name="description"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Cutting Option Form View -->
+    <record id="view_jabin_cutting_option_form" model="ir.ui.view">
+        <field name="name">jabin.cutting.option.form</field>
+        <field name="model">jabin.cutting.option</field>
+        <field name="arch" type="xml">
+            <form string="Cutting Option">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Cutting Option Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="description" colspan="2"/>
+                        </group>
+                        <group>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Cutting Option Action -->
+    <record id="action_jabin_cutting_option" model="ir.actions.act_window">
+        <field name="name">Cutting Options</field>
+        <field name="res_model">jabin.cutting.option</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

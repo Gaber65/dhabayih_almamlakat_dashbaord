@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+
+access_res_users_manager,res.users manager,base.model_res_users,,1,1,1,1
+access_res_users_read,res.users read,base.model_res_users,,1,0,0,0
+res_users_address_manager_access,res.users.address manager,model_res_users_address,,1,1,1,1
+res_users_address_read_access,res.users.address read,model_res_users_address,,1,0,0,0

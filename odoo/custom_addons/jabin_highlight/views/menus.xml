@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- JABIN Dashboard – Top-level menu category                     -->
+    <!-- ============================================================ -->
+    <!--
+        Creates a "JABIN Dashboard" top-level menu entry in the Odoo
+        navigation bar. If your project already has a shared Dashboard
+        menu (e.g., from jabin_dashboard), replace this record with
+        a reference to that menu's XML ID in the 'parent_id' of the
+        Highlights menu below.
+    -->
+    <menuitem
+            id="menu_jabin_dashboard_root"
+            name="Dashboard"
+            sequence="10"
+            web_icon="jabin_highlight,static/description/icon.png"
+            groups="base.group_user"/>
+
+    <!-- ============================================================ -->
+    <!-- Highlights – Sub-menu under Dashboard                         -->
+    <!-- ============================================================ -->
+    <menuitem
+            id="menu_jabin_highlight"
+            name="Highlights"
+            parent="menu_jabin_dashboard_root"
+            action="action_jabin_highlight"
+            sequence="10"
+    />
+
+</odoo>

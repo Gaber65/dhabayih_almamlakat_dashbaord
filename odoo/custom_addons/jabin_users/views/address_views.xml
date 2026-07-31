@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Tree View for Addresses -->
+    <record id="view_jabin_addresses_tree" model="ir.ui.view">
+        <field name="name">jabin.addresses.tree</field>
+        <field name="model">res.users.address</field>
+        <field name="arch" type="xml">
+            <tree string="User Addresses">
+                <field name="user_id" string="User"/>
+                <field name="title"/>
+                <field name="recipient_name"/>
+                <field name="recipient_phone"/>
+                <field name="country_id"/>
+                <field name="city"/>
+                <field name="street"/>
+                <field name="is_default" widget="boolean"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View for Addresses -->
+    <record id="view_jabin_addresses_form" model="ir.ui.view">
+        <field name="name">jabin.addresses.form</field>
+        <field name="model">res.users.address</field>
+        <field name="arch" type="xml">
+            <form string="User Address">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="title"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="user_id" required="1"/>
+                            <field name="recipient_name" required="1"/>
+                            <field name="recipient_phone"/>
+                            <field name="is_default"/>
+                        </group>
+                        <group>
+                            <field name="country_id" required="1"/>
+                            <field name="city" required="1"/>
+                            <field name="street" required="1"/>
+                            <field name="latitude"/>
+                            <field name="longitude"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View for Addresses -->
+    <record id="view_jabin_addresses_search" model="ir.ui.view">
+        <field name="name">jabin.addresses.search</field>
+        <field name="model">res.users.address</field>
+        <field name="arch" type="xml">
+            <search string="Search Addresses">
+                <field name="title" string="Title"/>
+                <field name="recipient_name" string="Name"/>
+                <field name="city" string="City"/>
+                <field name="street" string="Street"/>
+                <filter name="default_addresses" string="Default Addresses" domain="[('is_default','=',True)]"/>
+            </search>
+        </field>
+    </record>
+
+</odoo>

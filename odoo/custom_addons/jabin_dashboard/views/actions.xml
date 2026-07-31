@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Dashboard Actions -->
+    <record id="action_jabin_dashboard" model="ir.actions.act_window">
+        <field name="name">Dashboards</field>
+        <field name="res_model">jabin.dashboard</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_jabin_dashboard_view" model="ir.actions.client">
+        <field name="name">Dashboard</field>
+        <field name="tag">jabin_dashboard.dashboard_view</field>
+        <field name="target">main</field>
+    </record>
+
+    <record id="action_jabin_dashboard_settings" model="ir.actions.act_window">
+        <field name="name">Dashboard Settings</field>
+        <field name="res_model">jabin.dashboard.setting</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="view_jabin_dashboard_settings"/>
+    </record>
+
+
+
+    <!-- Product/Category/Other Actions -->
+    <record id="action_jabin_product" model="ir.actions.act_window">
+        <field name="name">Products</field>
+        <field name="res_model">jabin.product</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_jabin_category" model="ir.actions.act_window">
+        <field name="name">Categories</field>
+        <field name="res_model">jabin.category</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_jabin_cutting_option" model="ir.actions.act_window">
+        <field name="name">Cutting Options</field>
+        <field name="res_model">jabin.cutting.option</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_jabin_packaging" model="ir.actions.act_window">
+        <field name="name">Packaging Options</field>
+        <field name="res_model">jabin.packaging</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_jabin_excluded_part" model="ir.actions.act_window">
+        <field name="name">Excluded Parts</field>
+        <field name="res_model">jabin.excluded.part</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_jabin_banner" model="ir.actions.act_window">
+        <field name="name">Banners</field>
+        <field name="res_model">banner</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

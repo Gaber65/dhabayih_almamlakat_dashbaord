@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_jabin_highlight_public,jabin.highlight public,model_jabin_highlight,,1,1,1,1
+access_jabin_highlight_service,jabin.highlight.service abstract,model_jabin_highlight_service,,1,0,0,0

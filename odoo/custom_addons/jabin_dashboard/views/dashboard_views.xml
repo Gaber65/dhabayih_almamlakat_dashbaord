@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Tree View for Dashboard -->
+        <record id="view_jabin_dashboard_tree" model="ir.ui.view">
+            <field name="name">jabin.dashboard.tree</field>
+            <field name="model">jabin.dashboard</field>
+            <field name="arch" type="xml">
+                <tree string="Dashboards">
+                    <field name="sequence" widget="handle"/>
+                    <field name="name"/>
+                    <field name="description"/>
+                    <field name="color" widget="color"/>
+                    <field name="icon"/>
+                    <field name="active"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Form View for Dashboard -->
+        <record id="view_jabin_dashboard_form" model="ir.ui.view">
+            <field name="name">jabin.dashboard.form</field>
+            <field name="model">jabin.dashboard</field>
+            <field name="arch" type="xml">
+                <form string="Dashboard">
+                    <sheet>
+                        <field name="name" placeholder="Dashboard Name" class="oe_title"/>
+                        <group>
+                            <group>
+                                <field name="sequence" widget="handle"/>
+                                <field name="color" widget="color"/>
+                                <field name="icon" placeholder="fa-icon-name"/>
+                            </group>
+                            <group>
+                                <field name="active"/>
+                                <field name="description" placeholder="Description"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Search View for Dashboard -->
+        <record id="view_jabin_dashboard_search" model="ir.ui.view">
+            <field name="name">jabin.dashboard.search</field>
+            <field name="model">jabin.dashboard</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <field name="description"/>
+                    <filter name="active" string="Active" domain="[('active', '=', True)]"/>
+                    <separator/>
+                    <filter name="inactive" string="Inactive" domain="[('active', '=', False)]"/>
+                    <group expand="0" string="Group By">
+                        <filter name="group_by_color" string="Color" context="{'group_by': 'color'}"/>
+                        <filter name="group_by_active" string="Active" context="{'group_by': 'active'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Settings View -->
+        <record id="view_jabin_dashboard_settings" model="ir.ui.view">
+            <field name="name">jabin.dashboard.settings</field>
+            <field name="model">jabin.dashboard.setting</field>
+            <field name="arch" type="xml">
+                <form string="Dashboard Settings">
+                    <sheet>
+                        <group string="Display Options">
+                            <group>
+                                <field name="dashboard_layout"/>
+                                <field name="refresh_interval"/>
+                            </group>
+                            <group>
+                                <field name="show_kpi"/>
+                                <field name="show_recent_orders"/>
+                                <field name="show_top_products"/>
+                                <field name="show_sales_chart"/>
+                                <field name="show_inventory_summary"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

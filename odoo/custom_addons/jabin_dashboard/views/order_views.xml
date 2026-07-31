@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!--  PAYMENT METHOD VIEWS                                        -->
+    <!-- ============================================================ -->
+
+    <record id="view_jabin_payment_method_tree" model="ir.ui.view">
+        <field name="name">jabin.payment.method.tree</field>
+        <field name="model">jabin.payment.method</field>
+        <field name="arch" type="xml">
+            <tree string="Payment Methods">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="provider"/>
+                <field name="payment_type"/>
+                <field name="is_installment"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_jabin_payment_method_form" model="ir.ui.view">
+        <field name="name">jabin.payment.method.form</field>
+        <field name="model">jabin.payment.method</field>
+        <field name="arch" type="xml">
+            <form string="Payment Method">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="General">
+                            <field name="code"/>
+                            <field name="payment_type"/>
+                            <field name="provider"/>
+                            <field name="active"/>
+                        </group>
+                        <group string="Installment Settings">
+                            <field name="is_installment"/>
+                            <field name="max_installments" invisible="not is_installment"/>
+                        </group>
+                    </group>
+                    <group string="Description">
+                        <field name="description" nolabel="1" colspan="2"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!--  ORDER VIEWS                                                  -->
+    <!-- ============================================================ -->
+
+    <record id="view_jabin_order_tree" model="ir.ui.view">
+        <field name="name">jabin.order.tree</field>
+        <field name="model">jabin.order</field>
+        <field name="arch" type="xml">
+            <tree string="Orders"
+                  decoration-success="state == 'delivered'"
+                  decoration-warning="state in ('preparing','ready_pickup','out_delivery')"
+                  decoration-muted="state in ('cancelled','refunded')"
+                  decoration-info="state in ('draft','pending_payment','confirmed')">
+                <field name="name"/>
+                <field name="customer_id"/>
+                <field name="date"/>
+                <field name="state"/>
+                <field name="payment_status"/>
+                <field name="payment_method_id"/>
+                <field name="coupon_id" optional="show"/>
+                <field name="points_redeemed" optional="show"/>
+                <field name="loyalty_points_earned" optional="show"/>
+                <field name="total" sum="Grand Total"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_jabin_order_form" model="ir.ui.view">
+        <field name="name">jabin.order.form</field>
+        <field name="model">jabin.order</field>
+        <field name="arch" type="xml">
+            <form string="Order">
+                <header>
+                    <!-- Business Action Buttons — status changes via service layer only -->
+                    <button name="action_confirm" string="Confirm Order" type="object"
+                            class="btn-primary"
+                            invisible="state not in ('draft', 'pending_payment')"/>
+                    <button name="action_start_preparing" string="Start Preparing" type="object"
+                            invisible="state != 'confirmed'"/>
+                    <button name="action_mark_ready" string="Mark Ready for Pickup" type="object"
+                            invisible="state != 'preparing'"/>
+                    <button name="action_out_for_delivery" string="Out for Delivery" type="object"
+                            invisible="state != 'ready_pickup'"/>
+                    <button name="action_mark_delivered" string="Mark as Delivered" type="object"
+                            class="btn-primary"
+                            invisible="state != 'out_delivery'"/>
+                    <button name="action_cancel" string="Cancel Order" type="object"
+                            class="btn-danger"
+                            invisible="state in ('delivered', 'cancelled', 'refunded')"/>
+                    <button name="action_refund" string="Request Refund" type="object"
+                            invisible="state != 'delivered'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,confirmed,preparing,ready_pickup,out_delivery,delivered"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Order Details">
+                            <field name="customer_id"/>
+                            <field name="date"/>
+                            <field name="payment_method_id"/>
+                            <field name="payment_status"/>
+                            <field name="coupon_id"/>
+                        </group>
+                        <group string="Loyalty Details">
+                            <field name="points_redeemed"/>
+                            <field name="loyalty_discount_amount" widget="monetary"/>
+                            <field name="loyalty_points_earned"/>
+                            <field name="loyalty_points_awarded"/>
+                        </group>
+                        <group string="Financial">
+                            <field name="subtotal" widget="monetary"/>
+                            <field name="discount_amount" widget="monetary"/>
+                            <field name="total_after_discount" widget="monetary"/>
+                            <field name="tax_amount" widget="monetary"/>
+                            <field name="total" widget="monetary"/>
+                        </group>
+                    </group>
+
+                    <group string="Internal Notes">
+                        <field name="internal_notes" nolabel="1" colspan="2"/>
+                    </group>
+                    <notebook>
+                        <page string="Order Lines">
+                            <field name="order_line_ids">
+                                <tree editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="name"/>
+                                    <field name="quantity"/>
+                                    <field name="price_unit"/>
+                                    <field name="discount"/>
+                                    <field name="price_subtotal" sum="Subtotal"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Status Timeline">
+                            <field name="timeline_ids" readonly="1">
+                                <tree string="Order Timeline">
+                                    <field name="timestamp"/>
+                                    <field name="status_from"/>
+                                    <field name="status_to"/>
+                                    <field name="triggered_by_id"/>
+                                    <field name="description"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Payment Transactions">
+                            <field name="payment_transaction_ids" readonly="1">
+                                <tree string="Payment Transactions">
+                                    <field name="payment_method_id"/>
+                                    <field name="amount"/>
+                                    <field name="status"/>
+                                    <field name="transaction_ref"/>
+                                    <field name="paid_date"/>
+                                    <field name="is_installment" widget="boolean"/>
+                                    <field name="installment_status" optional="hide"/>
+                                    <field name="installment_provider" optional="hide"/>
+                                    <field name="num_installments" optional="hide"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_jabin_order_search" model="ir.ui.view">
+        <field name="name">jabin.order.search</field>
+        <field name="model">jabin.order</field>
+        <field name="arch" type="xml">
+            <search string="Search Orders">
+                <field name="name" string="Order Reference"/>
+                <field name="customer_id"/>
+                <field name="payment_method_id"/>
+                <separator/>
+                <filter name="filter_active" string="Active Orders"
+                        domain="[('state', 'in', ('confirmed','preparing','ready_pickup','out_delivery'))]"/>
+                <filter name="filter_delivered" string="Delivered"
+                        domain="[('state', '=', 'delivered')]"/>
+                <filter name="filter_cancelled" string="Cancelled"
+                        domain="[('state', '=', 'cancelled')]"/>
+                <filter name="filter_refunded" string="Refunded"
+                        domain="[('state', '=', 'refunded')]"/>
+                <separator/>
+                <filter name="filter_unpaid" string="Unpaid"
+                        domain="[('payment_status', 'in', ('pending','failed'))]"/>
+                <filter name="filter_paid" string="Paid"
+                        domain="[('payment_status', '=', 'paid')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_payment" string="Payment Method" context="{'group_by': 'payment_method_id'}"/>
+                    <filter name="group_customer" string="Customer" context="{'group_by': 'customer_id'}"/>
+                    <filter name="group_month" string="Month" context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!--  PAYMENT TRANSACTION VIEWS                                    -->
+    <!-- ============================================================ -->
+
+    <record id="view_jabin_payment_transaction_tree" model="ir.ui.view">
+        <field name="name">jabin.payment.transaction.tree</field>
+        <field name="model">jabin.payment.transaction</field>
+        <field name="arch" type="xml">
+            <tree string="Payment Transactions"
+                  decoration-success="status == 'paid'"
+                  decoration-danger="status == 'failed'"
+                  decoration-muted="status == 'refunded'">
+                <field name="order_id"/>
+                <field name="customer_id"/>
+                <field name="payment_method_id"/>
+                <field name="amount" sum="Total"/>
+                <field name="status"/>
+                <field name="transaction_ref"/>
+                <field name="paid_date"/>
+                <field name="is_installment" widget="boolean"/>
+                <field name="installment_provider" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_jabin_payment_transaction_form" model="ir.ui.view">
+        <field name="name">jabin.payment.transaction.form</field>
+        <field name="model">jabin.payment.transaction</field>
+        <field name="arch" type="xml">
+            <form string="Payment Transaction">
+                <header>
+                    <button name="action_collect_cod" string="Collect Cash (COD)" type="object"
+                            class="btn-primary"
+                            invisible="status != 'pending' or is_installment"/>
+                    <field name="status" widget="statusbar" statusbar_visible="pending,authorized,paid"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group string="References">
+                            <field name="order_id"/>
+                            <field name="customer_id"/>
+                            <field name="payment_method_id"/>
+                            <field name="transaction_ref"/>
+                        </group>
+                        <group string="Financials">
+                            <field name="amount" widget="monetary"/>
+                            <field name="paid_date"/>
+                            <field name="failure_reason" invisible="status != 'failed'"/>
+                            <field name="refund_status" invisible="status != 'refunded'"/>
+                        </group>
+                    </group>
+                    <group string="Installment Details" invisible="not is_installment">
+                        <group>
+                            <field name="is_installment"/>
+                            <field name="installment_provider"/>
+                            <field name="installment_status"/>
+                        </group>
+                        <group>
+                            <field name="installment_approval_status"/>
+                            <field name="num_installments"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_jabin_payment_transaction_search" model="ir.ui.view">
+        <field name="name">jabin.payment.transaction.search</field>
+        <field name="model">jabin.payment.transaction</field>
+        <field name="arch" type="xml">
+            <search string="Search Transactions">
+                <field name="transaction_ref"/>
+                <field name="customer_id"/>
+                <field name="order_id"/>
+                <separator/>
+                <filter name="filter_paid" string="Paid" domain="[('status', '=', 'paid')]"/>
+                <filter name="filter_pending" string="Pending" domain="[('status', '=', 'pending')]"/>
+                <filter name="filter_failed" string="Failed" domain="[('status', '=', 'failed')]"/>
+                <filter name="filter_refunded" string="Refunded" domain="[('status', '=', 'refunded')]"/>
+                <filter name="filter_installment" string="Installments" domain="[('is_installment', '=', True)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_status" string="Status" context="{'group_by': 'status'}"/>
+                    <filter name="group_method" string="Payment Method" context="{'group_by': 'payment_method_id'}"/>
+                    <filter name="group_provider" string="Installment Provider" context="{'group_by': 'installment_provider'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!--  CUSTOMER ACTIVITY HISTORY VIEWS                             -->
+    <!-- ============================================================ -->
+
+    <record id="view_jabin_customer_activity_tree" model="ir.ui.view">
+        <field name="name">jabin.customer.activity.tree</field>
+        <field name="model">jabin.customer.activity</field>
+        <field name="arch" type="xml">
+            <tree string="Customer Activity History" create="false" edit="false" delete="false">
+                <field name="timestamp"/>
+                <field name="user_id" string="Customer"/>
+                <field name="action"/>
+                <field name="related_record"/>
+                <field name="triggered_by_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_jabin_customer_activity_search" model="ir.ui.view">
+        <field name="name">jabin.customer.activity.search</field>
+        <field name="model">jabin.customer.activity</field>
+        <field name="arch" type="xml">
+            <search string="Search Activity Logs">
+                <field name="user_id" string="Customer"/>
+                <field name="action"/>
+                <separator/>
+                <filter name="filter_login" string="Logins" domain="[('action', '=', 'logged_in')]"/>
+                <filter name="filter_logout" string="Logouts" domain="[('action', '=', 'logged_out')]"/>
+                <filter name="filter_register" string="Registrations" domain="[('action', '=', 'registered')]"/>
+                <filter name="filter_orders" string="Orders"
+                        domain="[('action', 'in', ['created_order', 'cancelled_order', 'requested_refund', 'paid_order'])]"/>
+                <filter name="filter_profile" string="Profile Changes"
+                        domain="[('action', 'in', ['updated_profile', 'changed_address'])]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_customer" string="Customer" context="{'group_by': 'user_id'}"/>
+                    <filter name="group_action" string="Action Type" context="{'group_by': 'action'}"/>
+                    <filter name="group_day" string="Day" context="{'group_by': 'timestamp:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!--  ACTIONS for new views                                       -->
+    <!-- ============================================================ -->
+
+    <record id="action_jabin_orders" model="ir.actions.act_window">
+        <field name="name">Orders</field>
+        <field name="res_model">jabin.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_jabin_order_search"/>
+    </record>
+
+    <record id="action_jabin_payment_methods" model="ir.actions.act_window">
+        <field name="name">Payment Methods</field>
+        <field name="res_model">jabin.payment.method</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_jabin_payment_transactions" model="ir.actions.act_window">
+        <field name="name">Payment Transactions</field>
+        <field name="res_model">jabin.payment.transaction</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_jabin_payment_transaction_search"/>
+    </record>
+
+    <record id="action_jabin_customer_activities" model="ir.actions.act_window">
+        <field name="name">Customer Activity Logs</field>
+        <field name="res_model">jabin.customer.activity</field>
+        <field name="view_mode">tree</field>
+        <field name="search_view_id" ref="view_jabin_customer_activity_search"/>
+    </record>
+
+</odoo>

@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ==================== BANNERS ==================== -->
+        <record id="banner_home" model="banner">
+            <field name="name">لحوم طازجة يومياً</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="banner_eid" model="banner">
+            <field name="name">عروض عيد الأضحى</field>
+            <field name="active">True</field>
+        </record>
+
+        <!-- ==================== DASHBOARD SECTIONS ==================== -->
+        <record id="dashboard_overview" model="jabin.dashboard">
+            <field name="name">نظرة عامة</field>
+            <field name="sequence">10</field>
+            <field name="description">نظرة عامة على لوحة القيادة مع المقاييس الرئيسية</field>
+            <field name="active">True</field>
+            <field name="color">1</field>
+            <field name="icon">fa-dashboard</field>
+        </record>
+
+        <record id="dashboard_sales" model="jabin.dashboard">
+            <field name="name">تحليلات المبيعات</field>
+            <field name="sequence">20</field>
+            <field name="description">أداء المبيعات والتحليلات</field>
+            <field name="active">True</field>
+            <field name="color">2</field>
+            <field name="icon">fa-line-chart</field>
+        </record>
+
+        <!-- ==================== CATEGORIES ==================== -->
+        <record id="category_beef" model="jabin.category">
+            <field name="name">لحم بقر</field>
+            <field name="description">لحوم بقر طازجة</field>
+            <field name="sequence">10</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="category_lamb" model="jabin.category">
+            <field name="name">لحم ضأن</field>
+            <field name="description">لحوم ضأن طازجة</field>
+            <field name="sequence">20</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="category_chicken" model="jabin.category">
+            <field name="name">دجاج</field>
+            <field name="description">دجاج طازج ومبرد</field>
+            <field name="sequence">30</field>
+            <field name="active">True</field>
+        </record>
+
+        <!-- ==================== CUTTING OPTIONS ==================== -->
+        <record id="cutting_minced" model="jabin.cutting.option">
+            <field name="name">مفروم</field>
+            <field name="description">فرم ناعم أو خشن</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cutting_cubes" model="jabin.cutting.option">
+            <field name="name">مكعبات</field>
+            <field name="description">مكعبات للطبخ</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cutting_slices" model="jabin.cutting.option">
+            <field name="name">شرائح</field>
+            <field name="description">شرائح رقيقة</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cutting_whole" model="jabin.cutting.option">
+            <field name="name">كامل</field>
+            <field name="description">بدون تقطيع</field>
+            <field name="active">True</field>
+        </record>
+
+        <!-- ==================== PACKAGING OPTIONS ==================== -->
+        <record id="packaging_vacuum" model="jabin.packaging">
+            <field name="name">تغليف مفرغ من الهواء</field>
+            <field name="description">تغليف للحفاظ على الطزاجة</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="packaging_tray" model="jabin.packaging">
+            <field name="name">طبق فوم</field>
+            <field name="description">طبق فوم مع تغليف بلاستيك</field>
+            <field name="active">True</field>
+        </record>
+
+        <!-- ==================== EXCLUDED PARTS ==================== -->
+        <record id="excluded_bone" model="jabin.excluded.part">
+            <field name="name">بدون عظم</field>
+            <field name="description">إزالة العظام</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="excluded_fat" model="jabin.excluded.part">
+            <field name="name">بدون دهن</field>
+            <field name="description">إزالة الشحوم والدهون</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="excluded_skin" model="jabin.excluded.part">
+            <field name="name">بدون جلد</field>
+            <field name="description">إزالة الجلد</field>
+            <field name="active">True</field>
+        </record>
+
+        <!-- ==================== PRODUCTS ==================== -->
+        <record id="product_beef_mince" model="jabin.product">
+            <field name="category_id" ref="category_beef"/>
+            <field name="name">لحم بقر مفروم</field>
+            <field name="description">لحم بقر مفروم طازج ممتاز</field>
+            <field name="sku">BEEF-001</field>
+            <field name="barcode">1234567890123</field>
+            <field name="purchase_price">30.00</field>
+            <field name="selling_price">45.00</field>
+            <field name="discount_type">percentage</field>
+            <field name="discount_value">0.0</field>
+            <field name="offer_start_date">2026-07-15</field>
+            <field name="offer_end_date">2026-08-15</field>
+            <field name="stock_quantity">50</field>
+            <field name="minimum_stock">10</field>
+            <field name="weight">1.0</field>
+            <field name="preparation_time">1</field>
+            <field name="active">True</field>
+            <field name="is_featured">True</field>
+            <field name="is_best_seller">True</field>
+            <field name="cutting_option_ids" eval="[(4, ref('cutting_minced'))]"/>
+            <field name="packaging_ids" eval="[(4, ref('packaging_tray')), (4, ref('packaging_vacuum'))]"/>
+            <field name="excluded_part_ids" eval="[(4, ref('excluded_fat'))]"/>
+        </record>
+
+        <record id="product_lamb_chops" model="jabin.product">
+            <field name="category_id" ref="category_lamb"/>
+            <field name="name">ريش ضأن</field>
+            <field name="description">ريش ضأن طازجة للشرواء</field>
+            <field name="sku">LAMB-001</field>
+            <field name="barcode">1234567890124</field>
+            <field name="purchase_price">40.00</field>
+            <field name="selling_price">65.00</field>
+            <field name="discount_type">fixed</field>
+            <field name="discount_value">5.0</field>
+            <field name="offer_start_date">2026-07-15</field>
+            <field name="offer_end_date">2026-08-15</field>
+            <field name="stock_quantity">30</field>
+            <field name="minimum_stock">5</field>
+            <field name="weight">1.0</field>
+            <field name="preparation_time">2</field>
+            <field name="active">True</field>
+            <field name="is_featured">True</field>
+            <field name="is_best_seller">False</field>
+            <field name="cutting_option_ids" eval="[(4, ref('cutting_slices'))]"/>
+            <field name="packaging_ids" eval="[(4, ref('packaging_vacuum'))]"/>
+        </record>
+
+        <record id="product_chicken_breast" model="jabin.product">
+            <field name="category_id" ref="category_chicken"/>
+            <field name="name">صدور دجاج</field>
+            <field name="description">صدور دجاج طازجة بدون عظم</field>
+            <field name="sku">CHIC-001</field>
+            <field name="barcode">1234567890125</field>
+            <field name="purchase_price">15.00</field>
+            <field name="selling_price">22.00</field>
+            <field name="discount_type">percentage</field>
+            <field name="discount_value">10.0</field>
+            <field name="offer_start_date">2026-07-15</field>
+            <field name="offer_end_date">2026-08-15</field>
+            <field name="stock_quantity">100</field>
+            <field name="minimum_stock">20</field>
+            <field name="weight">1.0</field>
+            <field name="preparation_time">1</field>
+            <field name="active">True</field>
+            <field name="is_featured">False</field>
+            <field name="is_best_seller">True</field>
+            <field name="cutting_option_ids" eval="[(4, ref('cutting_whole')), (4, ref('cutting_cubes'))]"/>
+            <field name="packaging_ids" eval="[(4, ref('packaging_tray'))]"/>
+            <field name="excluded_part_ids" eval="[(4, ref('excluded_bone')), (4, ref('excluded_skin'))]"/>
+        </record>
+
+        <!-- ==================== PRODUCT IMAGES ==================== -->
+        <record id="product_image_beef_1" model="jabin.product.image">
+            <field name="product_id" ref="product_beef_mince"/>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="product_image_lamb_1" model="jabin.product.image">
+            <field name="product_id" ref="product_lamb_chops"/>
+            <field name="sequence">10</field>
+        </record>
+
+        <record id="product_image_chicken_1" model="jabin.product.image">
+            <field name="product_id" ref="product_chicken_breast"/>
+            <field name="sequence">10</field>
+        </record>
+
+        <!-- ==================== DASHBOARD SETTINGS ==================== -->
+        <record id="dashboard_settings_default" model="jabin.dashboard.setting">
+            <field name="dashboard_layout">grid</field>
+            <field name="show_kpi">True</field>
+            <field name="show_recent_orders">True</field>
+            <field name="show_top_products">True</field>
+            <field name="show_sales_chart">True</field>
+            <field name="show_inventory_summary">True</field>
+            <field name="refresh_interval">60</field>
+        </record>
+
+    </data>
+</odoo>

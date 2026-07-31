@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_jabin_loyalty" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.jabin.loyalty</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="90"/>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="JABIN Loyalty" string="JABIN Loyalty" name="jabin_loyalty">
+                    <block title="Loyalty Program Settings" name="jabin_loyalty_block">
+                        <setting id="loyalty_earning_rate_setting" string="Earning Rate" help="Formula: Earned Points = Order Total (SAR) * Earning Rate (Default: 1 SAR = 1 Point).">
+                            <field name="loyalty_earning_rate"/>
+                        </setting>
+                        <setting id="loyalty_redemption_rate_setting" string="Redemption Rate" help="Formula: Discount (SAR) = Points / Redemption Rate (Default: 100 Points = 1 SAR).">
+                            <field name="loyalty_redemption_rate"/>
+                        </setting>
+                        <setting id="loyalty_min_redemption_setting" string="Minimum Redemption Threshold" help="Minimum loyalty points balance required before a customer can redeem points (Default: 500 Points).">
+                            <field name="loyalty_min_redemption"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_jabin_loyalty_settings" model="ir.actions.act_window">
+        <field name="name">Loyalty Settings</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module': 'jabin_loyalty'}</field>
+    </record>
+</odoo>

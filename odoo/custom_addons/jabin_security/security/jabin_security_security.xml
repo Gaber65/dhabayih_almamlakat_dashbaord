@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  JABIN Security: access rights and security groups.
+
+  This file defines:
+  1. Security groups for the JABIN security administration.
+  2. Access rights for every model introduced by jabin_security.
+
+  Access-right philosophy:
+  * System models (jabin.role, jabin.permission, jabin.audit.log) are
+    readable by authenticated users but writable only by the security admin
+    group.
+  * The audit log is NEVER writable by any group through the ORM access
+    system; the model's own write/unlink raise regardless. Read access is
+    granted to the admin group only (compliance: audit logs are sensitive).
+  * Service AbstractModels have no table, so they get read-only access
+    rights (Odoo requires an entry or the registry will warn).
+-->
+<odoo>
+    <data>
+
+        <!-- ============================================================ -->
+        <!-- Security groups                                              -->
+        <!-- ============================================================ -->
+
+        <!-- Top-level JABIN security administrator group. -->
+        <record id="jabin_security_admin_group" model="res.groups">
+            <field name="name">JABIN Security Administrator</field>
+            <field name="comment">Can manage roles, permissions, and view audit logs.</field>
+            <field name="category_id" ref="base.module_category_usability"/>
+        </record>
+
+        <!-- ============================================================ -->
+        <!-- jabin.role                                                   -->
+        <!-- ============================================================ -->
+        <record id="access_jabin_role_admin" model="ir.model.access">
+            <field name="name">jabin.role: admin full access</field>
+            <field name="model_id" ref="model_jabin_role"/>
+            <field name="group_id" ref="jabin_security_admin_group"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+        </record>
+
+        <record id="access_jabin_role_user" model="ir.model.access">
+            <field name="name">jabin.role: user read</field>
+            <field name="model_id" ref="model_jabin_role"/>
+            <field name="group_id" ref="base.group_user"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <!-- ============================================================ -->
+        <!-- jabin.permission                                             -->
+        <!-- ============================================================ -->
+        <record id="access_jabin_permission_admin" model="ir.model.access">
+            <field name="name">jabin.permission: admin full access</field>
+            <field name="model_id" ref="model_jabin_permission"/>
+            <field name="group_id" ref="jabin_security_admin_group"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+        </record>
+
+        <record id="access_jabin_permission_user" model="ir.model.access">
+            <field name="name">jabin.permission: user read</field>
+            <field name="model_id" ref="model_jabin_permission"/>
+            <field name="group_id" ref="base.group_user"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <!-- ============================================================ -->
+        <!-- jabin.audit.log: admin read-only                             -->
+        <!-- ============================================================ -->
+        <record id="access_jabin_audit_log_admin" model="ir.model.access">
+            <field name="name">jabin.audit.log: admin read-only</field>
+            <field name="model_id" ref="model_jabin_audit_log"/>
+            <field name="group_id" ref="jabin_security_admin_group"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <!-- ============================================================ -->
+        <!-- Service AbstractModels: no table, read-only access           -->
+        <!-- ============================================================ -->
+        <record id="access_jabin_permission_service_none" model="ir.model.access">
+            <field name="name">jabin.permission.service: read-only (abstract)</field>
+            <field name="model_id" ref="model_jabin_permission_service"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <record id="access_jabin_authorization_service_none" model="ir.model.access">
+            <field name="name">jabin.authorization.service: read-only (abstract)</field>
+            <field name="model_id" ref="model_jabin_authorization_service"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <record id="access_jabin_audit_service_none" model="ir.model.access">
+            <field name="name">jabin.audit.service: read-only (abstract)</field>
+            <field name="model_id" ref="model_jabin_audit_service"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+    </data>
+</odoo>

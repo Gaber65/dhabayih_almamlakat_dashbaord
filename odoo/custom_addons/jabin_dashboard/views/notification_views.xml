@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Notification Tree View -->
+    <record id="view_jabin_notification_tree" model="ir.ui.view">
+        <field name="name">jabin.notification.tree</field>
+        <field name="model">jabin.notification</field>
+        <field name="arch" type="xml">
+            <tree string="Notifications History" create="false" edit="false">
+                <field name="create_date" string="Created Date"/>
+                <field name="user_id"/>
+                <field name="title"/>
+                <field name="notification_type" widget="badge"/>
+                <field name="priority" widget="badge"/>
+                <field name="status" widget="badge"
+                       decoration-success="status in ('sent', 'read')"
+                       decoration-warning="status == 'pending'"
+                       decoration-danger="status == 'failed'"/>
+                <field name="sent_at"/>
+                <field name="read_at"/>
+                <field name="order_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Notification Form View -->
+    <record id="view_jabin_notification_form" model="ir.ui.view">
+        <field name="name">jabin.notification.form</field>
+        <field name="model">jabin.notification</field>
+        <field name="arch" type="xml">
+            <form string="Notification Details" create="false" edit="false">
+                <header>
+                    <button name="%(action_jabin_send_notification_wizard)d" string="Send FCM Notification" type="action" class="btn-primary" icon="fa-paper-plane"/>
+                </header>
+                <sheet>
+
+                    <group>
+                        <group string="Recipient &amp; Status">
+                            <field name="user_id" readonly="1"/>
+                            <field name="notification_type" readonly="1"/>
+                            <field name="priority" readonly="1"/>
+                            <field name="status" readonly="1"/>
+                        </group>
+                        <group string="Timestamps &amp; References">
+                            <field name="sent_at" readonly="1"/>
+                            <field name="delivered_at" readonly="1"/>
+                            <field name="read_at" readonly="1"/>
+                            <field name="order_id" readonly="1"/>
+                            <field name="created_by" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Message Payload">
+                        <field name="title" readonly="1"/>
+                        <field name="body" readonly="1"/>
+                        <field name="deep_link" readonly="1"/>
+                        <field name="image_url" readonly="1"/>
+                    </group>
+                    <group string="Raw Data (JSON)">
+                        <field name="data_json" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Notification Search View -->
+    <record id="view_jabin_notification_search" model="ir.ui.view">
+        <field name="name">jabin.notification.search</field>
+        <field name="model">jabin.notification</field>
+        <field name="arch" type="xml">
+            <search string="Search Notifications">
+                <field name="user_id"/>
+                <field name="title"/>
+                <field name="body"/>
+                <field name="notification_type"/>
+                <field name="order_id"/>
+                <separator/>
+                <filter string="Sent" name="status_sent" domain="[('status', '=', 'sent')]"/>
+                <filter string="Read" name="status_read" domain="[('status', '=', 'read')]"/>
+                <filter string="Failed" name="status_failed" domain="[('status', '=', 'failed')]"/>
+                <filter string="Pending" name="status_pending" domain="[('status', '=', 'pending')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="User" name="group_user" context="{'group_by': 'user_id'}"/>
+                    <filter string="Type" name="group_type" context="{'group_by': 'notification_type'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Date" name="group_date" context="{'group_by': 'create_date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Notification Action -->
+    <record id="action_jabin_notification" model="ir.actions.act_window">
+        <field name="name">Notification History</field>
+        <field name="res_model">jabin.notification</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_jabin_notification_search"/>
+    </record>
+</odoo>

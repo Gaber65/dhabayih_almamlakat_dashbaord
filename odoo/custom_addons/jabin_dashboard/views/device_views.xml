@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Device Tree View -->
+    <record id="view_jabin_device_tree" model="ir.ui.view">
+        <field name="name">jabin.device.tree</field>
+        <field name="model">jabin.device</field>
+        <field name="arch" type="xml">
+            <tree string="Customer Devices"
+                  decoration-success="is_active == True"
+                  decoration-muted="is_active == False">
+                <field name="user_id"/>
+                <field name="device_name"/>
+                <field name="device_type" widget="badge"/>
+                <field name="app_version"/>
+                <field name="os_version"/>
+                <field name="is_active" widget="boolean_toggle"/>
+                <field name="last_seen"/>
+                <field name="created_at"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Device Form View -->
+    <record id="view_jabin_device_form" model="ir.ui.view">
+        <field name="name">jabin.device.form</field>
+        <field name="model">jabin.device</field>
+        <field name="arch" type="xml">
+            <form string="Customer Device">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="deactivate" string="Deactivate Token" type="object"
+                                class="oe_stat_button" icon="fa-power-off"
+                                invisible="is_active == False"/>
+                    </div>
+                    <group>
+                        <group string="Customer &amp; Device Info">
+                            <field name="user_id"/>
+                            <field name="device_name"/>
+                            <field name="device_type"/>
+                            <field name="is_active"/>
+                        </group>
+                        <group string="App &amp; OS Specs">
+                            <field name="app_version"/>
+                            <field name="os_version"/>
+                            <field name="language"/>
+                            <field name="timezone"/>
+                            <field name="last_seen"/>
+                        </group>
+                    </group>
+                    <group string="Token &amp; Identification">
+                        <field name="uuid" readonly="1"/>
+                        <field name="fcm_token"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Device Search View -->
+    <record id="view_jabin_device_search" model="ir.ui.view">
+        <field name="name">jabin.device.search</field>
+        <field name="model">jabin.device</field>
+        <field name="arch" type="xml">
+            <search string="Search Devices">
+                <field name="user_id"/>
+                <field name="device_name"/>
+                <field name="fcm_token"/>
+                <field name="uuid"/>
+                <filter string="Active Tokens" name="active_devices" domain="[('is_active', '=', True)]"/>
+                <filter string="Inactive Tokens" name="inactive_devices" domain="[('is_active', '=', False)]"/>
+                <separator/>
+                <filter string="Android" name="type_android" domain="[('device_type', '=', 'android')]"/>
+                <filter string="iOS" name="type_ios" domain="[('device_type', '=', 'ios')]"/>
+                <filter string="Web" name="type_web" domain="[('device_type', '=', 'web')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="User" name="group_user" context="{'group_by': 'user_id'}"/>
+                    <filter string="Device Type" name="group_type" context="{'group_by': 'device_type'}"/>
+                    <filter string="Active Status" name="group_status" context="{'group_by': 'is_active'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Device Action -->
+    <record id="action_jabin_device" model="ir.actions.act_window">
+        <field name="name">Customer Devices</field>
+        <field name="res_model">jabin.device</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_jabin_device_search"/>
+    </record>
+</odoo>

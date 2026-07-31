@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================ -->
+    <!-- jabin.highlight – Tree (List) View                            -->
+    <!-- ============================================================ -->
+    <record id="view_jabin_highlight_tree" model="ir.ui.view">
+        <field name="name">jabin.highlight.tree</field>
+        <field name="model">jabin.highlight</field>
+        <field name="arch" type="xml">
+            <tree string="Highlights"
+                  decoration-muted="not is_active"
+                  decoration-success="is_active"
+                  decoration-danger="expires_at &lt;= datetime.datetime.now()">
+                <field name="name" string="Name"/>
+                <field name="user_id" string="Owner"/>
+                <field name="media_type" string="Type" widget="badge"/>
+                <field name="is_active" string="Active" widget="boolean" invisible="1"/>
+                <field name="active" string="Visible" widget="boolean"/>
+                <field name="views_count" string="Views" sum="Total Views"/>
+                <field name="expires_at" string="Expires At"/>
+                <field name="create_date" string="Created"/>
+                <button name="toggle_active"
+                        type="object"
+                        string="Archive"
+                        class="btn-sm btn-secondary"
+                        invisible="not active"/>
+                <button name="toggle_active"
+                        type="object"
+                        string="Restore"
+                        class="btn-sm btn-primary"
+                        invisible="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- jabin.highlight – Form View                                    -->
+    <!-- ============================================================ -->
+    <record id="view_jabin_highlight_form" model="ir.ui.view">
+        <field name="name">jabin.highlight.form</field>
+        <field name="model">jabin.highlight</field>
+        <field name="arch" type="xml">
+            <form string="Highlight">
+                <header>
+                    <button name="action_archive"
+                            type="object"
+                            string="Archive"
+                            class="btn-secondary"
+                            invisible="not active"
+                            confirm="Are you sure you want to archive this highlight? It will no longer be visible to users."/>
+                    <button name="action_restore"
+                            type="object"
+                            string="Restore"
+                            class="btn-primary"
+                            invisible="active"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,active,expired,archived"/>
+                </header>
+                <sheet>
+                    <!-- Status banner -->
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_media"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-picture-o"
+                                string="Media"
+                                help="View the uploaded media file"/>
+                        <button name="action_copy_highlight"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-copy"
+                                string="Duplicate"
+                                help="Create a copy of this highlight"
+                                invisible="not active"/>
+                    </div>
+
+                    <!-- Title -->
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Highlight Name"/>
+                        </h1>
+                        <span class="oe_read_only">
+                            <field name="media_type" widget="badge"/>
+                            <field name="is_active" widget="boolean" string="Active"/>
+                        </span>
+                    </div>
+
+                    <group>
+                        <!-- Left column -->
+                        <group string="Highlight Details">
+                            <field name="user_id" string="Owner" required="1"/>
+                            <field name="media_type" string="Media Type" required="1" widget="selection"/>
+                            <field name="media_filename" string="Filename"/>
+                            <field name="media_mimetype" string="MIME Type"/>
+                            <field name="active" string="Visible (Archived Flag)"/>
+                            <field name="views_count" string="View Count" readonly="1"/>
+                        </group>
+
+                        <!-- Right column -->
+                        <group string="Expiration &amp; Status">
+                            <field name="expires_at" string="Expires At" readonly="1"/>
+                            <field name="is_active" string="Currently Active" readonly="1" widget="boolean"/>
+                            <field name="create_date" string="Created At" readonly="1"/>
+                            <field name="write_date" string="Last Updated" readonly="1"/>
+                            <field name="create_uid" string="Created By" readonly="1"/>
+                            <field name="write_uid" string="Last Updated By" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <!-- Image Preview -->
+                    <group string="Image Preview"
+                           invisible="media_type != 'image'">
+                        <field name="image"
+                               widget="image"
+                               class="oe_avatar"
+                               options="{'size': [300, 300]}"/>
+                    </group>
+
+                    <!-- Video Preview -->
+                    <group string="Video Preview"
+                           invisible="media_type != 'video'">
+                        <div>
+                            <field name="video" widget="video"/>
+                        </div>
+                    </group>
+
+                    <!-- Statistics -->
+                    <group string="Statistics" invisible="views_count == 0">
+                        <field name="views_count" string="Total Views"/>
+                        <div>
+                            <span class="oe_stat_text">
+                                <span class="fa fa-eye"/> Views: <field name="views_count"/>
+                            </span>
+                        </div>
+                    </group>
+                </sheet>
+
+            </form>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- jabin.highlight – Kanban View                                  -->
+    <!-- ============================================================ -->
+    <record id="view_jabin_highlight_kanban" model="ir.ui.view">
+        <field name="name">jabin.highlight.kanban</field>
+        <field name="model">jabin.highlight</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile" default_group_by="user_id">
+                <field name="name"/>
+                <field name="user_id"/>
+                <field name="media_type"/>
+                <field name="image"/>
+                <field name="video"/>
+                <field name="views_count"/>
+                <field name="expires_at"/>
+                <field name="create_date"/>
+                <field name="active"/>
+                <field name="is_active"/>
+                <field name="color"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_image">
+                                <img t-att-src="kanban_image('jabin.highlight', 'image', record.id.raw_value)"
+                                     alt="Highlight"
+                                     class="o_image_64_cover"
+                                     t-if="record.media_type.raw_value == 'image'"/>
+                                <div t-if="record.media_type.raw_value == 'video'"
+                                     class="o_kanban_video_placeholder">
+                                    <span class="fa fa-play-circle o_kanban_video_icon"/>
+                                </div>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <strong class="o_kanban_record_title">
+                                    <field name="name"/>
+                                </strong>
+                                <div class="oe_kanban_status">
+                                    <field name="media_type" widget="badge"/>
+                                    <field name="is_active" widget="boolean"/>
+                                </div>
+                                <div class="oe_kanban_stats">
+                                    <div class="oe_kanban_stat_item">
+                                        <span class="fa fa-eye"/>
+                                        <field name="views_count"/>
+                                    </div>
+                                    <div class="oe_kanban_stat_item">
+                                        <span class="fa fa-clock-o"/>
+                                        <field name="expires_at"/>
+                                    </div>
+                                    <div class="oe_kanban_stat_item">
+                                        <span class="fa fa-user"/>
+                                        <field name="user_id"/>
+                                    </div>
+                                </div>
+                                <div class="oe_kanban_footer">
+                                    <field name="active" widget="boolean"/>
+                                    <span t-attf-class="oe_kanban_color_#{record.color.raw_value}">
+                                        <field name="color"/>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- jabin.highlight – Search View                                  -->
+    <!-- ============================================================ -->
+    <record id="view_jabin_highlight_search" model="ir.ui.view">
+        <field name="name">jabin.highlight.search</field>
+        <field name="model">jabin.highlight</field>
+        <field name="arch" type="xml">
+            <search string="Search Highlights">
+                <!-- Search fields -->
+                <field name="name" string="Name" filter_domain="['|', ('name','ilike',self), ('user_id.name','ilike',self)]"/>
+                <field name="user_id" string="Owner"/>
+                <field name="media_type" string="Media Type"/>
+
+                <!-- Predefined filters -->
+                <filter name="filter_active"
+                        string="Active Only"
+                        domain="[('active', '=', True), ('expires_at', '&gt;', datetime.datetime.now())]"
+                        help="Show only currently active highlights"/>
+                <filter name="filter_expired"
+                        string="Expired"
+                        domain="[('expires_at', '&lt;=', datetime.datetime.now())]"
+                        help="Show expired highlights"/>
+                <filter name="filter_images"
+                        string="Images"
+                        domain="[('media_type', '=', 'image')]"
+                        help="Show only image highlights"/>
+                <filter name="filter_videos"
+                        string="Videos"
+                        domain="[('media_type', '=', 'video')]"
+                        help="Show only video highlights"/>
+                <filter name="filter_archived"
+                        string="Archived"
+                        domain="[('active', '=', False)]"
+                        help="Show archived highlights"/>
+
+                <separator/>
+
+                <!-- Group by options -->
+                <group expand="0" string="Group By">
+                    <filter name="group_by_user"
+                            string="Owner"
+                            context="{'group_by': 'user_id'}"/>
+                    <filter name="group_by_media_type"
+                            string="Media Type"
+                            context="{'group_by': 'media_type'}"/>
+                    <filter name="group_by_create_date"
+                            string="Created Date"
+                            context="{'group_by': 'create_date:day'}"/>
+                    <filter name="group_by_expires_at"
+                            string="Expires At"
+                            context="{'group_by': 'expires_at:day'}"/>
+                    <filter name="group_by_active"
+                            string="Active Status"
+                            context="{'group_by': 'active'}"/>
+                </group>
+
+                <!-- Favorites -->
+                <filter name="my_highlights"
+                        string="My Highlights"
+                        domain="[('user_id','=',uid)]"
+                        help="Show only your own highlights"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- ============================================================ -->
+    <!-- jabin.highlight – Action (Form View Defaults)                  -->
+    <!-- ============================================================ -->
+    <record id="action_jabin_highlight" model="ir.actions.act_window">
+        <field name="name">Highlights</field>
+        <field name="res_model">jabin.highlight</field>
+        <field name="view_mode">tree,kanban,form</field>
+        <field name="context">{'active_test': False, 'default_user_id': uid}</field>
+        <field name="search_view_id" ref="view_jabin_highlight_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first highlight!
+            </p>
+            <p>
+                Highlights are temporary media posts (images or videos) that
+                expire automatically after the configured duration.
+            </p>
+            <p>
+                <strong>How it works:</strong>
+                <ul>
+                    <li>Upload an image or video</li>
+                    <li>It will be visible for the configured duration (default: 24 hours)</li>
+                    <li>After expiration, it will be automatically removed</li>
+                    <li>You can archive highlights manually at any time</li>
+                </ul>
+            </p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="jabin_dashboard.DashboardComponent">
+        <div class="jabin-dashboard-wrapper">
+            <!-- Loading State -->
+            <div t-if="state.loading" class="dashboard-loading">
+                <div class="loading-indicator">
+                    <div class="spinner-container">
+                        <div class="spinner-ring"></div>
+                        <div class="spinner-ring"></div>
+                        <div class="spinner-ring"></div>
+                    </div>
+                    <p>Loading Dashboard...</p>
+                </div>
+            </div>
+
+            <!-- Error State -->
+            <div t-elif="state.error" class="dashboard-error">
+                <div class="alert alert-danger">
+                    <i class="fa fa-exclamation-circle mr-2"/>
+                    <span t-esc="state.error"/>
+                    <button class="btn btn-sm btn-outline-danger ml-3" t-on-click="loadDashboardData">
+                        <i class="fa fa-refresh mr-1"/> Retry
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dashboard Content -->
+            <div t-else="" class="jabin-dashboard-container">
+                <!-- KPI Cards -->
+                <div class="kpi-grid row mb-4">
+                    <!-- Total Orders -->
+                    <div class="col-md-4 col-sm-6">
+                        <div class="card kpi-card">
+                            <div class="card-body">
+                                <div class="kpi-icon kpi-icon-primary">
+                                    <i class="fa fa-shopping-cart"/>
+                                </div>
+                                <div class="kpi-content">
+                                    <div class="kpi-title">Total Orders</div>
+                                    <div class="kpi-value"><t t-esc="formattedOrders"/></div>
+                                    <div class="kpi-progress mt-2">
+                                        <div class="progress">
+                                            <div class="progress-bar progress-bar-primary" t-attf-style="width: #{ordersProgress}%"></div>
+                                        </div>
+                                        <small>
+                                            <t t-esc="state.current_month_orders"/> this month
+                                            <t t-if="state.order_growth != 0">
+                                                <span t-attf-class="text-#{getGrowthIndicator(state.order_growth)} ml-2">
+                                                    <i t-attf-class="fa #{getGrowthIcon(state.order_growth)} mr-1"/>
+                                                    <t t-esc="state.order_growth"/>%
+                                                </span>
+                                            </t>
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total Revenue -->
+                    <div class="col-md-4 col-sm-6">
+                        <div class="card kpi-card">
+                            <div class="card-body">
+                                <div class="kpi-icon kpi-icon-success">
+                                    <i class="fa fa-dollar-sign"/>
+                                </div>
+                                <div class="kpi-content">
+                                    <div class="kpi-title">Total Revenue</div>
+                                    <div class="kpi-value"><t t-esc="formattedRevenue"/></div>
+                                    <div class="kpi-progress mt-2">
+                                        <div class="progress">
+                                            <div class="progress-bar progress-bar-success" t-attf-style="width: #{revenueProgress}%"></div>
+                                        </div>
+                                        <small>
+                                            <t t-esc="formatCurrency(state.current_month_revenue)"/> this month
+                                            <t t-if="state.revenue_growth != 0">
+                                                <span t-attf-class="text-#{getGrowthIndicator(state.revenue_growth)} ml-2">
+                                                    <i t-attf-class="fa #{getGrowthIcon(state.revenue_growth)} mr-1"/>
+                                                    <t t-esc="state.revenue_growth"/>%
+                                                </span>
+                                            </t>
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total Customers -->
+                    <div class="col-md-4 col-sm-6">
+                        <div class="card kpi-card">
+                            <div class="card-body">
+                                <div class="kpi-icon kpi-icon-info">
+                                    <i class="fa fa-users"/>
+                                </div>
+                                <div class="kpi-content">
+                                    <div class="kpi-title">Total Customers</div>
+                                    <div class="kpi-value"><t t-esc="formattedCustomers"/></div>
+                                    <div class="kpi-progress mt-2">
+                                        <div class="progress">
+                                            <div class="progress-bar progress-bar-info" t-attf-style="width: #{customersProgress}%"></div>
+                                        </div>
+                                        <small>
+                                            <t t-esc="state.current_month_customers"/> new this month
+                                            <t t-if="state.customer_growth != 0">
+                                                <span t-attf-class="text-#{getGrowthIndicator(state.customer_growth)} ml-2">
+                                                    <i t-attf-class="fa #{getGrowthIcon(state.customer_growth)} mr-1"/>
+                                                    <t t-esc="state.customer_growth"/>%
+                                                </span>
+                                            </t>
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total Products -->
+                    <div class="col-md-3 col-sm-6">
+                        <div class="card kpi-card">
+                            <div class="card-body">
+                                <div class="kpi-icon kpi-icon-warning">
+                                    <i class="fa fa-boxes"/>
+                                </div>
+                                <div class="kpi-content">
+                                    <div class="kpi-title">Total Products</div>
+                                    <div class="kpi-value"><t t-esc="formattedProducts"/></div>
+                                    <div class="kpi-subtitle">
+                                        <t t-esc="state.inventory_categories"/> categories
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pending Orders -->
+                    <div class="col-md-3 col-sm-6">
+                        <div class="card kpi-card">
+                            <div class="card-body">
+                                <div class="kpi-icon kpi-icon-danger">
+                                    <i class="fa fa-clock"/>
+                                </div>
+                                <div class="kpi-content">
+                                    <div class="kpi-title">Pending Orders</div>
+                                    <div class="kpi-value"><t t-esc="formattedPendingOrders"/></div>
+                                    <div class="kpi-progress mt-2">
+                                        <div class="progress">
+                                            <div class="progress-bar progress-bar-danger" t-attf-style="width: #{pendingProgress}%"></div>
+                                        </div>
+                                        <small><t t-esc="pendingProgress"/>% of capacity</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Low Stock -->
+                    <div class="col-md-6 col-sm-6">
+                        <div class="card kpi-card">
+                            <div class="card-body">
+                                <div class="kpi-icon kpi-icon-danger">
+                                    <i class="fa fa-exclamation-triangle"/>
+                                </div>
+                                <div class="kpi-content">
+                                    <div class="kpi-title">Low Stock Alert</div>
+                                    <div class="kpi-value"><t t-esc="formattedLowStock"/></div>
+                                    <div class="kpi-subtitle">
+                                        <t t-esc="state.inventory_out_of_stock"/> items out of stock
+                                    </div>
+                                    <div class="kpi-progress mt-2">
+                                        <div class="progress">
+                                            <div class="progress-bar progress-bar-danger" t-attf-style="width: #{lowStockProgress}%"></div>
+                                        </div>
+                                        <small><t t-esc="lowStockProgress"/>% of inventory at risk</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Sections -->
+                <div class="row">
+                    <!-- Recent Orders -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <i class="fa fa-history"/>
+                                <span>Recent Orders</span>
+
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-sm table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Order #</th>
+                                            <th>Customer</th>
+                                            <th>Date</th>
+                                            <th>Status</th>
+                                            <th class="text-right">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="state.recent_orders" t-as="order" t-key="order_index">
+                                            <td><t t-esc="order.order_number"/></td>
+                                            <td><t t-esc="order.customer"/></td>
+                                            <td><t t-esc="order.date"/></td>
+                                            <td>
+                                                <span class="badge" t-attf-class="#{order.badge_class}">
+                                                    <t t-esc="order.status"/>
+                                                </span>
+                                            </td>
+                                            <td class="text-right"><t t-esc="order.formatted_total"/></td>
+                                        </tr>
+                                        <tr t-if="state.recent_orders.length === 0">
+                                            <td colspan="5" class="text-center text-muted py-3">
+                                                <i class="fa fa-inbox mr-2"/> No recent orders found
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top Products -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <i class="fa fa-star"/>
+                                <span>Top Products</span>
+                                <span class="header-actions">
+                                    <span class="badge badge-light"><t t-esc="state.top_products.length"/> items</span>
+                                </span>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-sm table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Category</th>
+                                            <th class="text-right">Sales</th>
+                                            <th class="text-right">Units</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="state.top_products" t-as="product" t-key="product_index">
+                                            <td><t t-esc="product.name"/></td>
+                                            <td><t t-esc="product.category"/></td>
+                                            <td class="text-right"><t t-esc="product.formatted_sales"/></td>
+                                            <td class="text-right"><t t-esc="product.units"/></td>
+                                        </tr>
+                                        <tr t-if="state.top_products.length === 0">
+                                            <td colspan="4" class="text-center text-muted py-3">
+                                                <i class="fa fa-box mr-2"/> No product data available
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Monthly Sales Chart -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <i class="fa fa-chart-line"/>
+                                <span>Monthly Sales</span>
+                                <span class="header-actions">
+                                    <span class="badge badge-light"><t t-esc="state.sales_labels.length"/> months</span>
+                                </span>
+                            </div>
+                            <div class="card-body">
+                                <div t-if="state.sales_labels.length > 0" class="chart-container">
+                                    <div class="chart-bars">
+                                        <div t-foreach="state.sales_labels" t-as="label" t-key="label_index">
+                                            <div class="chart-bar-group">
+                                                <div class="chart-bar" t-attf-style="height: #{Math.max(8, (state.sales_data[label_index] / Math.max(1, ...state.sales_data)) * 180)}px">
+                                                    <span class="bar-value"><t t-esc="formatCurrencyShort(state.sales_data[label_index])"/></span>
+                                                </div>
+                                                <span class="bar-label"><t t-esc="label"/></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div t-else="" class="empty-state">
+                                    <i class="fa fa-chart-pie"/>
+                                    <h5>No Sales Data</h5>
+                                    <p>Sales data will appear here once orders are placed.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Inventory Summary -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="card dashboard-card">
+                            <div class="card-header">
+                                <i class="fa fa-warehouse"/>
+                                <span>Inventory Summary</span>
+                                <span class="header-actions">
+                                    <span class="badge badge-light">
+                                        <t t-esc="state.inventory_coverage"/>% covered
+                                    </span>
+                                </span>
+                            </div>
+                            <div class="card-body">
+                                <div class="inventory-stats">
+                                    <div class="inventory-item">
+                                        <span class="label">Total Items</span>
+                                        <span class="value"><t t-esc="state.inventory_total"/></span>
+                                    </div>
+                                    <div class="inventory-item">
+                                        <span class="label">Low Stock</span>
+                                        <span class="value text-warning"><t t-esc="state.inventory_low_stock"/></span>
+                                    </div>
+                                    <div class="inventory-item">
+                                        <span class="label">Out of Stock</span>
+                                        <span class="value text-danger"><t t-esc="state.inventory_out_of_stock"/></span>
+                                    </div>
+                                    <div class="inventory-item">
+                                        <span class="label">Categories</span>
+                                        <span class="value"><t t-esc="state.inventory_categories"/></span>
+                                    </div>
+                                    <div class="inventory-item">
+                                        <span class="label">Total Quantity</span>
+                                        <span class="value"><t t-esc="state.inventory_total_quantity.toLocaleString()"/></span>
+                                    </div>
+                                    <div class="inventory-item">
+                                        <span class="label">Coverage</span>
+                                        <span class="value text-primary"><t t-esc="state.inventory_coverage"/>%</span>
+                                    </div>
+                                </div>
+                                <div class="inventory-progress">
+                                    <div class="progress">
+                                        <div class="progress-bar" t-attf-style="width: #{state.inventory_coverage}%">
+                                            <t t-esc="state.inventory_coverage"/>% Stock Coverage
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

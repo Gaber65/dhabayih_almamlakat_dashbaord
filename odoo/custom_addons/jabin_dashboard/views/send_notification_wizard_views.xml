@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Send FCM Notification Wizard Form View -->
+    <record id="view_jabin_send_notification_wizard_form" model="ir.ui.view">
+        <field name="name">jabin.send.notification.wizard.form</field>
+        <field name="model">jabin.send.notification.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Send FCM Push Notification">
+                <sheet>
+                    <group>
+                        <group string="Recipient Information">
+                            <field name="user_id" options="{'no_create': True}"/>
+                            <field name="active_device_count"/>
+                        </group>
+                        <group string="Notification Parameters">
+                            <field name="notification_type"/>
+                            <field name="priority"/>
+                        </group>
+                    </group>
+                    <group string="Message Content">
+                        <field name="title" placeholder="e.g. Special Discount Just For You!"/>
+                        <field name="body" rows="4" placeholder="Type your push notification message here..."/>
+                    </group>
+                    <group string="Mobile Routing &amp; Payload (Optional)">
+                        <field name="deep_link" placeholder="e.g. jabin://offers or jabin://products/45"/>
+                        <field name="image_url" placeholder="https://example.com/images/promo.png"/>
+                        <field name="data_json" rows="3" placeholder='{"promo_code": "VIP10", "category": "special"}'/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="Send FCM Notification" name="action_send_notification" type="object" class="btn-primary" icon="fa-paper-plane"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Send FCM Notification Wizard Action -->
+    <record id="action_jabin_send_notification_wizard" model="ir.actions.act_window">
+        <field name="name">Send FCM Notification</field>
+        <field name="res_model">jabin.send.notification.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

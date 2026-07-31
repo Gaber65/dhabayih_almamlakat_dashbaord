@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Product Images Action -->
+    <record id="action_jabin_product_images" model="ir.actions.act_window">
+        <field name="name">Product Images</field>
+        <field name="res_model">jabin.product.image</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('product_id','=',active_id)]</field>
+        <field name="context">{'default_product_id': active_id}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add images to this product
+            </p>
+        </field>
+    </record>
+
+    <!-- Product Tree View -->
+    <record id="view_jabin_product_tree" model="ir.ui.view">
+        <field name="name">jabin.product.tree</field>
+        <field name="model">jabin.product</field>
+        <field name="arch" type="xml">
+            <tree string="Products" decoration-success="is_on_offer==True" decoration-info="active==False" decoration-danger="stock_quantity &lt; minimum_stock">
+                <field name="name"/>
+                <field name="sku"/>
+                <field name="category_id"/>
+                <field name="selling_price" sum="Total Selling Price"/>
+                <field name="offer_price"/>
+                <field name="is_on_offer"/>
+                <field name="stock_quantity"/>
+                <field name="minimum_stock" invisible="1"/>
+                <field name="is_available"/>
+                <field name="is_featured"/>
+                <field name="is_best_seller"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Product Form View -->
+    <record id="view_jabin_product_form" model="ir.ui.view">
+        <field name="name">jabin.product.form</field>
+        <field name="model">jabin.product</field>
+        <field name="arch" type="xml">
+            <form string="Product">
+                <header>
+                    <button name="action_activate" string="Activate" type="object" class="oe_highlight" invisible="active == True"/>
+                    <button name="action_deactivate" string="Deactivate" type="object" invisible="active == False"/>
+                    <button name="action_update_stock" string="Update Stock" type="object" class="oe_highlight"/>
+                    <field name="active" invisible="True"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(action_jabin_product_images)d"
+                                type="action"
+                                class="oe_stat_button"
+                                icon="fa-image"
+                                context="{'default_product_id': active_id}">
+                            <div class="o_stat_info">
+                                <field name="product_image_ids" widget="many2many_tags"/>
+                                <span class="o_stat_text">Images</span>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name" string="Product Name"/>
+                        <h1>
+                            <field name="name" placeholder="Product Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="category_id" options="{'no_create': True}"/>
+                            <field name="sku"/>
+                            <field name="barcode"/>
+                        </group>
+                        <group>
+                            <field name="active"/>
+                            <field name="is_featured"/>
+                            <field name="is_best_seller"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="description" colspan="4" placeholder="Product Description"/>
+                    </group>
+                    <group string="Pricing &amp; Offers">
+                        <group>
+                            <field name="purchase_price"/>
+                            <field name="selling_price"/>
+                            <field name="profit" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="profit_percentage"/>
+                        </group>
+                        <group>
+                            <field name="discount_type"/>
+                            <field name="discount_value" invisible="discount_type == False"/>
+                            <field name="offer_price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                            <field name="is_on_offer"/>
+                            <field name="offer_start_date" required="is_on_offer == True"/>
+                            <field name="offer_end_date" required="is_on_offer == True"/>
+                        </group>
+                    </group>
+                    <group string="Stock &amp; Details">
+                        <group>
+                            <field name="stock_quantity"/>
+                            <field name="minimum_stock"/>
+                            <field name="is_available"/>
+                        </group>
+                        <group>
+                            <field name="weight"/>
+                            <field name="preparation_time"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Media">
+                            <group>
+                                <field name="main_image" widget="image" class="oe_avatar" options="{'preview_image': 'main_image'}"/>
+                            </group>
+                            <group>
+                                <field name="product_image_ids">
+                                    <tree editable="bottom">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="image" widget="image"/>
+                                    </tree>
+                                </field>
+                            </group>
+                        </page>
+                        <page string="Options">
+                            <group string="Cutting Options">
+                                <field name="cutting_option_ids" widget="many2many_tags"/>
+                            </group>
+                            <group string="Packaging Options">
+                                <field name="packaging_ids" widget="many2many_tags"/>
+                            </group>
+                            <group string="Excluded Parts">
+                                <field name="excluded_part_ids" widget="many2many_tags"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Product Search View -->
+    <record id="view_jabin_product_search" model="ir.ui.view">
+        <field name="name">jabin.product.search</field>
+        <field name="model">jabin.product</field>
+        <field name="arch" type="xml">
+            <search string="Search Products">
+                <field name="name" string="Product Name"/>
+                <field name="sku"/>
+                <field name="barcode"/>
+                <field name="category_id"/>
+                <filter name="active" string="Active" domain="[('active','=',True)]"/>
+                <filter name="inactive" string="Inactive" domain="[('active','=',False)]"/>
+                <separator/>
+                <filter name="on_offer" string="On Offer" domain="[('is_on_offer','=',True)]"/>
+                <filter name="in_stock" string="In Stock" domain="[('stock_quantity','>',0)]"/>
+                <filter name="low_stock" string="Low Stock" domain="[('stock_quantity','&lt;=','minimum_stock')]"/>
+                <filter name="featured" string="Featured" domain="[('is_featured','=',True)]"/>
+                <filter name="best_seller" string="Best Seller" domain="[('is_best_seller','=',True)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_category" string="Category" domain="[]" context="{'group_by':'category_id'}"/>
+                    <filter name="group_active" string="Active" domain="[]" context="{'group_by':'active'}"/>
+                    <filter name="group_on_offer" string="On Offer" domain="[]" context="{'group_by':'is_on_offer'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Product Action -->
+    <record id="action_jabin_product" model="ir.actions.act_window">
+        <field name="name">Products</field>
+        <field name="res_model">jabin.product</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create and manage your products
+            </p>
+            <p>
+                Add products to your catalog with pricing, stock, and media.
+            </p>
+        </field>
+    </record>
+</odoo>

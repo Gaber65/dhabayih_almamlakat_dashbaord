@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Default System Parameter for Firebase Credentials Path -->
+        <record id="param_jabin_firebase_credentials" model="ir.config_parameter">
+            <field name="key">jabin.firebase.credentials</field>
+            <field name="value">jabin_dashboard/data/firebase_credentials.json</field>
+        </record>
+    </data>
+</odoo>

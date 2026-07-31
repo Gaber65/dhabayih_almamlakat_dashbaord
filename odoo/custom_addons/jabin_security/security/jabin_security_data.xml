@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  JABIN Security: seed data.
+
+  Defines the initial system roles and permissions that ship with the JABIN
+  platform. These records are created once at module install time and are
+  marked is_system=True so they cannot be accidentally deleted.
+
+  Permission naming convention: <resource>.<action>
+  Role naming convention: lowercase snake_case codes.
+
+  The permission records use noupdate="1" because once they exist we do not
+  want a module upgrade to clobber any manual role-permission wiring done by
+  administrators.  The role-to-permission associations, however, use
+  noupdate="0" inside the second data block so that new permissions added in
+  a future sprint are correctly linked on upgrade.
+-->
+<odoo>
+    <!-- ================================================================== -->
+    <!-- System permissions (noupdate: do not clobber on upgrade)            -->
+    <!-- ================================================================== -->
+    <data noupdate="1">
+
+        <!-- User management -->
+        <record id="perm_users_create" model="jabin.permission">
+            <field name="code">users.create</field>
+            <field name="name">Create Users</field>
+            <field name="description">Create new user accounts.</field>
+            <field name="is_system" eval="True"/>
+        </record>
+        <record id="perm_users_read" model="jabin.permission">
+            <field name="code">users.read</field>
+            <field name="name">View Users</field>
+            <field name="description">View user profiles and lists.</field>
+            <field name="is_system" eval="True"/>
+        </record>
+        <record id="perm_users_update" model="jabin.permission">
+            <field name="code">users.update</field>
+            <field name="name">Update Users</field>
+            <field name="description">Edit user profile information.</field>
+            <field name="is_system" eval="True"/>
+        </record>
+        <record id="perm_users_delete" model="jabin.permission">
+            <field name="code">users.delete</field>
+            <field name="name">Delete Users</field>
+            <field name="description">Archive / delete user accounts.</field>
+            <field name="is_system" eval="True"/>
+        </record>
+        <record id="perm_users_manage_status" model="jabin.permission">
+            <field name="code">users.manage_status</field>
+            <field name="name">Manage User Status</field>
+            <field name="description">Suspend, activate, or ban user accounts.</field>
+            <field name="is_system" eval="True"/>
+        </record>
+
+        <!-- Address management -->
+        <record id="perm_addresses_create" model="jabin.permission">
+            <field name="code">addresses.create</field>
+            <field name="name">Create Addresses</field>
+            <field name="description">Create delivery/billing addresses.</field>
+            <field name="is_system" eval="True"/>
+        </record>
+        <record id="perm_addresses_read" model="jabin.permission">
+            <field name="code">addresses.read</field>
+            <field name="name">View Addresses</field>
+            <field name="description">View addresses.</field>
+            <field name="is_system" eval="True"/>
+        </record>
+        <record id="perm_addresses_update" model="jabin.permission">
+            <field name="code">addresses.update</field>
+            <field name="name">Update Addresses</field>
+            <field name="description">Edit existing addresses.</field>
+            <field name="is_system" eval="True"/>
+        </record>
+        <record id="perm_addresses_delete" model="jabin.permission">
+            <field name="code">addresses.delete</field>
+            <field name="name">Delete Addresses</field>
+            <field name="description">Delete addresses.</field>
+            <field name="is_system" eval="True"/>
+        </record>
+
+        <!-- RBAC administration -->
+        <record id="perm_roles_create" model="jabin.permission">
+            <field name="code">roles.create</field>
+            <field name="name">Create Roles</field>
+            <field name="description">Create new RBAC roles.</field>
+            <field name="is_system" eval="True"/>
+        </record>
+        <record id="perm_roles_read" model="jabin.permission">
+            <field name="code">roles.read</field>
+            <field name="name">View Roles</field>
+            <field name="description">View roles and permissions.</field>
+            <field name="is_system" eval="True"/>
+        </record>
+        <record id="perm_roles_update" model="jabin.permission">
+            <field name="code">roles.update</field>
+            <field name="name">Update Roles</field>
+            <field name="description">Edit role metadata and permissions.</field>
+            <field name="is_system" eval="True"/>
+        </record>
+        <record id="perm_roles_assign" model="jabin.permission">
+            <field name="code">roles.assign</field>
+            <field name="name">Assign Roles</field>
+            <field name="description">Assign or revoke roles on users.</field>
+            <field name="is_system" eval="True"/>
+        </record>
+
+        <!-- Audit permissions -->
+        <record id="perm_audit_read" model="jabin.permission">
+            <field name="code">audit.read</field>
+            <field name="name">View Audit Logs</field>
+            <field name="description">View system audit and activity logs.</field>
+            <field name="is_system" eval="True"/>
+        </record>
+
+        <!-- Mobile App & Admin permissions -->
+        <record id="perm_banners_manage" model="jabin.permission">
+            <field name="code">banners.manage</field>
+            <field name="name">Manage Banners</field>
+            <field name="description">Create, update, toggle, or delete promotional banners.</field>
+            <field name="is_system" eval="True"/>
+        </record>
+        <record id="perm_products_manage" model="jabin.permission">
+            <field name="code">products.manage</field>
+            <field name="name">Manage Products</field>
+            <field name="description">Create, update, stock, toggle, or delete products.</field>
+            <field name="is_system" eval="True"/>
+        </record>
+        <record id="perm_categories_manage" model="jabin.permission">
+            <field name="code">categories.manage</field>
+            <field name="name">Manage Categories</field>
+            <field name="description">Create, update, or delete catalog categories.</field>
+            <field name="is_system" eval="True"/>
+        </record>
+        <record id="perm_highlights_manage" model="jabin.permission">
+            <field name="code">highlights.manage</field>
+            <field name="name">Manage Highlights</field>
+            <field name="description">Upload or delete highlight stories.</field>
+            <field name="is_system" eval="True"/>
+        </record>
+        <record id="perm_coupons_manage" model="jabin.permission">
+            <field name="code">coupons.manage</field>
+            <field name="name">Manage Coupons</field>
+            <field name="description">Create, update, toggle, or delete promo coupons.</field>
+            <field name="is_system" eval="True"/>
+        </record>
+        <record id="perm_loyalty_adjust" model="jabin.permission">
+            <field name="code">loyalty.adjust</field>
+            <field name="name">Adjust Loyalty Points</field>
+            <field name="description">Manually adjust customer loyalty point balances.</field>
+            <field name="is_system" eval="True"/>
+        </record>
+        <record id="perm_loyalty_manage_settings" model="jabin.permission">
+            <field name="code">loyalty.manage_settings</field>
+            <field name="name">Manage Loyalty Settings</field>
+            <field name="description">Update loyalty point earning and redemption rates.</field>
+            <field name="is_system" eval="True"/>
+        </record>
+        <record id="perm_notifications_send_admin" model="jabin.permission">
+            <field name="code">notifications.send_admin</field>
+            <field name="name">Send Admin Notifications</field>
+            <field name="description">Send direct push notifications or broadcast alerts.</field>
+            <field name="is_system" eval="True"/>
+        </record>
+        <record id="perm_catalog_manage" model="jabin.permission">
+            <field name="code">catalog.manage</field>
+            <field name="name">Manage Catalog Options</field>
+            <field name="description">Manage cutting options, packaging, and excluded parts.</field>
+            <field name="is_system" eval="True"/>
+        </record>
+        <record id="perm_users_manage" model="jabin.permission">
+            <field name="code">users.manage</field>
+            <field name="name">Admin User Management</field>
+            <field name="description">List customer accounts, view details, and change status.</field>
+            <field name="is_system" eval="True"/>
+        </record>
+
+    </data>
+
+    <!-- ================================================================== -->
+    <!-- System roles                                                        -->
+    <!-- ================================================================== -->
+    <data noupdate="1">
+
+        <!-- Administrator: full access (implicit; admin user_type short-
+             circuits all checks, but the role documents the intent). -->
+        <record id="role_admin" model="jabin.role">
+            <field name="code">admin</field>
+            <field name="name">Administrator</field>
+            <field name="description">Full system access. Assigned to platform administrators.</field>
+            <field name="sequence">1</field>
+            <field name="is_system" eval="True"/>
+        </record>
+
+        <!-- User manager: manages user accounts and addresses. -->
+        <record id="role_user_manager" model="jabin.role">
+            <field name="code">user_manager</field>
+            <field name="name">User Manager</field>
+            <field name="description">Manages user accounts, statuses, and addresses.</field>
+            <field name="sequence">10</field>
+            <field name="is_system" eval="True"/>
+        </record>
+
+        <!-- Security officer: manages roles and permissions, views audit. -->
+        <record id="role_security_officer" model="jabin.role">
+            <field name="code">security_officer</field>
+            <field name="name">Security Officer</field>
+            <field name="description">Manages RBAC roles and permissions; views audit logs.</field>
+            <field name="sequence">15</field>
+            <field name="is_system" eval="True"/>
+        </record>
+
+        <!-- Customer: self-service access to own profile and addresses. -->
+        <record id="role_customer" model="jabin.role">
+            <field name="code">customer</field>
+            <field name="name">Customer</field>
+            <field name="description">End-customer role. Self-service access to own profile and addresses.</field>
+            <field name="sequence">100</field>
+            <field name="is_system" eval="True"/>
+        </record>
+
+    </data>
+
+    <!-- ================================================================== -->
+    <!-- Role to Permission associations (updated on upgrade)                -->
+    <!-- ================================================================== -->
+    <data noupdate="0">
+
+        <!-- Admin gets every permission (belt-and-suspenders; the
+             user_type short-circuit already covers this). -->
+        <record id="role_admin" model="jabin.role">
+            <field name="permission_ids" eval="[
+                (6, 0, [
+                    ref('perm_users_create'),
+                    ref('perm_users_read'),
+                    ref('perm_users_update'),
+                    ref('perm_users_delete'),
+                    ref('perm_users_manage_status'),
+                    ref('perm_addresses_create'),
+                    ref('perm_addresses_read'),
+                    ref('perm_addresses_update'),
+                    ref('perm_addresses_delete'),
+                    ref('perm_roles_create'),
+                    ref('perm_roles_read'),
+                    ref('perm_roles_update'),
+                    ref('perm_roles_assign'),
+                    ref('perm_audit_read'),
+                    ref('perm_banners_manage'),
+                    ref('perm_products_manage'),
+                    ref('perm_categories_manage'),
+                    ref('perm_highlights_manage'),
+                    ref('perm_coupons_manage'),
+                    ref('perm_loyalty_adjust'),
+                    ref('perm_loyalty_manage_settings'),
+                    ref('perm_notifications_send_admin'),
+                    ref('perm_catalog_manage'),
+                    ref('perm_users_manage'),
+                ])
+            ]"/>
+        </record>
+
+        <!-- User manager: user + address management. -->
+        <record id="role_user_manager" model="jabin.role">
+            <field name="permission_ids" eval="[
+                (6, 0, [
+                    ref('perm_users_create'),
+                    ref('perm_users_read'),
+                    ref('perm_users_update'),
+                    ref('perm_users_delete'),
+                    ref('perm_users_manage_status'),
+                    ref('perm_addresses_create'),
+                    ref('perm_addresses_read'),
+                    ref('perm_addresses_update'),
+                    ref('perm_addresses_delete'),
+                ])
+            ]"/>
+        </record>
+
+        <!-- Security officer: RBAC + audit. -->
+        <record id="role_security_officer" model="jabin.role">
+            <field name="permission_ids" eval="[
+                (6, 0, [
+                    ref('perm_roles_create'),
+                    ref('perm_roles_read'),
+                    ref('perm_roles_update'),
+                    ref('perm_roles_assign'),
+                    ref('perm_audit_read'),
+                ])
+            ]"/>
+        </record>
+
+        <!-- Customer: self-service read/update of own profile and addresses. -->
+        <record id="role_customer" model="jabin.role">
+            <field name="permission_ids" eval="[
+                (6, 0, [
+                    ref('perm_addresses_create'),
+                    ref('perm_addresses_read'),
+                    ref('perm_addresses_update'),
+                    ref('perm_addresses_delete'),
+                ])
+            ]"/>
+        </record>
+
+    </data>
+</odoo>

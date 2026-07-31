@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Loyalty Adjust Points Wizard Form View -->
+    <record id="view_jabin_loyalty_adjust_wizard_form" model="ir.ui.view">
+        <field name="name">jabin.loyalty.adjust.wizard.form</field>
+        <field name="model">jabin.loyalty.adjust.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Adjust Loyalty Points">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="customer_id" options="{'no_create': True}"/>
+                            <field name="current_points"/>
+                        </group>
+                        <group>
+                            <field name="adjustment_type" widget="radio"/>
+                            <field name="points"/>
+                        </group>
+                    </group>
+                    <group string="Reason &amp; Justification">
+                        <field name="reason" placeholder="Explain the reason for this manual point adjustment..."/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="Apply Adjustment" name="action_adjust_points" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Loyalty Adjust Wizard Action -->
+    <record id="action_jabin_loyalty_adjust_wizard" model="ir.actions.act_window">
+        <field name="name">Manual Point Adjustment</field>
+        <field name="res_model">jabin.loyalty.adjust.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

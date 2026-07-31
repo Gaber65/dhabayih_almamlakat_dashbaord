@@ -1,0 +1,318 @@
+<odoo>
+    <!-- Tree View -->
+    <record id="view_jabin_users_tree" model="ir.ui.view">
+        <field name="name">jabin.users.tree</field>
+        <field name="model">res.users</field>
+        <field name="arch" type="xml">
+            <tree string="JABIN Users"
+                  decoration-success="status == 'active'"
+                  decoration-warning="status == 'pending'"
+                  decoration-danger="status in ['suspended','inactive']"
+            >
+                <field name="name"/>
+                <field name="login"/>
+                <field name="user_type"/>
+                <field name="status"/>
+                <field name="profile_completed" widget="boolean"/>
+                <field name="balance" sum="Total Balance"/>
+                <field name="loyalty_points"/>
+                <field name="last_login"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <!-- Custom Form (Replace Odoo Simple Form) -->
+    <record id="view_jabin_users_form" model="ir.ui.view">
+        <field name="name">jabin.users.form</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_simple_form"/>
+        <field name="priority">9999</field>
+
+        <field name="arch" type="xml">
+
+            <!-- Replace the whole sheet -->
+            <xpath expr="//sheet" position="replace">
+
+                <sheet>
+
+                    <field name="image_1920"
+                           widget="image"
+                           class="oe_avatar"
+                           options="{'preview_image': 'avatar_128'}"/>
+
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                        <label for="login"/>
+                        <h2>
+                            <field name="login"/>
+                        </h2>
+                    </div>
+
+                    <notebook>
+
+                        <page string="Overview">
+                            <group>
+                                <group string="Financial Information">
+                                    <field name="total_orders_count"/>
+                                    <field name="total_spending" widget="monetary" options="{'currency_field':'currency_id'}"/>
+                                    <field name="average_order_value" widget="monetary" options="{'currency_field':'currency_id'}"/>
+                                    <field name="total_refunds" widget="monetary" options="{'currency_field':'currency_id'}"/>
+                                    <field name="preferred_payment_method_id"/>
+                                </group>
+                                <group string="Loyalty Wallet">
+                                    <field name="loyalty_points"/>
+                                    <field name="total_earned_points"/>
+                                    <field name="total_redeemed_points"/>
+                                </group>
+                                <group string="Activity Metrics">
+                                    <field name="pending_payments_count"/>
+                                    <field name="completed_payments_count"/>
+                                    <field name="create_date" string="Registration Date" readonly="1"/>
+                                    <field name="last_login" readonly="1"/>
+                                    <field name="last_activity_date" readonly="1"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Personal Information">
+                            <group>
+                                <group>
+                                    <field name="user_type"/>
+                                    <field name="status"/>
+                                    <field name="profile_completed"/>
+                                    <field name="verified_at"/>
+                                </group>
+                                <group>
+                                    <field name="balance" widget="monetary" options="{'currency_field':'currency_id'}"/>
+                                    <field name="currency_id"/>
+                                    <field name="company_id"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Loyalty Wallet">
+                            <group>
+                                <group string="Loyalty Summary">
+                                    <field name="loyalty_points"/>
+                                    <field name="total_earned_points"/>
+                                    <field name="total_redeemed_points"/>
+                                </group>
+                            </group>
+                            <separator string="Loyalty Transaction History"/>
+                            <field name="loyalty_transaction_ids" readonly="1">
+                                <tree string="Loyalty Transactions">
+                                    <field name="date"/>
+                                    <field name="transaction_type" widget="badge"
+                                           decoration-success="transaction_type == 'earn'"
+                                           decoration-warning="transaction_type == 'redeem'"
+                                           decoration-danger="transaction_type == 'refund_adjustment'"
+                                           decoration-info="transaction_type == 'manual_adjustment'"/>
+                                    <field name="points"/>
+                                    <field name="balance_after"/>
+                                    <field name="order_id"/>
+                                    <field name="description"/>
+                                </tree>
+                            </field>
+                        </page>
+
+                        <page string="Addresses">
+
+
+                            <field name="addresses">
+
+                                <tree editable="bottom">
+                                    <field name="title"/>
+                                    <field name="recipient_name"/>
+                                    <field name="recipient_phone"/>
+                                    <field name="street"/>
+                                    <field name="city"/>
+                                    <field name="country_id"/>
+                                    <field name="latitude"/>
+                                    <field name="longitude"/>
+                                    <field name="is_default"/>
+                                </tree>
+
+                            </field>
+
+                        </page>
+
+                        <page string="Orders">
+                            <notebook>
+                                <page string="All Orders">
+                                    <field name="order_ids" readonly="1">
+                                        <tree string="All Orders">
+                                            <field name="name"/>
+                                            <field name="date"/>
+                                            <field name="state"/>
+                                            <field name="payment_status"/>
+                                            <field name="total" sum="Total Purchases"/>
+                                        </tree>
+                                    </field>
+                                </page>
+                                <page string="Active Orders">
+                                    <field name="active_order_ids" readonly="1">
+                                        <tree string="Active Orders">
+                                            <field name="name"/>
+                                            <field name="date"/>
+                                            <field name="state"/>
+                                            <field name="payment_status"/>
+                                            <field name="total" sum="Total Active Purchases"/>
+                                        </tree>
+                                    </field>
+                                </page>
+                                <page string="Previous Orders">
+                                    <field name="previous_order_ids" readonly="1">
+                                        <tree string="Previous Orders">
+                                            <field name="name"/>
+                                            <field name="date"/>
+                                            <field name="state"/>
+                                            <field name="payment_status"/>
+                                            <field name="total" sum="Total Completed Purchases"/>
+                                        </tree>
+                                    </field>
+                                </page>
+                                <page string="Cancelled Orders">
+                                    <field name="cancelled_order_ids" readonly="1">
+                                        <tree string="Cancelled Orders">
+                                            <field name="name"/>
+                                            <field name="date"/>
+                                            <field name="state"/>
+                                            <field name="payment_status"/>
+                                            <field name="total"/>
+                                        </tree>
+                                    </field>
+                                </page>
+                                <page string="Refunded Orders">
+                                    <field name="refunded_order_ids" readonly="1">
+                                        <tree string="Refunded Orders">
+                                            <field name="name"/>
+                                            <field name="date"/>
+                                            <field name="state"/>
+                                            <field name="payment_status"/>
+                                            <field name="total" sum="Total Refunded Amount"/>
+                                        </tree>
+                                    </field>
+                                </page>
+                            </notebook>
+                        </page>
+
+                        <page string="Payment Management">
+                            <field name="payment_transaction_ids" readonly="1">
+                                <tree string="Payment Transactions">
+                                    <field name="order_id"/>
+                                    <field name="payment_method_id"/>
+                                    <field name="amount"/>
+                                    <field name="status"/>
+                                    <field name="transaction_ref"/>
+                                    <field name="paid_date"/>
+                                    <field name="is_installment" widget="boolean"/>
+                                    <field name="installment_status" optional="hide"/>
+                                    <field name="installment_provider" optional="hide"/>
+                                </tree>
+                            </field>
+                        </page>
+
+                        <page string="Activity History">
+                            <field name="activity_ids" readonly="1">
+                                <tree string="Customer Activities">
+                                    <field name="timestamp"/>
+                                    <field name="action"/>
+                                    <field name="related_record"/>
+                                    <field name="triggered_by_id"/>
+                                </tree>
+                            </field>
+                        </page>
+
+                    </notebook>
+
+                </sheet>
+
+            </xpath>
+
+            <!-- Replace header -->
+            <xpath expr="//form" position="inside">
+
+                <header>
+
+                    <button
+                            name="update_last_login"
+                            string="Update Last Login"
+                            type="object"
+                            class="btn-primary"
+                            invisible="status != 'active'"/>
+
+                    <button
+                            name="action_open_send_notification_wizard"
+                            string="Send FCM Notification"
+                            type="object"
+                            class="btn-primary"
+                            icon="fa-paper-plane"/>
+
+                    <button
+                            name="action_open_loyalty_adjust_wizard"
+                            string="Adjust Loyalty Points"
+                            type="object"
+                            class="btn-secondary"/>
+
+
+
+                    <field
+                            name="status"
+                            widget="statusbar"
+                            statusbar_visible="pending,active,suspended,inactive"/>
+
+                </header>
+
+            </xpath>
+
+        </field>
+    </record>
+    <!-- Search View -->
+    <record id="view_jabin_users_search" model="ir.ui.view">
+        <field name="name">jabin.users.search</field>
+        <field name="model">res.users</field>
+        <field name="arch" type="xml">
+            <search string="Search Users">
+                <field name="name"/>
+                <field name="login"/>
+                <field name="user_type"/>
+                <field name="status"/>
+                <filter name="active_users" string="Active Users"
+                        domain="[('status','=','active')]"/>
+                <filter name="pending_users" string="Pending Users"
+                        domain="[('status','=','pending')]"/>
+                <filter name="suspended_users" string="Suspended Users"
+                        domain="[('status','=','suspended')]"/>
+                <filter name="inactive_users" string="Inactive Users"
+                        domain="[('status','=','inactive')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_by_status" string="Status"
+                            context="{'group_by':'status'}"/>
+                    <filter name="group_by_type" string="User Type"
+                            context="{'group_by':'user_type'}"/>
+                    <filter name="group_by_company" string="Company"
+                            context="{'group_by':'company_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="action_jabin_users" model="ir.actions.act_window">
+        <field name="name">Users</field>
+        <field name="res_model">res.users</field>
+        <field name="view_mode">tree,form</field>
+
+        <field name="view_id" ref="view_jabin_users_tree"/>
+
+        <field name="search_view_id" ref="view_jabin_users_search"/>
+        <field name="context">{}</field>
+
+        <field name="views" eval="[
+        (ref('view_jabin_users_tree'), 'tree'),
+        (ref('view_jabin_users_form'), 'form')
+    ]"/>
+    </record>
+</odoo>

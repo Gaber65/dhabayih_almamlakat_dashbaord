@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- ============================================================ -->
+        <!-- JABIN Highlight: Security Groups                              -->
+        <!-- ============================================================ -->
+
+        <!--
+            Dedicated group for highlight management.
+            Members can view, delete, and disable any highlight.
+            Automatically granted to base.group_system (Odoo Administrators).
+        -->
+        <record id="jabin_highlight_manager_group" model="res.groups">
+            <field name="name">JABIN Highlight Manager</field>
+            <field name="comment">
+                Can view, delete, and disable any user's highlights regardless
+                of ownership. Intended for content moderators and administrators.
+            </field>
+            <field name="category_id" ref="base.module_category_usability"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <!-- ============================================================ -->
+        <!-- jabin.highlight: record rules                                  -->
+        <!-- ============================================================ -->
+
+        <!--
+            Regular users: read only their own highlights (ORM layer).
+            The API service uses sudo(), so API access is enforced in Python,
+            not at the ORM record rule level. These rules apply to direct
+            ORM access (e.g. from Odoo backend, scripts).
+        -->
+        <record id="rule_jabin_highlight_user_own" model="ir.rule">
+            <field name="name">jabin.highlight: user sees own records</field>
+            <field name="model_id" ref="model_jabin_highlight"/>
+            <field name="domain_force">[('user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+        </record>
+
+        <!--
+            Highlight managers and system administrators see all records.
+        -->
+        <record id="rule_jabin_highlight_manager_all" model="ir.rule">
+            <field name="name">jabin.highlight: manager sees all records</field>
+            <field name="model_id" ref="model_jabin_highlight"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[
+                (4, ref('jabin_highlight_manager_group')),
+                (4, ref('base.group_system'))
+            ]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+        </record>
+
+    </data>
+</odoo>

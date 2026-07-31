@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_res_users,res.users,base.model_res_users,,1,1,1,1
+access_res_users_address,res.users.address,model_res_users_address,,1,1,1,1
+access_jabin_order,jabin_order,model_jabin_order,,1,1,1,1
+access_jabin_order_line,jabin_order_line,model_jabin_order_line,,1,1,1,1
+access_jabin_order_timeline,jabin_order_timeline,model_jabin_order_timeline,,1,1,1,1
+access_jabin_payment_method,jabin_payment_method,model_jabin_payment_method,,1,1,1,1
+access_jabin_payment_transaction,jabin_payment_transaction,model_jabin_payment_transaction,,1,1,1,1
+access_jabin_customer_activity,jabin_customer_activity,model_jabin_customer_activity,,1,1,1,1
+access_jabin_customer_service,jabin_customer_service,model_jabin_customer_service,,1,1,1,1
+

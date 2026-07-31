@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo noupdate="1">
+
+    <record id="jabin_internal_admin_secret"
+            model="ir.config_parameter">
+
+        <field name="key">jabin.internal.admin.secret</field>
+        <field name="value">2E3B8F6A92D441F5B6D0BDBD6E6DAD73</field>
+
+    </record>
+
+</odoo>

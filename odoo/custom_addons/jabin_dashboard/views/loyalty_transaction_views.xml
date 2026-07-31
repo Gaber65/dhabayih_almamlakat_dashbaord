@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Loyalty Transaction Tree View -->
+    <record id="view_jabin_loyalty_transaction_tree" model="ir.ui.view">
+        <field name="name">jabin.loyalty.transaction.tree</field>
+        <field name="model">jabin.loyalty.transaction</field>
+        <field name="arch" type="xml">
+            <tree string="Loyalty Transactions" create="false" edit="false" delete="false">
+                <field name="date"/>
+                <field name="customer_id"/>
+                <field name="transaction_type" widget="badge" 
+                       decoration-success="transaction_type == 'earn'"
+                       decoration-warning="transaction_type == 'redeem'"
+                       decoration-danger="transaction_type == 'refund_adjustment'"
+                       decoration-info="transaction_type == 'manual_adjustment'"/>
+                <field name="points" sum="Total Points"/>
+                <field name="balance_after"/>
+                <field name="order_id"/>
+                <field name="description"/>
+                <field name="created_by_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Loyalty Transaction Form View -->
+    <record id="view_jabin_loyalty_transaction_form" model="ir.ui.view">
+        <field name="name">jabin.loyalty.transaction.form</field>
+        <field name="model">jabin.loyalty.transaction</field>
+        <field name="arch" type="xml">
+            <form string="Loyalty Transaction" create="false" edit="false" delete="false">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="customer_id" readonly="1"/>
+                            <field name="transaction_type" readonly="1"/>
+                            <field name="points" readonly="1"/>
+                            <field name="balance_after" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="date" readonly="1"/>
+                            <field name="order_id" readonly="1"/>
+                            <field name="created_by_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="Details">
+                        <field name="description" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Loyalty Transaction Search View -->
+    <record id="view_jabin_loyalty_transaction_search" model="ir.ui.view">
+        <field name="name">jabin.loyalty.transaction.search</field>
+        <field name="model">jabin.loyalty.transaction</field>
+        <field name="arch" type="xml">
+            <search string="Search Loyalty Transactions">
+                <field name="customer_id"/>
+                <field name="order_id"/>
+                <field name="transaction_type"/>
+                <field name="description"/>
+                <separator/>
+                <filter string="Earned" name="type_earn" domain="[('transaction_type', '=', 'earn')]"/>
+                <filter string="Redeemed" name="type_redeem" domain="[('transaction_type', '=', 'redeem')]"/>
+                <filter string="Refund Adjustments" name="type_refund" domain="[('transaction_type', '=', 'refund_adjustment')]"/>
+                <filter string="Manual Adjustments" name="type_manual" domain="[('transaction_type', '=', 'manual_adjustment')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Customer" name="group_customer" context="{'group_by': 'customer_id'}"/>
+                    <filter string="Transaction Type" name="group_type" context="{'group_by': 'transaction_type'}"/>
+                    <filter string="Date" name="group_date" context="{'group_by': 'date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Loyalty Transaction Window Action -->
+    <record id="action_jabin_loyalty_transaction" model="ir.actions.act_window">
+        <field name="name">Loyalty Transactions</field>
+        <field name="res_model">jabin.loyalty.transaction</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_jabin_loyalty_transaction_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No loyalty transactions recorded yet!
+            </p>
+        </field>
+    </record>
+</odoo>

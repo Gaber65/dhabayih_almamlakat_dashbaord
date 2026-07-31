@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Initialize default dashboard sections -->
+        <record id="dashboard_overview" model="jabin.dashboard">
+            <field name="name">Overview</field>
+            <field name="sequence">10</field>
+            <field name="description">Main dashboard overview</field>
+            <field name="icon">fa-dashboard</field>
+            <field name="color">1</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="dashboard_sales" model="jabin.dashboard">
+            <field name="name">Sales Dashboard</field>
+            <field name="sequence">20</field>
+            <field name="description">Sales performance dashboard</field>
+            <field name="icon">fa-chart-line</field>
+            <field name="color">2</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="dashboard_operations" model="jabin.dashboard">
+            <field name="name">Operations Dashboard</field>
+            <field name="sequence">30</field>
+            <field name="description">Operational metrics dashboard</field>
+            <field name="icon">fa-cogs</field>
+            <field name="color">3</field>
+            <field name="active">True</field>
+        </record>
+
+        <!-- Initialize default Main Branch -->
+        <record id="branch_main" model="jabin.branch">
+            <field name="name">الفرع الرئيسي</field>
+            <field name="code">MAIN</field>
+            <field name="address">الرياض، المملكة العربية السعودية</field>
+            <field name="city">الرياض</field>
+            <field name="phone">+966112345678</field>
+            <field name="latitude">24.7136</field>
+            <field name="longitude">46.6753</field>
+            <field name="opening_hours">08:00 AM - 11:00 PM</field>
+            <field name="active">True</field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ============================================================ -->
+    <!--  COUPON / PROMO CODE VIEWS                                  -->
+    <!-- ============================================================ -->
+
+    <record id="view_jabin_coupon_tree" model="ir.ui.view">
+        <field name="name">jabin.coupon.tree</field>
+        <field name="model">jabin.coupon</field>
+        <field name="arch" type="xml">
+            <tree string="Coupons / Promo Codes"
+                  decoration-muted="not active"
+                  decoration-success="active">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="discount_type"/>
+                <field name="discount_value"/>
+                <field name="applies_to"/>
+                <field name="minimum_order_amount"/>
+                <field name="used_count"/>
+                <field name="usage_limit"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_jabin_coupon_form" model="ir.ui.view">
+        <field name="name">jabin.coupon.form</field>
+        <field name="model">jabin.coupon</field>
+        <field name="arch" type="xml">
+            <form string="Coupon / Promo Code">
+                <header>
+                    <button name="action_generate_random_code_new"
+                            string="Generate Random Code"
+                            type="object"
+                            class="btn-primary"
+                            icon="fa-refresh"/>
+                </header>
+                <sheet>
+
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <label for="code" string="Coupon Code"/>
+                        <h1>
+                            <field name="code" placeholder="e.g. SAVE10"/>
+                        </h1>
+                        <label for="name" string="Coupon Name"/>
+                        <h2>
+                            <field name="name" placeholder="e.g. Summer Special 10% Off"/>
+                        </h2>
+                    </div>
+                    <group>
+                        <group string="Discount Rules">
+                            <field name="discount_type"/>
+                            <field name="discount_value"/>
+                            <field name="minimum_order_amount"/>
+                            <field name="maximum_discount" invisible="discount_type != 'percentage'"/>
+                            <field name="active"/>
+                        </group>
+                        <group string="Usage &amp; Timing">
+                            <field name="usage_limit"/>
+                            <field name="used_count" readonly="1"/>
+                            <field name="usage_limit_per_customer"/>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Restrictions / Applicability">
+                            <group>
+                                <field name="applies_to" widget="radio"/>
+                            </group>
+                            <group invisible="applies_to != 'categories'">
+                                <field name="category_ids" widget="many2many_tags"
+                                       placeholder="Select eligible categories..."/>
+                            </group>
+                            <group invisible="applies_to != 'products'">
+                                <field name="product_ids" widget="many2many_tags"
+                                       placeholder="Select eligible products..."/>
+                            </group>
+                        </page>
+                        <page string="Description &amp; Terms">
+                            <field name="description"
+                                   placeholder="Enter coupon description, promotion terms, or internal notes..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_jabin_coupon_search" model="ir.ui.view">
+        <field name="name">jabin.coupon.search</field>
+        <field name="model">jabin.coupon</field>
+        <field name="arch" type="xml">
+            <search string="Search Coupons">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="discount_type"/>
+                <filter string="Active" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                <separator/>
+                <filter string="Percentage Discounts" name="percentage"
+                        domain="[('discount_type', '=', 'percentage')]"/>
+                <filter string="Fixed Amount Discounts" name="fixed" domain="[('discount_type', '=', 'fixed')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Discount Type" name="group_discount_type" context="{'group_by': 'discount_type'}"/>
+                    <filter string="Applies To" name="group_applies_to" context="{'group_by': 'applies_to'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_jabin_coupons" model="ir.actions.act_window">
+        <field name="name">Coupons &amp; Promo Codes</field>
+        <field name="res_model">jabin.coupon</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_jabin_coupon_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first promotional coupon!
+            </p>
+            <p>
+                Manage percentage or fixed amount promo codes, set usage limits, date ranges, and category/product
+                restrictions.
+            </p>
+        </field>
+    </record>
+</odoo>
