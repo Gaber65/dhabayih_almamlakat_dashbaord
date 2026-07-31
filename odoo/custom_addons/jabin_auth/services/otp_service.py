@@ -148,8 +148,7 @@ class OtpService(models.AbstractModel):
             )
         except Exception as exc:
             _get_logger().error('Failed to send OTP email: %s', exc)
-            # Don't raise here - we want to return the code even if email fails
-            pass
+            raise
 
         return plain_code
 
