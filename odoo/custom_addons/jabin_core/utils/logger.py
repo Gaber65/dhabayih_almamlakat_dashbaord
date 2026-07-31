@@ -12,6 +12,9 @@ class JabinAuditLogger(logging.Logger):
 
     def audit(self, msg: str, *args: Any, **kwargs: Any) -> None:
         if self.isEnabledFor(AUDIT_LEVEL):
+            if args and "%" not in msg:
+                msg = f"{msg} | " + " | ".join(str(arg) for arg in args)
+                args = ()
             self._log(AUDIT_LEVEL, msg, args, **kwargs)
 
 
@@ -19,7 +22,9 @@ class JabinAuditLoggerAdapter(logging.LoggerAdapter):
     """LoggerAdapter that also exposes audit()."""
 
     def audit(self, msg: str, *args: Any, **kwargs: Any) -> None:
-        self.logger.audit(msg, *args, **kwargs)
+        if self.isEnabledFor(AUDIT_LEVEL):
+            msg, kwargs = self.process(msg, kwargs)
+            self.logger.audit(msg, *args, **kwargs)
 
 
 logging.setLoggerClass(JabinAuditLogger)
