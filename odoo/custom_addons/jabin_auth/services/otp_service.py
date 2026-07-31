@@ -98,12 +98,6 @@ class OtpService(models.AbstractModel):
 
         try:
             OTP.create(otp_data)
-            _get_logger().audit(
-                'OTP created: email=%s purpose=%s',
-                email,
-                purpose,
-                extra={'email': email, 'purpose': purpose}
-            )
         except IntegrityError as exc:
             # If we still get a duplicate, try one more time with a fresh deletion
             self.env.cr.rollback()
@@ -122,12 +116,6 @@ class OtpService(models.AbstractModel):
             # Try creating again
             try:
                 OTP.create(otp_data)
-                _get_logger().audit(
-                    'OTP created after cleanup: email=%s purpose=%s',
-                    email,
-                    purpose,
-                    extra={'email': email, 'purpose': purpose}
-                )
             except Exception as retry_exc:
                 _get_logger().error('Failed to create OTP after cleanup: %s', retry_exc)
                 raise ValidationError(f'Failed to create OTP: {retry_exc}')
