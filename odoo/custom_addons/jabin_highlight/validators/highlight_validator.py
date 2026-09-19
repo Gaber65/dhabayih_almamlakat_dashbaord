@@ -43,6 +43,15 @@ class HighlightValidator(BaseValidator):
     MAX_NAME_LENGTH = 255
 
     @staticmethod
+    def is_missing(value: Any) -> bool:
+        """Return True if the value is considered empty or missing."""
+        if value is None:
+            return True
+        if isinstance(value, str) and not value.strip():
+            return True
+        return False
+
+    @staticmethod
     def validate_create(
         media_type: Optional[str],
         file_storage: Any,

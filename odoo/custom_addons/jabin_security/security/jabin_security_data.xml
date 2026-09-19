@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  JABIN Security: seed data.
+  Jabin Security: seed data.
 
-  Defines the initial system roles and permissions that ship with the JABIN
+  Defines the initial system roles and permissions that ship with the Jabin
   platform. These records are created once at module install time and are
   marked is_system=True so they cannot be accidentally deleted.
 

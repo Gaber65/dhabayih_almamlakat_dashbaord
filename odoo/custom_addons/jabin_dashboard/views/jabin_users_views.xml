@@ -4,7 +4,7 @@
         <field name="name">jabin.users.tree</field>
         <field name="model">res.users</field>
         <field name="arch" type="xml">
-            <tree string="JABIN Users"
+            <tree string="Dhabayih Lmamlaka Users"
                   decoration-success="status == 'active'"
                   decoration-warning="status == 'pending'"
                   decoration-danger="status in ['suspended','inactive']"
@@ -234,7 +234,7 @@
             </xpath>
 
             <!-- Replace header -->
-            <xpath expr="//form" position="inside">
+            <xpath expr="//sheet" position="before">
 
                 <header>
 

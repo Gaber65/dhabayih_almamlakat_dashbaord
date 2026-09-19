@@ -4,7 +4,7 @@ from odoo.exceptions import ValidationError
 
 class JabinCategory(models.Model):
     _name = 'jabin.category'
-    _description = 'JABIN Category'
+    _description = 'Dhabayih Lmamlaka Category'
     _order = 'sequence, name'
 
     name = fields.Char(string='Name', required=True, translate=True)
@@ -45,6 +45,17 @@ class JabinCategory(models.Model):
                     _('Cannot delete category with existing products!')
                 )
         return super(JabinCategory, self).unlink()
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        records = super(JabinCategory, self).create(vals_list)
+        for record in records:
+            if record.active:
+                try:
+                    self.env["jabin.notification.service"].sudo().send_new_category(self.env, record)
+                except Exception:
+                    pass
+        return records
 
     def name_get(self):
         result = []

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Centralised constants package for the JABIN ERP platform.
+"""Centralised constants package for the Jabin ERP platform.
 
 Every enum lives in its own module so that downstream modules can import only
 the constants they need (``from odoo.addons.jabin_core.constants.user_types import UserType``)

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- ===================== -->
+    <!-- Form View -->
+    <!-- ===================== -->
+    <record id="view_jabin_offer_form" model="ir.ui.view">
+        <field name="name">jabin.offer.form</field>
+        <field name="model">jabin.offer</field>
+        <field name="arch" type="xml">
+            <form string="Promotional Offer">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active == True"/>
+                    <widget name="web_ribbon" title="Active Offer" bg_color="text-bg-success" invisible="is_currently_active == False"/>
+
+                    <div class="oe_title">
+                        <label for="name" string="Offer Title"/>
+                        <h1>
+                            <field name="name" placeholder="e.g. عروض العيد - توفير الذبائح"/>
+                        </h1>
+                        <field name="subtitle" placeholder="e.g. خصم 15% على جميع ذبائح النعيمي والحري"/>
+                    </div>
+
+                    <group>
+                        <group string="Discount Rules">
+                            <field name="discount_type" widget="radio" options="{'horizontal': true}"/>
+                            <field name="discount_value"/>
+                            <field name="badge_text"/>
+                        </group>
+                        <group string="Validity &amp; Schedule">
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                            <field name="sequence"/>
+                            <field name="active"/>
+                            <field name="is_currently_active" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Included Products" name="products">
+                            <field name="product_ids" widget="many2many">
+                                <tree string="Products" editable="bottom">
+                                    <field name="name"/>
+                                    <field name="category_id"/>
+                                    <field name="selling_price"/>
+                                    <field name="offer_price" string="Discounted Price"/>
+                                    <field name="stock_quantity"/>
+                                </tree>
+                            </field>
+                        </page>
+
+                        <page string="Promotional Banner" name="banner">
+                            <group>
+                                <field name="banner_image" widget="image" options="{'size': [1200, 500]}" class="oe_avatar" nolabel="1"/>
+                            </group>
+                        </page>
+
+                        <page string="Description &amp; Terms" name="description">
+                            <field name="description" placeholder="تفاصيل وشروط العرض الترويجي..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ===================== -->
+    <!-- Tree View -->
+    <!-- ===================== -->
+    <record id="view_jabin_offer_tree" model="ir.ui.view">
+        <field name="name">jabin.offer.tree</field>
+        <field name="model">jabin.offer</field>
+        <field name="arch" type="xml">
+            <tree string="Promotional Offers" decoration-success="is_currently_active == True" decoration-muted="active == False">
+                <field name="sequence" widget="handle"/>
+                <field name="banner_image" widget="image" options="{'size': [120, 50]}"/>
+                <field name="name"/>
+                <field name="badge_text"/>
+                <field name="discount_type"/>
+                <field name="discount_value"/>
+                <field name="products_count"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="is_currently_active" widget="boolean"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ===================== -->
+    <!-- Search View -->
+    <!-- ===================== -->
+    <record id="view_jabin_offer_search" model="ir.ui.view">
+        <field name="name">jabin.offer.search</field>
+        <field name="model">jabin.offer</field>
+        <field name="arch" type="xml">
+            <search string="Search Offers">
+                <field name="name"/>
+                <field name="badge_text"/>
+                <filter string="Active Offers" name="active_offers" domain="[('active', '=', True)]"/>
+                <filter string="Archived" name="archived" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Discount Type" name="group_discount_type" context="{'group_by': 'discount_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- ===================== -->
+    <!-- Action -->
+    <!-- ===================== -->
+    <record id="action_jabin_offer" model="ir.actions.act_window">
+        <field name="name">Promotional Offers</field>
+        <field name="res_model">jabin.offer</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'search_default_active_offers': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first promotional offer and link multiple products with a dedicated banner!
+            </p>
+        </field>
+    </record>
+
+</odoo>

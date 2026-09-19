@@ -55,6 +55,7 @@ class ProfileController(BaseApiController):
         auth="public",
         methods=["GET"],
         csrf=False,
+        cors="*",
     )
     def get_profile(self, **kwargs):
         """Get customer profile."""
@@ -103,6 +104,7 @@ class ProfileController(BaseApiController):
         auth="public",
         methods=["PUT"],
         csrf=False,
+        cors="*",
     )
     def update_profile(self, **kwargs):
         """Update customer profile."""

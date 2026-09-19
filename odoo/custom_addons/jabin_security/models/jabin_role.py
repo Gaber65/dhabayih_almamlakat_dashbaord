@@ -8,7 +8,7 @@ _logger = JabinLogger.get('security.role')
 
 class JabinRole(models.Model):
     _name = 'jabin.role'
-    _description = 'JABIN Role'
+    _description = 'Dhabayih Lmamlaka Role'
     _order = 'sequence, code'
     _rec_name = 'code'
 
@@ -19,7 +19,7 @@ class JabinRole(models.Model):
         help="Unique machine-readable role identifier (e.g. 'order_manager')."
     )
     name = fields.Char(
-        string='Display Name',
+        string='Role Name',
         required=True,
         help='Human-readable role name.'
     )

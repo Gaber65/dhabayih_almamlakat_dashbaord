@@ -47,6 +47,12 @@ def _parse_request_data() -> Dict[str, Any]:
         # Remove id if present
         vals.pop("id", None)
 
+    # Sanitize fields for jabin.excluded.part model
+    if "is_active" in vals:
+        vals["active"] = bool(vals.pop("is_active"))
+    vals.pop("extra_price", None)
+    vals.pop("type", None)
+
     return vals
 
 
@@ -69,6 +75,7 @@ class ExcludedPartController(BaseApiController):
         auth="public",
         methods=["POST"],
         csrf=False,
+        cors="*",
     )
     @permission_required("catalog.manage")
     def create_excluded_part(self, **kwargs):
@@ -97,6 +104,9 @@ class ExcludedPartController(BaseApiController):
                             "name": excluded_part.name,
                             "description": excluded_part.description,
                             "active": excluded_part.active,
+                            "is_active": excluded_part.active,
+                            "extra_price": 0.0,
+                            "type": "excluded_part",
                         },
                         message=_("Excluded part created successfully"),
                         code=201,
@@ -132,6 +142,7 @@ class ExcludedPartController(BaseApiController):
         auth="public",
         methods=["PUT"],
         csrf=False,
+        cors="*",
     )
     @permission_required("catalog.manage")
     def update_excluded_part(self, part_id, **kwargs):
@@ -161,6 +172,9 @@ class ExcludedPartController(BaseApiController):
                             "name": excluded_part.name,
                             "description": excluded_part.description,
                             "active": excluded_part.active,
+                            "is_active": excluded_part.active,
+                            "extra_price": 0.0,
+                            "type": "excluded_part",
                         },
                         message=_("Excluded part updated successfully"),
                     )
@@ -195,6 +209,7 @@ class ExcludedPartController(BaseApiController):
         auth="public",
         methods=["DELETE"],
         csrf=False,
+        cors="*",
     )
     @permission_required("catalog.manage")
     def delete_excluded_part(self, part_id, **kwargs):
@@ -241,6 +256,7 @@ class ExcludedPartController(BaseApiController):
         auth="public",
         methods=["GET"],
         csrf=False,
+        cors="*",
     )
     def get(self, part_id, **kwargs):
         """Get a single excluded part by ID."""
@@ -294,6 +310,7 @@ class ExcludedPartController(BaseApiController):
         auth="public",
         methods=["GET"],
         csrf=False,
+        cors="*",
     )
     def get_list(self, **kwargs):
         """Get paginated list of excluded parts."""

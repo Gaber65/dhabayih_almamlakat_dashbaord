@@ -7,7 +7,7 @@ _logger = JabinLogger.get('security.audit_log')
 
 class JabinAuditLog(models.Model):
     _name = 'jabin.audit.log'
-    _description = 'JABIN Audit Log'
+    _description = 'Dhabayih Lmamlaka Audit Log'
     _order = 'create_date desc'
     action = fields.Char(string='Action', required=True, index=True, help="Event code in '<domain>.<event>' format (e.g. 'auth.login').")
     severity = fields.Selection(selection=[('info', 'Info'), ('warning', 'Warning'), ('error', 'Error'), ('critical', 'Critical')], string='Severity', default='info', required=True, index=True)

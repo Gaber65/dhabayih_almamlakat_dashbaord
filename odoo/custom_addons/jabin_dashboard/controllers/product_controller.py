@@ -1,6 +1,7 @@
 # product_controller.py
 import base64
 import json
+import time
 from typing import Dict, Any, Optional, List
 
 from odoo import http, _
@@ -69,8 +70,25 @@ def _parse_request_data() -> Dict[str, Any]:
             except json.JSONDecodeError:
                 raise ValueError("Invalid JSON payload.")
 
-        # Remove id if present
+        # Remove unwanted fields if present
         vals.pop("id", None)
+        vals.pop("image_path", None)
+        vals.pop("image_url", None)
+
+    # Map Flutter fields
+    name = vals.pop("name_ar", None) or vals.pop("title", None) or vals.get("name") or vals.pop("name_en", None)
+    if name:
+        vals["name"] = name
+    vals.pop("name_ar", None)
+    vals.pop("name_en", None)
+    vals.pop("title", None)
+
+    if "price" in vals and "selling_price" not in vals:
+        vals["selling_price"] = vals.pop("price")
+    vals.pop("price", None)
+
+    if not vals.get("sku"):
+        vals["sku"] = f"PROD-{int(time.time() * 1000)}"
 
     return vals
 
@@ -130,12 +148,12 @@ def _get_lang() -> str:
 
 
 def _get_product_main_image_url(product) -> Optional[str]:
-    """Get the primary image URL for a product, prioritizing the first gallery image in product_image_ids."""
+    """Get the primary image URL for a product, checking main_image first then gallery."""
+    if getattr(product, "main_image", False):
+        return BaseApiController.build_image_url("jabin.product", product.id, "main_image")
     first_img = product.product_image_ids[:1]
     if first_img:
         return BaseApiController.build_image_url("jabin.product.image", first_img.id, "image")
-    if getattr(product, "main_image", False):
-        return BaseApiController.build_image_url("jabin.product", product.id, "main_image")
     return None
 
 
@@ -167,6 +185,7 @@ def _serialize_product(product) -> Dict[str, Any]:
         "preparation_time": product.preparation_time,
         "main_image": main_img_url,
         "main_image_url": main_img_url,
+        "image_url": main_img_url,
         "active": product.active,
         "is_available": product.is_available,
         "is_featured": product.is_featured,
@@ -208,6 +227,7 @@ class ProductController(BaseApiController):
         auth="public",
         methods=["POST"],
         csrf=False,
+        cors="*",
     )
     @permission_required("products.manage")
     def create_product(self, **kwargs):
@@ -244,6 +264,9 @@ class ProductController(BaseApiController):
                     vals,
                 )
 
+                img_url = BaseApiController.build_image_url(
+                    "jabin.product", product.id, "main_image", bool(product.main_image)
+                )
                 # Build success response
                 ctx.set_body(
                     ResponseBuilder.success(
@@ -251,10 +274,12 @@ class ProductController(BaseApiController):
                             "id": product.id,
                             "name": product.name,
                             "sku": product.sku,
+                            "price": product.selling_price or 0.0,
                             "selling_price": product.selling_price,
                             "offer_price": product.offer_price,
                             "is_on_offer": product.is_on_offer,
                             "stock_quantity": product.stock_quantity,
+                            "image_url": img_url,
                         },
                         message=_("Product created successfully"),
                         code=201,
@@ -293,6 +318,7 @@ class ProductController(BaseApiController):
         auth="public",
         methods=["GET"],
         csrf=False,
+        cors="*",
     )
     def get_product(self, product_id, **kwargs):
         """Get a single product by ID."""
@@ -341,6 +367,7 @@ class ProductController(BaseApiController):
         auth="public",
         methods=["GET"],
         csrf=False,
+        cors="*",
     )
     def get_products(self, **kwargs):
         """Get paginated list of products."""
@@ -361,14 +388,26 @@ class ProductController(BaseApiController):
                 # Build domain
                 domain = []
 
+                search_query = kwargs.get("search") or kwargs.get("query")
+                if search_query:
+                    domain.append("|")
+                    domain.append(("name", "ilike", search_query))
+                    domain.append(("sku", "ilike", search_query))
+
                 # Generic filter param helper
                 filter_param = kwargs.get("filter")
                 if filter_param == "best_seller":
                     domain.append(("is_best_seller", "=", True))
                 elif filter_param == "featured":
                     domain.append(("is_featured", "=", True))
-                elif filter_param == "offers":
+                elif filter_param in ("offers", "on_offer"):
                     domain.append(("is_on_offer", "=", True))
+                elif filter_param == "active":
+                    domain.append(("active", "=", True))
+                elif filter_param == "inactive":
+                    domain.append(("active", "=", False))
+                elif filter_param == "low_stock":
+                    domain.append(("stock_quantity", "<=", 5))
 
                 if kwargs.get("category_id"):
                     try:
@@ -431,9 +470,9 @@ class ProductController(BaseApiController):
                             "stock_quantity": p.stock_quantity,
                             "is_available": p.is_available,
                             "is_featured": p.is_featured,
-                            "is_best_seller": p.is_best_seller,
-                            "main_image": BaseApiController.build_image_url("jabin.product", p.id, "main_image", bool(p.main_image)),
-                            "main_image_url": BaseApiController.build_image_url("jabin.product", p.id, "main_image", bool(p.main_image)),
+                            "main_image": _get_product_main_image_url(p),
+                            "main_image_url": _get_product_main_image_url(p),
+                            "image_url": _get_product_main_image_url(p),
                             "cutting_options": [{"id": opt.id, "name": opt.name} for opt in p.cutting_option_ids],
                             "packaging_options": [{"id": pkg.id, "name": pkg.name} for pkg in p.packaging_ids],
                             "excluded_parts": [{"id": part.id, "name": part.name} for part in p.excluded_part_ids],
@@ -487,6 +526,7 @@ class ProductController(BaseApiController):
         auth="public",
         methods=["PUT"],
         csrf=False,
+        cors="*",
     )
     @permission_required("products.manage")
     def update_product(self, product_id, **kwargs):
@@ -574,6 +614,7 @@ class ProductController(BaseApiController):
         auth="public",
         methods=["DELETE"],
         csrf=False,
+        cors="*",
     )
     @permission_required("products.manage")
     def delete_product(self, product_id, **kwargs):
@@ -623,6 +664,7 @@ class ProductController(BaseApiController):
         auth="public",
         methods=["POST"],
         csrf=False,
+        cors="*",
     )
     @permission_required("products.manage")
     def update_stock(self, product_id, **kwargs):
@@ -700,6 +742,7 @@ class ProductController(BaseApiController):
         auth="public",
         methods=["POST"],
         csrf=False,
+        cors="*",
     )
     @permission_required("products.manage")
     def toggle_active(self, product_id, **kwargs):

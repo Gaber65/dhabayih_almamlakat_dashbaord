@@ -58,12 +58,17 @@ class CheckoutService:
 
         # Determine initial state: COD orders automatically move to confirmed
         initial_state = "confirmed" if (payment_method and payment_method.code == "cod") else "pending_payment"
+        
+        delivery_fee_config = float(env['ir.config_parameter'].sudo().get_param('jabin.delivery.fee', '31.95'))
+        delivery_fee = delivery_fee_config if delivery_type == "address" else 0.0
 
         order = env["jabin.order"].sudo().create({
             "customer_id": customer_id,
             "state": initial_state,
             "payment_method_id": payment_method_id,
             "internal_notes": notes or cart.notes or "",
+            "delivery_type": delivery_type,
+            "delivery_fee": delivery_fee,
         })
 
         for line in cart.line_ids:
@@ -87,11 +92,29 @@ class CheckoutService:
             order.apply_coupon(str(coupon_code).strip())
 
         # Redeem loyalty points if provided
-        if redeem_points and int(redeem_points) > 0:
-            pts = int(redeem_points)
-            order.apply_loyalty_points(pts)
-            from odoo.addons.jabin_dashboard.services.loyalty_service import LoyaltyService
-            LoyaltyService.deduct_redeemed_points(env, customer_id, pts, order.id)
+        if redeem_points:
+            if isinstance(redeem_points, bool) and redeem_points:
+                pts = user.loyalty_points
+            elif isinstance(redeem_points, str) and redeem_points.lower() in ('true', '1'):
+                pts = user.loyalty_points
+            else:
+                try:
+                    pts = int(redeem_points)
+                except (ValueError, TypeError):
+                    pts = 0
+
+            if pts > 0:
+                pts = min(pts, user.loyalty_points)
+                from odoo.addons.jabin_dashboard.services.loyalty_service import LoyaltyService
+                settings = LoyaltyService.get_settings(env)
+                
+                subtotal_before_loyalty = order.subtotal - (order.discount_amount - order.loyalty_discount_amount) + order.tax_amount
+                max_points_for_order = int(subtotal_before_loyalty * settings['redemption_rate'])
+                
+                pts = min(pts, max_points_for_order)
+                if pts >= settings['min_redemption']:
+                    order.apply_loyalty_points(pts)
+                    LoyaltyService.deduct_redeemed_points(env, customer_id, pts, order.id)
 
         cart.write({
             "status": "checked_out",

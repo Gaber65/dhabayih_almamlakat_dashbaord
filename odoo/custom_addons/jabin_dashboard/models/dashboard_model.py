@@ -5,7 +5,7 @@ from typing import Dict, Any, Optional
 class JabinDashboard(models.Model):
     """Placeholder dashboard model - no business logic"""
     _name = 'jabin.dashboard'
-    _description = 'JABIN Dashboard'
+    _description = 'Dhabayih Lmamlaka Dashboard'
     _order = 'sequence, name'
     _rec_name = 'name'
 
@@ -173,7 +173,7 @@ class JabinDashboard(models.Model):
 class JabinDashboardSetting(models.TransientModel):
     """Dashboard settings model"""
     _name = 'jabin.dashboard.setting'
-    _description = 'JABIN Dashboard Settings'
+    _description = 'Dhabayih Lmamlaka Dashboard Settings'
 
     dashboard_layout = fields.Selection([
         ('grid', 'Grid'),

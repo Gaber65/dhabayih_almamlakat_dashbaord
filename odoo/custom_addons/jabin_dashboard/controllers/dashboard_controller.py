@@ -1,6 +1,5 @@
 from odoo import http, _
 from odoo.http import request
-from odoo.addons.web.controllers.main import ensure_db
 from odoo.addons.jabin_api.controllers import BaseApiController
 from odoo.addons.jabin_core import ResponseBuilder
 from odoo.addons.jabin_security.utils.token_auth import require_token
@@ -15,15 +14,14 @@ class DashboardController(BaseApiController):
         auth="public",
         methods=["GET", "POST"],
         csrf=False,
+        cors="*",
     )
-    @permission_required("audit.read")
     def get_dashboard_data(self, **kwargs):
         """Get all dashboard data stats (Admin API)."""
         denied = require_token()
         if denied:
             return denied
 
-        ensure_db()
         with self.handle() as ctx:
             service = request.env['jabin.dashboard.service'].sudo()
             data = service.get_dashboard_data()

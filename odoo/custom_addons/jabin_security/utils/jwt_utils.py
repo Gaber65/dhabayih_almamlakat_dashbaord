@@ -27,7 +27,7 @@ class JWTUtils:
     def _resolve_secret(explicit: Optional[str]=None) -> str:
         if explicit:
             return explicit
-        env_secret = os.environ.get('JABIN_JWT_SECRET')
+        env_secret = os.environ.get('Jabin_JWT_SECRET')
         if env_secret:
             return env_secret
         try:

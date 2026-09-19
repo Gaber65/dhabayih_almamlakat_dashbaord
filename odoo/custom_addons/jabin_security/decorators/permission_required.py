@@ -22,11 +22,13 @@ def permission_required(permission: Optional[str]=None, *, any_of: Optional[List
             if not ctx.is_authenticated:
                 envelope = ResponseBuilder.unauthorized(message='Authentication required before permission check.')
                 return self._build_response(envelope, status=401)
-            authz_svc = request.env['jabin.authorization.service']
+            if ctx.is_admin:
+                return func(self, *args, **kwargs)
+            authz_svc = request.env['jabin.authorization.service'].sudo()
             allowed = authz_svc.authorize(ctx, any_of=required_any or None, all_of=required_all or None, require_active_account=True)
             if not allowed:
                 try:
-                    request.env['jabin.audit.service'].log_unauthorized(user_id=ctx.user_id, action='authz.permission_denied', permission=permission, any_of=required_any, all_of=required_all)
+                    request.env['jabin.audit.service'].sudo().log_unauthorized(user_id=ctx.user_id, action='authz.permission_denied', permission=permission, any_of=required_any, all_of=required_all)
                 except Exception:
                     pass
                 envelope = ResponseBuilder.forbidden(message='You do not have permission to perform this action.')

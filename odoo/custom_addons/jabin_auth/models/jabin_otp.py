@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, Any, Optional
 
 from odoo.addons.jabin_core import JabinLogger
-from odoo import api, fields, models
+from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 from odoo.tools import mute_logger
 
@@ -39,12 +39,12 @@ class OTPPurpose:
 
 
 class JabinOTP(models.Model):
-    """JABIN One-Time Password (OTP) Model.
+    """Jabin One-Time Password (OTP) Model.
 
     Stores OTP codes securely as hashes with expiration and attempt tracking.
     """
     _name = 'jabin.otp'
-    _description = 'JABIN OTP'
+    _description = 'Dhabayih Lmamlaka OTP'
     _order = 'created_at desc'
     _rec_name = 'email'
 
@@ -129,12 +129,26 @@ class JabinOTP(models.Model):
     )
 
     # -- Constraints ------------------------------------------------------- #
-    _sql_constraints = [
-        # Only enforce uniqueness for unverified OTPs
-        ('email_purpose_active',
-         'UNIQUE(email, purpose) WHERE verified = false',
-         'Only one active (unverified) OTP per email and purpose is allowed.'),
-    ]
+    @api.constrains('email', 'purpose', 'verified')
+    def _check_unique_active_otp(self):
+        for rec in self:
+            if not rec.verified:
+                duplicate = self.search([
+                    ('id', '!=', rec.id),
+                    ('email', '=', rec.email),
+                    ('purpose', '=', rec.purpose),
+                    ('verified', '=', False),
+                ], limit=1)
+                if duplicate:
+                    raise ValidationError(_('Only one active (unverified) OTP per email and purpose is allowed.'))
+
+    def init(self):
+        super().init()
+        self.env.cr.execute("""
+            CREATE UNIQUE INDEX IF NOT EXISTS jabin_otp_email_purpose_active_idx
+            ON jabin_otp (email, purpose)
+            WHERE verified = false;
+        """)
     # -- Helper Methods ---------------------------------------------------- #
     @api.model
     def _get_purpose_selection(self):
@@ -181,7 +195,7 @@ class JabinOTP(models.Model):
             return False
 
     # -- CRUD Overrides ---------------------------------------------------- #
-    @api.model
+    @api.model_create_multi
     def create(self, vals_list) -> 'JabinOTP':
         """Override create to set default values and hash the code."""
         # Convert single dict to list if needed

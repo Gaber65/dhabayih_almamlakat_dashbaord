@@ -8,6 +8,7 @@ access_jabin_cutting_option_user,jabin.cutting.option.user,model_jabin_cutting_o
 access_jabin_packaging_user,jabin.packaging.user,model_jabin_packaging,,1,1,1,1
 access_jabin_excluded_part_user,jabin.excluded.part.user,model_jabin_excluded_part,,1,1,1,1
 access_banner_user,banner.user,model_banner,,1,1,1,1
+access_jabin_offer_user,jabin.offer.user,model_jabin_offer,,1,1,1,1
 access_jabin_order_user,jabin.order.user,model_jabin_order,base.group_user,1,1,1,1
 access_jabin_cart_user,jabin.cart.user,model_jabin_cart,base.group_user,1,1,1,1
 access_jabin_cart_line_user,jabin.cart.line.user,model_jabin_cart_line,base.group_user,1,1,1,1

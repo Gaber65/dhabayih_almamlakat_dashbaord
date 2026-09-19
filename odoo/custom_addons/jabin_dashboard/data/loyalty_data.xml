@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="1">
-        <!-- Default System Parameters for JABIN Loyalty Points System -->
+        <!-- Default System Parameters for Jabin Loyalty Points System -->
         <record id="param_jabin_loyalty_earning_rate" model="ir.config_parameter">
             <field name="key">jabin_loyalty.earning_rate</field>
             <field name="value">1.0</field>

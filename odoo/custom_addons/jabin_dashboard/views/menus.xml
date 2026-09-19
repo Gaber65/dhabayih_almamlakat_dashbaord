@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <menuitem id="menu_jabin_root" name="JABIN" sequence="10" web_icon="jabin_dashboard,static/description/icon.png"
+    <menuitem id="menu_jabin_root" name="Dhabayih Lmamlaka" sequence="10" web_icon="jabin_dashboard,static/description/icon.png"
               groups="base.group_user"/>
     <menuitem id="menu_jabin_dashboard" name="Dashboard" parent="menu_jabin_root" action="action_jabin_dashboard_view"
               sequence="10"/>
@@ -9,6 +9,8 @@
               sequence="10"/>
     <menuitem id="menu_jabin_category" name="Categories" parent="menu_jabin_products" action="action_jabin_category"
               sequence="20"/>
+    <menuitem id="menu_jabin_offers" name="Promotional Offers" parent="menu_jabin_products" action="action_jabin_offer"
+              sequence="25"/>
     <menuitem id="menu_jabin_users_root" name="Users" parent="menu_jabin_root" sequence="25"/>
     <menuitem id="menu_jabin_users_list" name="All Users" parent="menu_jabin_users_root" action="action_jabin_users"
               sequence="10"/>
@@ -42,7 +44,7 @@
               action="action_jabin_payment_methods" sequence="20"/>
 
     <menuitem id="menu_jabin_activity_logs" name="Activity Logs" parent="menu_jabin_root"
-              action="action_jabin_customer_activities" sequence="29"/>
+              action="action_jabin_customer_activities" sequence="29" active="False"/>
 
     <menuitem id="menu_jabin_configuration" name="Configuration" parent="menu_jabin_root" sequence="30"
               groups="base.group_system"/>
@@ -55,7 +57,7 @@
     <menuitem id="menu_jabin_banner" name="Banners" parent="menu_jabin_configuration" action="action_jabin_banner"
               sequence="35"/>
     <menuitem id="menu_jabin_dashboard_settings" name="Dashboard Settings" parent="menu_jabin_configuration"
-              action="action_jabin_dashboard_settings" sequence="40"/>
+              action="action_jabin_dashboard_settings" sequence="40" active="False"/>
     <menuitem id="menu_jabin_loyalty_settings" name="Loyalty Settings" parent="menu_jabin_configuration"
               action="action_jabin_loyalty_settings" sequence="50"/>
-</odoo>
+</odoo>

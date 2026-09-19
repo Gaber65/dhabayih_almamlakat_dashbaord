@@ -20,7 +20,7 @@ except ImportError:
 
 class FirebaseService(models.AbstractModel):
     _name = 'jabin.firebase.service'
-    _description = 'JABIN Firebase Cloud Messaging Service'
+    _description = 'Dhabayih Lmamlaka Firebase Cloud Messaging Service'
 
     _firebase_app = None
 
@@ -29,7 +29,7 @@ class FirebaseService(models.AbstractModel):
         """
         Initialize Firebase Admin SDK singleton.
         Reads credentials from system parameter 'jabin.firebase.credentials'
-        or environment variable 'JABIN_FIREBASE_CREDENTIALS'.
+        or environment variable 'Jabin_FIREBASE_CREDENTIALS'.
         """
         if not HAS_FIREBASE:
             _logger.warning("firebase_admin Python package is not installed. Push notifications via Firebase are disabled.")
@@ -47,7 +47,7 @@ class FirebaseService(models.AbstractModel):
 
         # 2. Check environment variable fallback
         if not cred_path:
-            cred_path = os.environ.get('JABIN_FIREBASE_CREDENTIALS', '')
+            cred_path = os.environ.get('Jabin_FIREBASE_CREDENTIALS', '')
 
         # 3. Check default path fallback inside module
         if not cred_path:

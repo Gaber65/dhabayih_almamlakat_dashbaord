@@ -76,6 +76,18 @@ def _parse_request_data() -> Dict[str, Any]:
                 raise ValueError("Invalid JSON payload.")
         vals.pop("id", None)
 
+    # Map Flutter fields
+    if not vals.get("name") and vals.get("code"):
+        vals["name"] = vals["code"]
+    if "is_active" in vals:
+        vals["active"] = bool(vals.pop("is_active"))
+    if "min_order_value" in vals and "minimum_order_amount" not in vals:
+        vals["minimum_order_amount"] = vals.pop("min_order_value")
+    if "max_uses" in vals and "usage_limit" not in vals:
+        vals["usage_limit"] = vals.pop("max_uses")
+    if "expiry_date" in vals and "end_date" not in vals:
+        vals["end_date"] = vals.pop("expiry_date")
+
     return vals
 
 
@@ -88,6 +100,7 @@ class CouponController(BaseApiController):
         auth="public",
         methods=["POST"],
         csrf=False,
+        cors="*",
     )
     @permission_required("coupons.manage")
     def create_coupon(self, **kwargs):
@@ -115,6 +128,7 @@ class CouponController(BaseApiController):
         auth="public",
         methods=["PUT"],
         csrf=False,
+        cors="*",
     )
     @permission_required("coupons.manage")
     def update_coupon(self, coupon_id, **kwargs):
@@ -141,6 +155,7 @@ class CouponController(BaseApiController):
         auth="public",
         methods=["DELETE"],
         csrf=False,
+        cors="*",
     )
     @permission_required("coupons.manage")
     def delete_coupon(self, coupon_id, **kwargs):
@@ -165,6 +180,7 @@ class CouponController(BaseApiController):
         auth="public",
         methods=["POST"],
         csrf=False,
+        cors="*",
     )
     @permission_required("coupons.manage")
     def toggle_coupon_active(self, coupon_id, **kwargs):
@@ -190,6 +206,7 @@ class CouponController(BaseApiController):
         auth="public",
         methods=["GET"],
         csrf=False,
+        cors="*",
     )
     def list_coupons(self, **kwargs):
         """Get paginated list of coupons."""
@@ -253,6 +270,7 @@ class CouponController(BaseApiController):
         auth="public",
         methods=["GET"],
         csrf=False,
+        cors="*",
     )
     def get_coupon_details(self, coupon_id, **kwargs):
         """Get coupon details by ID."""
@@ -277,6 +295,7 @@ class CouponController(BaseApiController):
         auth="public",
         methods=["POST"],
         csrf=False,
+        cors="*",
     )
     def apply_coupon_to_order(self, **kwargs):
         """Apply a coupon code to an order."""
@@ -320,6 +339,7 @@ class CouponController(BaseApiController):
         auth="public",
         methods=["DELETE", "POST"],
         csrf=False,
+        cors="*",
     )
     def remove_coupon_from_order(self, **kwargs):
         """Remove applied coupon from an order."""

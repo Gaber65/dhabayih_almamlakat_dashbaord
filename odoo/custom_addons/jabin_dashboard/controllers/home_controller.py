@@ -1,5 +1,5 @@
 # home_controller.py
-from odoo import http, _
+from odoo import http, fields, _
 from odoo.http import request
 from odoo.addons.jabin_api.controllers import BaseApiController
 from odoo.addons.jabin_core import ResponseBuilder
@@ -18,6 +18,7 @@ class HomeController(BaseApiController):
         auth="public",
         methods=["GET"],
         csrf=False,
+        cors="*",
     )
     def get_home_data(self, **kwargs):
         """Get aggregated home page data with optional authentication."""
@@ -80,9 +81,46 @@ class HomeController(BaseApiController):
                     "name": b.name,
                     "image": BaseApiController.build_image_url("banner", b.id, "image", bool(b.image)),
                     "image_url": BaseApiController.build_image_url("banner", b.id, "image", bool(b.image)),
+                    "banner_type": getattr(b, "banner_type", "offer"),
+                    "offer_id": b.offer_id.id if getattr(b, "offer_id", None) else None,
+                    "deep_link": getattr(b, "deep_link", None) or (f"jabin://offers/{b.offer_id.id}" if getattr(b, "offer_id", None) else "jabin://offers"),
                 }
                 for b in banners
             ]
+
+            # 2.1 Active Offers
+            today = fields.Date.context_today(env['jabin.offer']) if 'jabin.offer' in env else None
+            offers_data = []
+            if 'jabin.offer' in env:
+                active_offers = env['jabin.offer'].sudo().search([
+                    ('active', '=', True),
+                    ('start_date', '<=', today),
+                    '|',
+                    ('end_date', '=', False),
+                    ('end_date', '>=', today)
+                ], order="sequence, id desc", limit=6)
+                from .offer_controller import OfferController
+                offer_ctrl = OfferController()
+                offers_data = [offer_ctrl._serialize_offer(o, include_products=True) for o in active_offers]
+
+                # Automatically include active offers with banner images in home banners
+                existing_offer_ids = {b.offer_id.id for b in banners if getattr(b, 'offer_id', None)}
+                offer_banners = []
+                for off in active_offers:
+                    if off.id not in existing_offer_ids:
+                        img_url = BaseApiController.build_image_url("jabin.offer", off.id, "banner_image", bool(off.banner_image))
+                        if img_url:
+                            offer_banners.append({
+                                "id": 10000 + off.id,
+                                "name": off.name,
+                                "image": img_url,
+                                "image_url": img_url,
+                                "banner_type": "offer",
+                                "offer_id": off.id,
+                                "deep_link": f"jabin://offers/{off.id}",
+                            })
+                if offer_banners:
+                    banners_data = offer_banners + banners_data
 
             # 3. Jabin Highlight (Public Stories Feed)
             jabin_highlight = []
@@ -112,8 +150,9 @@ class HomeController(BaseApiController):
             # 5. Featured Products (Public)
             featured, _total = ProductService.get_list(
                 env,
-                domain=[('is_featured', '=', True), ('active', '=', True)],
+                domain=[('active', '=', True)],
                 limit=10,
+                order="id desc",
                 lang=lang
             )
             featured_data = [_serialize_product(p) for p in featured]
@@ -121,8 +160,9 @@ class HomeController(BaseApiController):
             # 6. Best Sellers (Public)
             best_sellers, _total = ProductService.get_list(
                 env,
-                domain=[('is_best_seller', '=', True), ('active', '=', True)],
+                domain=[('active', '=', True)],
                 limit=10,
+                order="id desc",
                 lang=lang
             )
             best_sellers_data = [_serialize_product(p) for p in best_sellers]
@@ -132,7 +172,7 @@ class HomeController(BaseApiController):
                 env,
                 domain=[('active', '=', True)],
                 limit=10,
-                order="id desc", # Fallback order
+                order="id desc",
                 lang=lang
             )
             recommended_data = [_serialize_product(p) for p in recommended]
@@ -142,6 +182,7 @@ class HomeController(BaseApiController):
                 "user_highlight": user_highlight,
                 "jabin_highlight": jabin_highlight,
                 "banners": banners_data,
+                "offers": offers_data,
                 "categories": categories_data,
                 "featured_products": featured_data,
                 "best_sellers": best_sellers_data,

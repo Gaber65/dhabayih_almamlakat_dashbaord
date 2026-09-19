@@ -69,7 +69,7 @@ class _HandlerContext:
 # Base controller
 # ---------------------------------------------------------------------------
 class BaseApiController(http.Controller):
-    """Foundation controller for every JABIN REST endpoint.
+    """Foundation controller for every Jabin REST endpoint.
 
     Subclasses inherit the unified envelope, JSON serialisation, and
     exception handling without re-implementing them.
@@ -118,9 +118,14 @@ class BaseApiController(http.Controller):
     @classmethod
     def build_image_url(cls, model: str, record_id: int, field_name: str = "image", has_value: bool = True) -> Optional[str]:
         """Build relative URL path for public binary image endpoint."""
-        if not record_id:
+        if not record_id or not has_value:
             return None
-        return f"api/v1/image/{model}/{record_id}/{field_name}"
+        try:
+            from odoo.http import request
+            base_url = request.httprequest.host_url.rstrip('/')
+            return f"{base_url}/api/v1/image/{model}/{record_id}/{field_name}"
+        except Exception:
+            return f"api/v1/image/{model}/{record_id}/{field_name}"
 
     @http.route(
         [
@@ -131,6 +136,7 @@ class BaseApiController(http.Controller):
         auth="public",
         methods=["GET"],
         csrf=False,
+        cors="*",
     )
     def get_public_image(self, model: str, record_id: int, field_name: str = "image", **kwargs):
         """Serve binary images/media with sudo() so public API and mobile clients can view images without session restrictions."""
@@ -175,9 +181,6 @@ class BaseApiController(http.Controller):
                 ("Content-Type", mimetype),
                 ("Content-Length", str(len(image_data))),
                 ("Cache-Control", "public, max-age=86400"),
-                ("Access-Control-Allow-Origin", "*"),
-                ("Access-Control-Allow-Methods", "GET, OPTIONS"),
-                ("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept, Accept-Language, lang"),
             ]
             return Response(image_data, status=200, headers=headers)
         except Exception:
@@ -201,9 +204,6 @@ class BaseApiController(http.Controller):
         body = JsonHelper.dumps(envelope)
         headers = {
             "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-            "Access-Control-Allow-Headers": "Content-Type, Authorization, Accept, Accept-Language, lang",
         }
         if extra_headers:
             headers.update(extra_headers)
@@ -235,7 +235,7 @@ class BaseApiController(http.Controller):
 
         Usage::
 
-            @http.route(...)
+            @http.route(..., cors="*")
             def my_endpoint(self, **kw):
                 with self.handle() as ctx:
                     ctx.set_body(ResponseBuilder.success(data=...))
@@ -257,6 +257,9 @@ class BaseApiController(http.Controller):
                 context={"endpoint": getattr(request, "httprequest", None)
                                      and request.httprequest.path},
             )
+            if code == 500:
+                import traceback
+                envelope["message"] = traceback.format_exc()
             ctx.set_body(envelope, status=code)
         # The caller reads ctx.response after the block.
 

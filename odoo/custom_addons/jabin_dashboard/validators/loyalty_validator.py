@@ -6,7 +6,7 @@ from odoo.addons.jabin_core import BaseValidator
 
 
 class LoyaltyValidator(BaseValidator):
-    """Validator for JABIN Loyalty Points operations."""
+    """Validator for Jabin Loyalty Points operations."""
 
     @staticmethod
     def validate_redemption(customer, points: int, order_total: float, min_redemption: int, redemption_rate: float) -> None:

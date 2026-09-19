@@ -1,14 +1,14 @@
 {
-    'name': 'JABIN Dashboard',
+    'name': 'Jabin Dashboard',
     'version': '17.0.1.0.0',
     'category': 'Sales',
-    'summary': 'JABIN Admin Dashboard Framework',
+    'summary': 'Jabin Admin Dashboard Framework',
     'description': """
-        JABIN Admin Dashboard Foundation Module
-        Provides the dashboard framework for JABIN ERP system.
+        Jabin Admin Dashboard Foundation Module
+        Provides the dashboard framework for Jabin ERP system.
         No business logic included - only dashboard infrastructure.
     """,
-    'author': 'JABIN',
+    'author': 'Jabin',
     'website': 'https://www.jabin.com',
     'depends': [
         'base',
@@ -24,16 +24,16 @@
         'data/dashboard_data.xml',
         'data/loyalty_data.xml',
         'data/firebase_data.xml',
-
         'views/jabin_users_views.xml',  # Users views and actions FIRST
 
-        'views/dashboard_views.xml',
+        'views/dashboard_views.xml',      
         'views/category_views.xml',
         'views/product_views.xml',
         'views/cutting_option_views.xml',
         'views/packaging_views.xml',
         'views/excluded_part_views.xml',
         'views/banner_views.xml',
+        'views/offer_views.xml',
         'views/coupon_views.xml',
 
         'views/order_views.xml',   # Orders, Payments, Activity views + their actions

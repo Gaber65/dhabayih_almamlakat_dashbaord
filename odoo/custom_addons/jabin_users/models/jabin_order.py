@@ -3,7 +3,7 @@ from odoo.exceptions import ValidationError
 
 class JabinOrder(models.Model):
     _name = "jabin.order"
-    _description = "JABIN Order"
+    _description = "Dhabayih Lmamlaka Order"
     _order = "date desc, id desc"
 
     name = fields.Char(
@@ -72,6 +72,15 @@ class JabinOrder(models.Model):
         default=0.0,
         currency_field="currency_id"
     )
+    delivery_type = fields.Selection([
+        ('address', 'Delivery to Address'),
+        ('pickup', 'Store Pickup')
+    ], string="Delivery Type", default='address')
+    delivery_fee = fields.Monetary(
+        string="Delivery Fee",
+        default=0.0,
+        currency_field="currency_id"
+    )
     total = fields.Monetary(
         string="Total Amount",
         compute="_compute_totals",
@@ -102,7 +111,7 @@ class JabinOrder(models.Model):
         string="Payment Transactions"
     )
 
-    @api.depends("order_line_ids.price_subtotal", "order_line_ids.discount", "tax_amount")
+    @api.depends("order_line_ids.price_subtotal", "order_line_ids.discount", "tax_amount", "delivery_fee")
     def _compute_totals(self):
         for order in self:
             lines = order.order_line_ids
@@ -110,7 +119,7 @@ class JabinOrder(models.Model):
             discount = sum(lines.mapped("discount_amount"))
             order.subtotal = subtotal
             order.discount_amount = discount
-            order.total = subtotal - discount + order.tax_amount
+            order.total = subtotal - discount + order.tax_amount + order.delivery_fee
 
     # --- Business Action Methods (delegate to service layer) ---
     def _get_service(self):
@@ -170,7 +179,7 @@ class JabinOrder(models.Model):
 
 class JabinOrderLine(models.Model):
     _name = "jabin.order.line"
-    _description = "JABIN Order Line"
+    _description = "Dhabayih Lmamlaka Order Line"
 
     order_id = fields.Many2one(
         "jabin.order",
@@ -212,7 +221,7 @@ class JabinOrderLine(models.Model):
 
 class JabinOrderTimeline(models.Model):
     _name = "jabin.order.timeline"
-    _description = "JABIN Order Status Timeline"
+    _description = "Dhabayih Lmamlaka Order Status Timeline"
     _order = "timestamp desc, id desc"
 
     order_id = fields.Many2one(

@@ -3,7 +3,7 @@ from odoo import models
 
 class JabinCoreMixin(models.AbstractModel):
     _name = "jabin.core.mixin"
-    _description = "JABIN Core Mixin"
+    _description = "Dhabayih Lmamlaka Core Mixin"
 
     _inherit = [
         "jabin.soft.delete.mixin",

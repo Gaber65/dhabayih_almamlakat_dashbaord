@@ -3,7 +3,7 @@
 
 Re-exports the three cross-cutting utilities that the whole platform relies on:
 
-* :class:`ResponseBuilder` -- builds the canonical JABIN JSON envelope.
+* :class:`ResponseBuilder` -- builds the canonical Jabin JSON envelope.
 * :class:`ApiError`        -- structured representation of a single error.
 * :class:`ExceptionMapper` -- converts Odoo exceptions into that envelope.
 * :class:`JabinLogger`     -- reusable logger with INFO/WARNING/ERROR/AUDIT.

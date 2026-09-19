@@ -78,6 +78,7 @@ class CartController(BaseApiController):
         auth="public",
         methods=["GET"],
         csrf=False,
+        cors="*",
     )
     def get_cart(self, **kwargs):
         """Retrieve current user's active cart."""
@@ -101,6 +102,7 @@ class CartController(BaseApiController):
         auth="public",
         methods=["POST"],
         csrf=False,
+        cors="*",
     )
     def add_product(self, **kwargs):
         """Add product to the active cart."""
@@ -147,6 +149,7 @@ class CartController(BaseApiController):
         auth="public",
         methods=["DELETE"],
         csrf=False,
+        cors="*",
     )
     def remove_product(self, product_id, **kwargs):
         """Remove product from active cart."""
@@ -179,6 +182,7 @@ class CartController(BaseApiController):
         auth="public",
         methods=["PUT"],
         csrf=False,
+        cors="*",
     )
     def update_quantity(self, **kwargs):
         """Update product quantity in active cart."""
@@ -227,6 +231,7 @@ class CartController(BaseApiController):
         auth="public",
         methods=["PATCH"],
         csrf=False,
+        cors="*",
     )
     def increase_quantity(self, product_id, **kwargs):
         """Increase quantity of product in cart by 1."""
@@ -259,6 +264,7 @@ class CartController(BaseApiController):
         auth="public",
         methods=["PATCH"],
         csrf=False,
+        cors="*",
     )
     def decrease_quantity(self, product_id, **kwargs):
         """Decrease quantity of product in cart by 1."""
@@ -287,6 +293,6 @@ class CartController(BaseApiController):
 
 class TestController(http.Controller):
 
-    @http.route('/test_cart', auth='public', type='http', methods=['GET'], csrf=False)
+    @http.route('/test_cart', auth='public', type='http', methods=['GET'], csrf=False, cors="*")
     def test_cart(self, **kw):
         return "OK"

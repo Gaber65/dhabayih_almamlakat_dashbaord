@@ -1,13 +1,13 @@
 {
-    "name": "JABIN Auth",
+    "name": "Jabin Auth",
     "version": "17.0.1.0.0",
-    "category": "Services/JABIN",
-    "summary": "JABIN ERP - Authentication: JWT login, logout, refresh, verify, profile",
+    "category": "Services/Jabin",
+    "summary": "Jabin ERP - Authentication: JWT login, logout, refresh, verify, profile",
     "description": """
-JABIN Auth
+Jabin Auth
 ==========
 
-Authentication gateway for the JABIN ERP platform.
+Authentication gateway for the Jabin ERP platform.
 
 Provides:
     * JWT-based login / logout / refresh / verify endpoints.
@@ -15,8 +15,8 @@ Provides:
     * Refresh-token revocation registry.
     * Password hashing and verification (passlib).
     """,
-    "author": "JABIN Engineering",
-    "website": "https://github.com/Gaber65/JABIN",
+    "author": "Jabin Engineering",
+    "website": "https://github.com/Gaber65/Jabin",
     "license": "Other proprietary",
     "depends": ["base", "jabin_core", "jabin_users", "jabin_security"],
     "data": [

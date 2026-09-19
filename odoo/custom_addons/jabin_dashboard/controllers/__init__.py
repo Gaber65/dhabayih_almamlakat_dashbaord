@@ -14,3 +14,4 @@ from . import branch_controller
 from . import favorite_controller
 from . import search_controller
 from . import home_controller
+from . import offer_controller

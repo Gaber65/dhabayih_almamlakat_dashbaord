@@ -4,7 +4,7 @@ from odoo.exceptions import ValidationError
 
 class JabinCart(models.Model):
     _name = 'jabin.cart'
-    _description = 'JABIN Shopping Cart'
+    _description = 'Dhabayih Lmamlaka Shopping Cart'
     _order = 'id desc'
 
     # --- Core Fields ---
@@ -46,6 +46,11 @@ class JabinCart(models.Model):
     delivery_address_id = fields.Many2one(
         'res.users.address',
         string='Delivery Address'
+    )
+    delivery_fee = fields.Monetary(
+        string='Delivery Fee',
+        default=0.0,
+        currency_field='currency_id'
     )
     notes = fields.Text(string='Notes')
 
@@ -105,7 +110,7 @@ class JabinCart(models.Model):
             cart.line_count = len(cart.line_ids)
 
     @api.depends('line_ids.price_subtotal', 'line_ids.discount_amount',
-                 'line_ids.tax_amount')
+                 'line_ids.tax_amount', 'delivery_fee')
     def _compute_totals(self):
         for cart in self:
             lines = cart.line_ids
@@ -113,7 +118,7 @@ class JabinCart(models.Model):
             cart.discount_amount = sum(lines.mapped('discount_amount'))
             cart.tax_amount = sum(lines.mapped('tax_amount'))
             cart.total_quantity = sum(lines.mapped('quantity'))
-            cart.grand_total = cart.subtotal - cart.discount_amount + cart.tax_amount
+            cart.grand_total = cart.subtotal - cart.discount_amount + cart.tax_amount + cart.delivery_fee
 
     # --- ORM Overrides ---
     def write(self, vals):
@@ -176,13 +181,12 @@ class JabinCart(models.Model):
                 vals['notes'] = notes
             existing_line.write(vals)
         else:
-            # Determine discount percent
+            # Determine discount percent from offer_price
             discount = 0.0
-            if product.is_on_offer:
-                if product.discount_type == 'percentage':
-                    discount = product.discount_value
-                elif product.discount_type == 'fixed' and product.selling_price:
-                    discount = (product.discount_value / product.selling_price) * 100.0
+            if product.is_on_offer and product.selling_price > 0 and product.offer_price < product.selling_price:
+                discount = round(((product.selling_price - product.offer_price) / product.selling_price) * 100.0, 2)
+            elif product.is_on_offer and product.discount_type == 'percentage':
+                discount = product.discount_value
 
             line_vals = {
                 'cart_id': self.id,
@@ -389,6 +393,7 @@ class JabinCart(models.Model):
             'subtotal': self.subtotal,
             'discount_amount': self.discount_amount,
             'tax_amount': self.tax_amount,
+            'delivery_fee': self.delivery_fee,
             'grand_total': self.grand_total,
             'currency_id': self.currency_id.id if self.currency_id else None,
             'currency_symbol': self.currency_id.symbol if self.currency_id else None,
@@ -398,7 +403,7 @@ class JabinCart(models.Model):
 
 class JabinCartLine(models.Model):
     _name = 'jabin.cart.line'
-    _description = 'JABIN Cart Line'
+    _description = 'Dhabayih Lmamlaka Cart Line'
     _order = 'id asc'
 
     # --- Core Fields ---

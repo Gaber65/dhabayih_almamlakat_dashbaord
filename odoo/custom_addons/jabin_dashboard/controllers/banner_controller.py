@@ -87,13 +87,30 @@ def _parse_request_data() -> Dict[str, Any]:
             except json.JSONDecodeError:
                 raise ValueError("Invalid JSON payload.")
 
-        # Remove id if present
-        vals.pop("id", None)
+    # Remove unwanted fields if present
+    vals.pop("id", None)
+    vals.pop("image_path", None)
+    vals.pop("image_url", None)
 
-        # Handle image removal from JSON
-        if vals.get("remove_image"):
-            vals["image"] = False
-            vals.pop("remove_image", None)
+    # Map Flutter fields
+    title = vals.pop("title", None)
+    if title and "name" not in vals:
+        vals["name"] = title
+    if "is_active" in vals:
+        vals["active"] = bool(vals.pop("is_active"))
+    link = vals.pop("link", None)
+    if link and not vals.get("deep_link"):
+        vals["deep_link"] = link
+        vals["banner_type"] = "custom"
+    if not vals.get("banner_type"):
+        vals["banner_type"] = "offer"
+    vals.pop("subtitle", None)
+    vals.pop("sequence", None)
+
+    # Handle image removal
+    if vals.get("remove_image"):
+        vals["image"] = False
+        vals.pop("remove_image", None)
 
     return vals
 
@@ -102,11 +119,12 @@ class BannerController(BaseApiController):
     """Banner REST API Controller following enterprise standards."""
 
     @http.route(
-        "/api/v1/banner/create",
+        ["/api/v1/banners", "/api/v1/banner/create"],
         type="http",
         auth="public",
         methods=["POST"],
         csrf=False,
+        cors="*",
     )
     @permission_required("banners.manage")
     def create_banner(self, **kwargs):
@@ -126,7 +144,7 @@ class BannerController(BaseApiController):
                 vals,
             )
 
-            base_url = request.httprequest.host_url.rstrip('/')
+            img_url = BaseApiController.build_image_url("banner", banner.id, "image", bool(banner.image))
 
             # Build success response
             ctx.set_body(
@@ -134,8 +152,11 @@ class BannerController(BaseApiController):
                     data={
                         "id": banner.id,
                         "name": banner.name,
-                        "image": BaseApiController.build_image_url("banner", banner.id, "image", bool(banner.image)),
+                        "title": banner.name,
+                        "image": img_url,
+                        "image_url": img_url,
                         "active": banner.active,
+                        "is_active": banner.active,
                     },
                     message=_("Banner created successfully"),
                     code=201,
@@ -150,6 +171,7 @@ class BannerController(BaseApiController):
         auth="public",
         methods=["PUT"],
         csrf=False,
+        cors="*",
     )
     @permission_required("banners.manage")
     def update_banner(self, banner_id, **kwargs):
@@ -193,6 +215,7 @@ class BannerController(BaseApiController):
         auth="public",
         methods=["DELETE"],
         csrf=False,
+        cors="*",
     )
     @permission_required("banners.manage")
     def delete_banner(self, banner_id, **kwargs):
@@ -224,6 +247,7 @@ class BannerController(BaseApiController):
         auth="public",
         methods=["GET"],
         csrf=False,
+        cors="*",
     )
     def get_banners(self, **kwargs):
         """Get paginated list of banners."""
@@ -277,6 +301,12 @@ class BannerController(BaseApiController):
                         "image": BaseApiController.build_image_url("banner", banner.id, "image", bool(banner.image)),
                         "image_url": BaseApiController.build_image_url("banner", banner.id, "image", bool(banner.image)),
                         "active": banner.active,
+                        "banner_type": getattr(banner, "banner_type", "offer"),
+                        "offer_id": banner.offer_id.id if getattr(banner, "offer_id", None) else None,
+                        "offer_name": banner.offer_id.name if getattr(banner, "offer_id", None) else None,
+                        "category_id": banner.category_id.id if getattr(banner, "category_id", None) else None,
+                        "product_id": banner.product_id.id if getattr(banner, "product_id", None) else None,
+                        "deep_link": getattr(banner, "deep_link", None) or (f"jabin://offers/{banner.offer_id.id}" if getattr(banner, "offer_id", None) else "jabin://offers"),
                     }
                     for banner in banners
                 ],
@@ -300,6 +330,7 @@ class BannerController(BaseApiController):
         auth="public",
         methods=["GET"],
         csrf=False,
+        cors="*",
     )
     def get_banner(self, banner_id, **kwargs):
         """Get a single banner by ID."""
@@ -345,6 +376,7 @@ class BannerController(BaseApiController):
         auth="public",
         methods=["POST", "PATCH"],
         csrf=False,
+        cors="*",
     )
     @permission_required("banners.manage")
     def toggle_banner_active(self, banner_id, **kwargs):

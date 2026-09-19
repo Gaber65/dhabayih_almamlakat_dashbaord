@@ -3,7 +3,7 @@ from odoo.exceptions import ValidationError
 
 class JabinPaymentMethod(models.Model):
     _name = "jabin.payment.method"
-    _description = "JABIN Payment Method"
+    _description = "Dhabayih Lmamlaka Payment Method"
     _order = "name"
 
     name = fields.Char(string="Name", required=True, translate=True)
@@ -16,6 +16,7 @@ class JabinPaymentMethod(models.Model):
     ], string="Payment Type", default="cash", required=True)
     provider = fields.Selection([
         ("manual", "Cash on Delivery / Manual"),
+        ("myfatoorah", "MyFatoorah Gateway"),
         ("tamara", "Tamara"),
         ("tabby", "Tabby"),
         ("stripe", "Stripe Gateway"),
@@ -35,7 +36,7 @@ class JabinPaymentMethod(models.Model):
 
 class JabinPaymentTransaction(models.Model):
     _name = "jabin.payment.transaction"
-    _description = "JABIN Payment Transaction"
+    _description = "Dhabayih Lmamlaka Payment Transaction"
     _order = "id desc"
 
     order_id = fields.Many2one(

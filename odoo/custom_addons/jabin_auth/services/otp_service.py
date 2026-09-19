@@ -21,13 +21,13 @@ def _get_logger():
 
 
 class OtpService(models.AbstractModel):
-    """JABIN OTP Service.
+    """Jabin OTP Service.
 
     Handles OTP generation, hashing, verification, expiration checks,
     attempt tracking, and resend limiting.
     """
     _name = 'jabin.otp.service'
-    _description = 'JABIN OTP Service'
+    _description = 'Dhabayih Lmamlaka OTP Service'
 
     # -- Configuration ---------------------------------------------------- #
     OTP_LENGTH = 6

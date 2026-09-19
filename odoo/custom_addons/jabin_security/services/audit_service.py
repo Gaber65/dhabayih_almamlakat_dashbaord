@@ -8,7 +8,7 @@ _MAX_USER_AGENT = 256
 
 class AuditService(models.AbstractModel):
     _name = 'jabin.audit.service'
-    _description = 'JABIN Audit Service'
+    _description = 'Dhabayih Lmamlaka Audit Service'
 
     @staticmethod
     def _extract_request_meta() -> Dict[str, Optional[str]]:

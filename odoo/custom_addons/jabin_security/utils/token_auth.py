@@ -7,7 +7,7 @@ Usage inside any controller method::
 
     from odoo.addons.jabin_security.utils.token_auth import require_token
 
-    @http.route('/api/...', type='http', auth='public', methods=['POST'], csrf=False)
+    @http.route('/api/...', type='http', auth='public', methods=['POST'], csrf=False, cors="*")
     def my_write_endpoint(self, **kw):
         denied = require_token()
         if denied:

@@ -3,7 +3,7 @@ from odoo import models, fields, api, _
 
 class JabinLoyaltyTransaction(models.Model):
     _name = 'jabin.loyalty.transaction'
-    _description = 'JABIN Loyalty Transaction'
+    _description = 'Dhabayih Lmamlaka Loyalty Transaction'
     _order = 'date desc, id desc'
 
     customer_id = fields.Many2one(

@@ -8,12 +8,12 @@ from odoo.exceptions import ValidationError
 
 class JabinCoupon(models.Model):
     _name = "jabin.coupon"
-    _description = "JABIN Coupon / Promo Code"
+    _description = "Dhabayih Lmamlaka Coupon / Promo Code"
     _order = "id desc"
 
     @api.model
-    def _generate_unique_random_code(self, prefix: str = "JABIN", length: int = 8) -> str:
-        """Generate a guaranteed unique random coupon code (e.g. JABIN-X8K9L2)."""
+    def _generate_unique_random_code(self, prefix: str = "Jabin", length: int = 8) -> str:
+        """Generate a guaranteed unique random coupon code (e.g. Jabin-X8K9L2)."""
         chars = string.ascii_uppercase + string.digits
         clean_chars = chars.translate(str.maketrans("", "", "0O1I"))
         for _ in range(100):
@@ -27,7 +27,7 @@ class JabinCoupon(models.Model):
     code = fields.Char(
         string="Coupon Code",
         default=lambda self: self._generate_unique_random_code(),
-        help="Unique promotional discount code (e.g. SAVE10 or auto-generated JABIN-X9K2L4)"
+        help="Unique promotional discount code (e.g. SAVE10 or auto-generated Jabin-X9K2L4)"
     )
     name = fields.Char(
         string="Coupon Name",

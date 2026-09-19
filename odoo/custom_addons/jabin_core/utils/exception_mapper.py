@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-"""Centralised exception mapper for the JABIN platform.
+"""Centralised exception mapper for the Jabin platform.
 
 Goal
 ----
 Provide a single point where *any* Odoo / Python exception raised inside an
-API request is translated into the canonical JABIN JSON envelope (see
+API request is translated into the canonical Jabin JSON envelope (see
 :class:`~jabin_core.utils.response_builder.ResponseBuilder`).
 
 Why centralisation?
@@ -115,7 +115,7 @@ _MAPPING: List[Tuple[type, int, str]] = [
 
 
 class ExceptionMapper:
-    """Translate exceptions into the canonical JABIN JSON envelope.
+    """Translate exceptions into the canonical Jabin JSON envelope.
 
     The class is fully static; it carries no mutable state, which makes it
     trivially thread-safe and testable.
@@ -266,7 +266,7 @@ class ExceptionMapper:
 
         if code >= 500:
             logger.error(
-                "JABIN unmapped server error: %s (code=%s)%s",
+                "Jabin unmapped server error: %s (code=%s)%s",
                 message,
                 code,
                 ctx_str,
@@ -274,7 +274,7 @@ class ExceptionMapper:
             )
         else:
             logger.warning(
-                "JABIN business error: %s (code=%s) :: %s%s",
+                "Jabin business error: %s (code=%s) :: %s%s",
                 message,
                 code,
                 str(exception)[:500],  # truncate very long messages

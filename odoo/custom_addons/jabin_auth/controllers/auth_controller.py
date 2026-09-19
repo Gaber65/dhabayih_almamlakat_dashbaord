@@ -62,6 +62,7 @@ class AuthController(BaseApiController):
         auth="public",
         methods=["POST"],
         csrf=False,
+        cors="*",
     )
     def register(self):
         try:
@@ -101,6 +102,7 @@ class AuthController(BaseApiController):
         auth="public",
         methods=["POST"],
         csrf=False,
+        cors="*",
     )
     def register_verify(self):
         try:
@@ -140,6 +142,7 @@ class AuthController(BaseApiController):
         auth="public",
         methods=["POST"],
         csrf=False,
+        cors="*",
     )
     def login(self):
         try:
@@ -186,6 +189,7 @@ class AuthController(BaseApiController):
         auth="public",
         methods=["POST"],
         csrf=False,
+        cors="*",
     )
     def resend_verification(self):
         """
@@ -227,6 +231,7 @@ class AuthController(BaseApiController):
         auth="public",
         methods=["POST"],
         csrf=False,
+        cors="*",
     )
     def login_verify(self):
         try:
@@ -266,6 +271,7 @@ class AuthController(BaseApiController):
         auth="public",
         methods=["POST"],
         csrf=False,
+        cors="*",
     )
     def register_admin(self):
         """Create an Odoo administrator account bypassing OTP/email verification.
@@ -311,3 +317,87 @@ class AuthController(BaseApiController):
 
         except Exception as exc:
             return self._handle_server_error("Register admin", exc)
+
+    @http.route(
+        "/api/v1/auth/refresh",
+        type="http",
+        auth="public",
+        methods=["POST"],
+        csrf=False,
+        cors="*",
+    )
+    def refresh_token(self):
+        try:
+            token = None
+            raw_header = request.httprequest.headers.get("Authorization", "")
+            if raw_header:
+                parts = raw_header.split(None, 1)
+                if len(parts) == 2 and parts[0].lower() == 'bearer':
+                    token = parts[1].strip()
+
+            if not token:
+                try:
+                    body = self._get_request_data()
+                    token = body.get("refresh_token") or body.get("refreshToken")
+                except Exception:
+                    pass
+
+            if not token:
+                return ResponseBuilder.http_unauthorized(message="Missing refresh token in Authorization header or body")
+
+            from odoo.addons.jabin_security.utils.jwt_utils import JWTUtils, JWTError
+            try:
+                claims = JWTUtils.decode_token(token)
+            except JWTError as exc:
+                return ResponseBuilder.http_unauthorized(message=str(exc))
+
+            kind = JWTUtils.get_token_kind(claims)
+            if kind != 'refresh':
+                return ResponseBuilder.http_bad_request(message="Invalid token kind. Refresh token expected.")
+
+            jti = JWTUtils.get_token_id(claims)
+
+            refresh_token_model = request.env['jabin.refresh.token'].sudo()
+            if not refresh_token_model.is_valid(jti):
+                return ResponseBuilder.http_unauthorized(message="Refresh token is revoked or expired.")
+
+            user_id = JWTUtils.get_user_id(claims)
+            user = request.env['res.users'].sudo().browse(user_id)
+            if not user.exists() or (hasattr(user, "status") and user.status != "active"):
+                return ResponseBuilder.http_unauthorized(message="User account is inactive or not found.")
+
+            # Revoke old refresh token so it cannot be used again
+            old_token_rec = refresh_token_model.find_by_jti(jti)
+            if old_token_rec:
+                old_token_rec.revoke()
+            else:
+                from datetime import datetime, timedelta
+                from odoo.addons.jabin_security.utils.jwt_utils import DEFAULT_REFRESH_TTL
+                expires_at = datetime.utcnow() + timedelta(seconds=DEFAULT_REFRESH_TTL)
+                try:
+                    refresh_token_model.create({
+                        'jti': jti,
+                        'user_id': user.id,
+                        'expires_at': expires_at,
+                        'is_revoked': True,
+                        'revoked_at': fields.Datetime.now(),
+                    })
+                except Exception:
+                    pass
+
+            # generate_tokens automatically issues & registers new refresh token in DB
+            tokens_data = request.env["jabin.auth.token.service"].sudo().generate_tokens(user)
+
+            if hasattr(request.env['jabin.security.audit.service'].sudo(), 'log_token_refresh'):
+                try:
+                    request.env['jabin.security.audit.service'].sudo().log_token_refresh(user.id)
+                except Exception:
+                    pass
+
+            return ResponseBuilder.http_success(
+                data=tokens_data,
+                message="Token refreshed successfully.",
+            )
+
+        except Exception as exc:
+            return self._handle_server_error("Token refresh", exc)

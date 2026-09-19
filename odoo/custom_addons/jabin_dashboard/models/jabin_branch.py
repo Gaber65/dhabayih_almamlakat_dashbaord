@@ -3,7 +3,7 @@ from odoo import api, fields, models
 
 class JabinBranch(models.Model):
     _name = "jabin.branch"
-    _description = "JABIN Store Branch"
+    _description = "Dhabayih Lmamlaka Store Branch"
     _order = "name"
 
     name = fields.Char(string="Branch Name", required=True, translate=True)

@@ -5,7 +5,7 @@ from odoo import models, fields, api, _
 
 class JabinNotification(models.Model):
     _name = 'jabin.notification'
-    _description = 'JABIN Notification History'
+    _description = 'Dhabayih Lmamlaka Notification History'
     _order = 'create_date desc, id desc'
 
     uuid = fields.Char(

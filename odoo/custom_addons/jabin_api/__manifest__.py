@@ -1,13 +1,13 @@
 {
-    "name": "JABIN API",
+    "name": "Jabin API",
     "version": "17.0.1.0.0",
-    "category": "Services/JABIN",
-    "summary": "JABIN ERP - REST API gateway (controllers, versioning, base controller)",
+    "category": "Services/Jabin",
+    "summary": "Jabin ERP - REST API gateway (controllers, versioning, base controller)",
     "description": """
-JABIN API
+Jabin API
 =========
 
-REST API gateway for the JABIN ERP platform.
+REST API gateway for the Jabin ERP platform.
 
 Provides:
     * Base API controller with unified JSON response envelope
@@ -17,8 +17,8 @@ Provides:
 
 This module contains NO business endpoints (Sprint 1 only).
     """,
-    "author": "JABIN Engineering",
-    "website": "https://github.com/Gaber65/JABIN",
+    "author": "Jabin Engineering",
+    "website": "https://github.com/Gaber65/Jabin",
     "license": "Other proprietary",
     "depends": ["base", "jabin_core"],
     "data": [],

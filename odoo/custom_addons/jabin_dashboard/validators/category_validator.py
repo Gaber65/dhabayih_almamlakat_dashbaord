@@ -340,7 +340,8 @@ class CategoryValidator(BaseValidator):
             return
 
         # Check if data is bytes
-        CategoryValidator.validate_field_type(image_data, bytes, 'Image')
+        if not isinstance(image_data, (bytes, str)):
+            raise ValidationError(_('Field Image must be of type bytes or string'))
 
         # Check size (max 5MB)
         if len(image_data) > CategoryValidator.MAX_IMAGE_SIZE_MB * 1024 * 1024:

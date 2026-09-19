@@ -4,7 +4,7 @@ from typing import Optional, Dict, Any
 
 class ResUsers(models.Model):
     _inherit = 'res.users'
-    _description = 'Jabin User (Extended)'
+    _description = 'Dhabayih Lmamlaka User (Extended)'
 
     # --- Custom Fields (preserved from res.users) ---
     verified_at = fields.Datetime(string='Verified At', readonly=True)

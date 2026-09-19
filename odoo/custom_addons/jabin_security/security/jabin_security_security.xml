@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  JABIN Security: access rights and security groups.
+  Jabin Security: access rights and security groups.
 
   This file defines:
-  1. Security groups for the JABIN security administration.
+  1. Security groups for the Jabin security administration.
   2. Access rights for every model introduced by jabin_security.
 
   Access-right philosophy:
@@ -23,9 +23,9 @@
         <!-- Security groups                                              -->
         <!-- ============================================================ -->
 
-        <!-- Top-level JABIN security administrator group. -->
+        <!-- Top-level Jabin security administrator group. -->
         <record id="jabin_security_admin_group" model="res.groups">
-            <field name="name">JABIN Security Administrator</field>
+            <field name="name">Jabin Security Administrator</field>
             <field name="comment">Can manage roles, permissions, and view audit logs.</field>
             <field name="category_id" ref="base.module_category_usability"/>
         </record>

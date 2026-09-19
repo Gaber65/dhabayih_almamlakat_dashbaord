@@ -7,7 +7,7 @@
         <field name="inherit_id" ref="base.res_config_settings_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//form" position="inside">
-                <app data-string="JABIN Loyalty" string="JABIN Loyalty" name="jabin_loyalty">
+                <app data-string="Dhabayih Lmamlaka Loyalty" string="Dhabayih Lmamlaka Loyalty" name="jabin_loyalty">
                     <block title="Loyalty Program Settings" name="jabin_loyalty_block">
                         <setting id="loyalty_earning_rate_setting" string="Earning Rate" help="Formula: Earned Points = Order Total (SAR) * Earning Rate (Default: 1 SAR = 1 Point).">
                             <field name="loyalty_earning_rate"/>

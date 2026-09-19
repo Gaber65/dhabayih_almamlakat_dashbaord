@@ -3,15 +3,15 @@ from odoo.exceptions import ValidationError
 
 class JabinCustomerService(models.AbstractModel):
     _name = "jabin.customer.service"
-    _description = "JABIN Customer Operations Service"
+    _description = "Dhabayih Lmamlaka Customer Operations Service"
 
     # Define valid transitions for state safety
     STATE_TRANSITIONS = {
         "draft": ["pending_payment", "confirmed", "cancelled"],
         "pending_payment": ["confirmed", "cancelled"],
-        "confirmed": ["preparing", "cancelled"],
-        "preparing": ["ready_pickup", "cancelled"],
-        "ready_pickup": ["out_delivery", "cancelled"],
+        "confirmed": ["preparing", "ready_pickup", "out_delivery", "delivered", "cancelled"],
+        "preparing": ["ready_pickup", "out_delivery", "delivered", "cancelled"],
+        "ready_pickup": ["out_delivery", "delivered", "cancelled"],
         "out_delivery": ["delivered", "cancelled"],
         "delivered": ["refunded"],
         "cancelled": [],

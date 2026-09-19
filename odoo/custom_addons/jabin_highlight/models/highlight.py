@@ -45,7 +45,7 @@ class JabinHighlight(models.Model):
     """
 
     _name = "jabin.highlight"
-    _description = "JABIN Highlight (Story)"
+    _description = "Dhabayih Lmamlaka Highlight (Story)"
     _inherit = ["jabin.timestamp.mixin"]
     _order = "create_date asc"
     _rec_name = "name"

@@ -61,6 +61,17 @@ class JabinOrder(models.Model):
         help='Flag indicating whether redeemed points have been deducted from customer wallet.'
     )
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        records = super(JabinOrder, self).create(vals_list)
+        for record in records:
+            try:
+                self.env["jabin.notification.service"].sudo().send_order_created(self.env, record)
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).warning("Failed to send order created notification: %s", e)
+        return records
+
     @api.depends(
         'order_line_ids.price_subtotal',
         'order_line_ids.discount_amount',
@@ -179,7 +190,17 @@ class JabinOrder(models.Model):
         return self
 
     def write(self, vals):
-        res = super().write(vals)
+        old_states = {order.id: order.state for order in self}
+        res = super(JabinOrder, self).write(vals)
+        if 'state' in vals:
+            new_state = vals['state']
+            for order in self:
+                if old_states.get(order.id) != new_state:
+                    try:
+                        self.env["jabin.notification.service"].sudo().send_order_status_changed(self.env, order, new_state)
+                    except Exception as e:
+                        import logging
+                        logging.getLogger(__name__).error("Failed to send order status changed notification: %s", e)
         # If order state changes to confirmed, increment used_count for coupon
         if 'state' in vals and vals['state'] == 'confirmed':
             for order in self:

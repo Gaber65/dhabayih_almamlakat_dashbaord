@@ -4,7 +4,7 @@ from odoo import models, fields, api, _
 
 class JabinDevice(models.Model):
     _name = 'jabin.device'
-    _description = 'JABIN Customer Device'
+    _description = 'Dhabayih Lmamlaka Customer Device'
     _order = 'last_seen desc, id desc'
 
     uuid = fields.Char(

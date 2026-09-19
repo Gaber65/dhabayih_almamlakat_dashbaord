@@ -8,7 +8,7 @@ _logger = JabinLogger.get('auth.refresh_token')
 
 class JabinRefreshToken(models.Model):
     _name = 'jabin.refresh.token'
-    _description = 'JABIN Refresh Token'
+    _description = 'Dhabayih Lmamlaka Refresh Token'
     _order = 'expires_at desc'
 
     jti = fields.Char(
@@ -84,7 +84,8 @@ class JabinRefreshToken(models.Model):
     def is_valid(self, jti: str) -> bool:
         token = self.find_by_jti(jti)
         if not token:
-            return False
+            # If not yet recorded in DB, it is not revoked; validity is verified by JWT signature & exp
+            return True
         if token.is_revoked:
             return False
         now = fields.Datetime.now()

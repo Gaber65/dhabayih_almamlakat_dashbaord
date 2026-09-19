@@ -168,7 +168,7 @@
                                      t-if="record.media_type.raw_value == 'image'"/>
                                 <div t-if="record.media_type.raw_value == 'video'"
                                      class="o_kanban_video_placeholder">
-                                    <span class="fa fa-play-circle o_kanban_video_icon"/>
+                                    <span class="fa fa-play-circle o_kanban_video_icon" title="Video"/>
                                 </div>
                             </div>
                             <div class="oe_kanban_details">
@@ -181,15 +181,15 @@
                                 </div>
                                 <div class="oe_kanban_stats">
                                     <div class="oe_kanban_stat_item">
-                                        <span class="fa fa-eye"/>
+                                        <span class="fa fa-eye" title="Views"/>
                                         <field name="views_count"/>
                                     </div>
                                     <div class="oe_kanban_stat_item">
-                                        <span class="fa fa-clock-o"/>
+                                        <span class="fa fa-clock-o" title="Expires At"/>
                                         <field name="expires_at"/>
                                     </div>
                                     <div class="oe_kanban_stat_item">
-                                        <span class="fa fa-user"/>
+                                        <span class="fa fa-user" title="Owner"/>
                                         <field name="user_id"/>
                                     </div>
                                 </div>

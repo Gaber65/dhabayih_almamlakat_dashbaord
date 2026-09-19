@@ -2,7 +2,7 @@
 <odoo>
     <data>
         <!-- ============================================================ -->
-        <!-- Access Rights for JABIN Auth Models                            -->
+        <!-- Access Rights for Jabin Auth Models                            -->
         <!-- ============================================================ -->
 
         <!-- jabin.otp access - using base.group_user -->
@@ -27,8 +27,30 @@
             <field name="perm_unlink" eval="1"/>
         </record>
 
+        <!-- jabin.refresh.token user access -->
+        <record id="access_jabin_refresh_token_user" model="ir.model.access">
+            <field name="name">jabin.refresh.token user</field>
+            <field name="model_id" ref="model_jabin_refresh_token"/>
+            <field name="group_id" ref="base.group_user"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <!-- jabin.refresh.token manager access -->
+        <record id="access_jabin_refresh_token_manager" model="ir.model.access">
+            <field name="name">jabin.refresh.token manager</field>
+            <field name="model_id" ref="model_jabin_refresh_token"/>
+            <field name="group_id" ref="base.group_system"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+        </record>
+
         <!-- ============================================================ -->
-        <!-- Record Rules for JABIN Auth Models                            -->
+        <!-- Record Rules for Jabin Auth Models                            -->
         <!-- ============================================================ -->
 
         <!-- OTP record rule - users can only see their own OTPs -->

@@ -94,8 +94,17 @@ def _parse_request_data() -> Dict[str, Any]:
             except json.JSONDecodeError:
                 raise ValueError("Invalid JSON payload.")
 
-        # Remove id if present
+        # Remove unwanted fields if present
         vals.pop("id", None)
+        vals.pop("image_path", None)
+        vals.pop("image_url", None)
+
+        # Handle data URI prefix in base64 image or strip URL
+        if vals.get("image") and isinstance(vals["image"], str):
+            if vals["image"].startswith("http://") or vals["image"].startswith("https://"):
+                vals.pop("image", None)
+            elif "," in vals["image"] and "base64" in vals["image"]:
+                vals["image"] = vals["image"].split(",", 1)[1].strip()
 
         # Handle image removal from JSON
         if vals.get("remove_image"):
@@ -114,6 +123,7 @@ class CategoryController(BaseApiController):
         auth="public",
         methods=["POST"],
         csrf=False,
+        cors="*",
     )
     @permission_required("categories.manage")
     def create_category(self, **kwargs):
@@ -133,6 +143,10 @@ class CategoryController(BaseApiController):
                 vals,
             )
 
+            img_url = BaseApiController.build_image_url(
+                "jabin.category", category.id, "image", bool(category.image)
+            )
+
             # Build success response - use success() NOT http_success()
             # success() returns a DICTIONARY envelope
             ctx.set_body(
@@ -140,6 +154,8 @@ class CategoryController(BaseApiController):
                     data={
                         "id": category.id,
                         "name": category.name,
+                        "image": img_url,
+                        "image_url": img_url,
                         "sequence": category.sequence,
                         "active": category.active,
                         "product_count": category.product_count,
@@ -157,6 +173,7 @@ class CategoryController(BaseApiController):
         auth="public",
         methods=["PUT"],
         csrf=False,
+        cors="*",
     )
     @permission_required("categories.manage")
     def update_category(self, category_id, **kwargs):
@@ -177,12 +194,18 @@ class CategoryController(BaseApiController):
                 vals,
             )
 
+            img_url = BaseApiController.build_image_url(
+                "jabin.category", category.id, "image", bool(category.image)
+            )
+
             # Build success response - use success() NOT http_success()
             ctx.set_body(
                 ResponseBuilder.success(
                     data={
                         "id": category.id,
                         "name": category.name,
+                        "image": img_url,
+                        "image_url": img_url,
                         "sequence": category.sequence,
                         "active": category.active,
                         "product_count": category.product_count,
@@ -199,6 +222,7 @@ class CategoryController(BaseApiController):
         auth="public",
         methods=["DELETE"],
         csrf=False,
+        cors="*",
     )
     @permission_required("categories.manage")
     def delete_category(self, category_id, **kwargs):
@@ -231,6 +255,7 @@ class CategoryController(BaseApiController):
         auth="public",
         methods=["GET"],
         csrf=False,
+        cors="*",
     )
     def get_categories(self, **kwargs):
         """Get paginated list of categories."""
@@ -306,6 +331,7 @@ class CategoryController(BaseApiController):
         auth="public",
         methods=["GET"],
         csrf=False,
+        cors="*",
     )
     def get_category(self, category_id, **kwargs):
         """Get a single category by ID."""
@@ -359,6 +385,7 @@ class CategoryController(BaseApiController):
         auth="public",
         methods=["GET"],
         csrf=False,
+        cors="*",
     )
     def get_category_products(self, category_id, **kwargs):
         """Get products of a specific category."""

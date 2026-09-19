@@ -2,7 +2,7 @@ from odoo import api, fields, models, _
 
 class JabinCustomerActivity(models.Model):
     _name = "jabin.customer.activity"
-    _description = "JABIN Customer Activity Log"
+    _description = "Dhabayih Lmamlaka Customer Activity Log"
     _order = "timestamp desc, id desc"
 
     user_id = fields.Many2one(

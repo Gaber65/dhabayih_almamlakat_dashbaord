@@ -16,6 +16,7 @@ class SearchController(BaseApiController):
         auth="public",
         methods=["GET"],
         csrf=False,
+        cors="*",
     )
     def search(self, **kwargs):
         """Search products and/or categories by term query ``q``."""

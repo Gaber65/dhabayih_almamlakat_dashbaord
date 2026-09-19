@@ -3,7 +3,7 @@
     <data>
 
         <!-- ============================================================ -->
-        <!-- JABIN Highlight: Security Groups                              -->
+        <!-- Jabin Highlight: Security Groups                              -->
         <!-- ============================================================ -->
 
         <!--
@@ -12,7 +12,7 @@
             Automatically granted to base.group_system (Odoo Administrators).
         -->
         <record id="jabin_highlight_manager_group" model="res.groups">
-            <field name="name">JABIN Highlight Manager</field>
+            <field name="name">Jabin Highlight Manager</field>
             <field name="comment">
                 Can view, delete, and disable any user's highlights regardless
                 of ownership. Intended for content moderators and administrators.

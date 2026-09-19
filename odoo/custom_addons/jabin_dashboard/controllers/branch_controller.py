@@ -13,6 +13,7 @@ class BranchController(BaseApiController):
         auth="public",
         methods=["GET"],
         csrf=False,
+        cors="*",
     )
     def list_branches(self, **kwargs):
         """List active store branches for pickup."""

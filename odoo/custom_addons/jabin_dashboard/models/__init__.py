@@ -5,6 +5,7 @@ from . import product_image
 from . import cutting_option
 from . import packaging
 from . import excluded_part
+from . import jabin_offer
 from . import banner_model
 from . import jabin_coupon
 from . import jabin_order_line_ext

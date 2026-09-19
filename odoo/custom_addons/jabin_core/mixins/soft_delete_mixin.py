@@ -4,7 +4,7 @@ from odoo import models, fields
 
 class SoftDeleteMixin(models.AbstractModel):
     _name = 'jabin.soft.delete.mixin'
-    _description = 'JABIN Soft Delete Mixin'
+    _description = 'Dhabayih Lmamlaka Soft Delete Mixin'
     is_deleted = fields.Boolean(string='Deleted', default=False,
                                 help='Marks the record as soft-deleted (kept for audit).')
     deleted_at = fields.Datetime(string='Deleted At', readonly=True,

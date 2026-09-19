@@ -43,18 +43,30 @@ class HighlightController(BaseApiController):
 
     @staticmethod
     def _current_user_id() -> Optional[int]:
-        """Resolve the authenticated user's ID from the security context.
-
-        require_token() has already validated the JWT and populated
-        SecurityContext before the controller method runs.
-        Returns None if called outside an authenticated context.
-        """
+        """Resolve the authenticated user's ID from the security context or token."""
         try:
             from odoo.addons.jabin_security import SecurityContext
             ctx = SecurityContext.get()
-            return ctx.user_id if ctx and ctx.is_authenticated else None
+            if ctx and ctx.is_authenticated:
+                return ctx.user_id
         except Exception:
-            return None
+            pass
+            
+        # Fallback for type="http" routes where SecurityContext is not set
+        try:
+            from odoo.http import request
+            from odoo.addons.jabin_security.utils.jwt_utils import JWTUtils
+            raw_header = request.httprequest.headers.get("Authorization", "")
+            if raw_header:
+                parts = raw_header.split(None, 1)
+                if len(parts) == 2 and parts[0].lower() == "bearer":
+                    token = parts[1].strip()
+                    claims = JWTUtils.decode_token(token)
+                    return JWTUtils.get_user_id(claims)
+        except Exception:
+            pass
+            
+        return None
 
     # ------------------------------------------------------------------
     # POST /api/v1/highlights — Create a highlight
@@ -66,8 +78,8 @@ class HighlightController(BaseApiController):
         auth="public",
         methods=["POST"],
         csrf=False,
+        cors="*",
     )
-    @permission_required("highlights.manage")
     def create_highlight(self):
         """Upload a new highlight (image or video).
 
@@ -95,11 +107,13 @@ class HighlightController(BaseApiController):
                 return ctx.response
 
             media_type = request.httprequest.form.get("media_type", "")
+            name = request.httprequest.form.get("name")
             file_storage = request.httprequest.files.get("media")
 
             highlight_data = self._service().create_highlight(
                 user_id=user_id,
                 media_type=media_type,
+                name=name,
                 file_storage=file_storage,
             )
 
@@ -123,6 +137,7 @@ class HighlightController(BaseApiController):
         auth="public",
         methods=["GET"],
         csrf=False,
+        cors="*",
     )
     def get_feed(self):
         """Return all active highlights grouped by user.
@@ -155,6 +170,7 @@ class HighlightController(BaseApiController):
         auth="public",
         methods=["GET"],
         csrf=False,
+        cors="*",
     )
     def get_user_highlights(self, user_id: int):
         """Return active highlights for a specific user (oldest → newest).
@@ -205,8 +221,8 @@ class HighlightController(BaseApiController):
         auth="public",
         methods=["DELETE"],
         csrf=False,
+        cors="*",
     )
-    @permission_required("highlights.manage")
     def delete_highlight(self, highlight_id: int):
         """Delete a highlight by ID.
 

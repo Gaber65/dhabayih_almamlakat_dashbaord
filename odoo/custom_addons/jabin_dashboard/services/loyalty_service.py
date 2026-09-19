@@ -1,18 +1,30 @@
 # loyalty_service.py
 from typing import Dict, Any, List, Optional
-from odoo import models, api, _
+from odoo import models, api, fields, _
 from odoo.exceptions import ValidationError
 from ..validators.loyalty_validator import LoyaltyValidator
 
 
+def _resolve_env(instance_or_env, env=None):
+    """Robustly resolve Odoo Environment whether called as model, class, or with explicit env."""
+    if env is not None and hasattr(env, 'cr'):
+        return env
+    if hasattr(instance_or_env, 'env'):
+        return instance_or_env.env
+    if hasattr(instance_or_env, 'cr'):
+        return instance_or_env
+    from odoo.http import request
+    return getattr(request, 'env', None)
+
+
 class LoyaltyService(models.AbstractModel):
     _name = 'jabin.loyalty.service'
-    _description = 'JABIN Loyalty Points Service'
+    _description = 'Dhabayih Lmamlaka Loyalty Points Service'
 
     @api.model
     def get_settings(self, env=None) -> Dict[str, Any]:
         """Fetch system configuration parameters for loyalty points."""
-        target_env = env or self.env
+        target_env = _resolve_env(self, env)
         icp = target_env['ir.config_parameter'].sudo()
 
         try:
@@ -40,7 +52,8 @@ class LoyaltyService(models.AbstractModel):
     def update_settings(self, env, earning_rate: float, redemption_rate: float, min_redemption: int):
         """Update system configuration parameters for loyalty points."""
         LoyaltyValidator.validate_settings(earning_rate, redemption_rate, min_redemption)
-        icp = env['ir.config_parameter'].sudo()
+        target_env = _resolve_env(self, env)
+        icp = target_env['ir.config_parameter'].sudo()
         icp.set_param('jabin_loyalty.earning_rate', str(earning_rate))
         icp.set_param('jabin_loyalty.redemption_rate', str(redemption_rate))
         icp.set_param('jabin_loyalty.min_redemption', str(min_redemption))

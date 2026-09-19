@@ -3,7 +3,7 @@ from odoo import api, fields, models
 
 class JabinProductImage(models.Model):
     _name = 'jabin.product.image'
-    _description = 'JABIN Product Image'
+    _description = 'Dhabayih Lmamlaka Product Image'
     _order = 'sequence, id'
 
     product_id = fields.Many2one(

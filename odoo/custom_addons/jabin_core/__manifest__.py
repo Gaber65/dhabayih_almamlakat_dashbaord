@@ -1,13 +1,13 @@
 {
-    "name": "JABIN Core",
+    "name": "Jabin Core",
     "version": "17.0.1.0.0",
-    "category": "Services/JABIN",
-    "summary": "JABIN ERP - Core foundation (constants, utils, mixins, helpers, validators)",
+    "category": "Services/Jabin",
+    "summary": "Jabin ERP - Core foundation (constants, utils, mixins, helpers, validators)",
     "description": """
-JABIN Core
+Jabin Core
 ==========
 
-Foundation infrastructure for the JABIN ERP platform.
+Foundation infrastructure for the Jabin ERP platform.
 
 Provides:
     * Centralised constants / enums
@@ -20,8 +20,8 @@ Provides:
 
 This module contains NO business logic.
     """,
-    "author": "JABIN Engineering",
-    "website": "https://github.com/Gaber65/JABIN",
+    "author": "Jabin Engineering",
+    "website": "https://github.com/Gaber65/Jabin",
     "license": "Other proprietary",
     "depends": ["base"],
     # jabin_core ships no data, no views, no security of its own.

@@ -32,7 +32,7 @@ logging.addLevelName(AUDIT_LEVEL, AUDIT_LEVEL_NAME)
 
 
 class JabinLogger:
-    """Factory for JABIN loggers."""
+    """Factory for Jabin loggers."""
 
     _ROOT_PREFIX = "jabin"
     _configured = False

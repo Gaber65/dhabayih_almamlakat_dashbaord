@@ -6,7 +6,7 @@ class JabinOrderLine(models.Model):
     product_id = fields.Many2one(
         "jabin.product",
         string="Product",
-        required=True,
+        required=False,
         ondelete="restrict"
     )
     cutting_option_id = fields.Many2one(

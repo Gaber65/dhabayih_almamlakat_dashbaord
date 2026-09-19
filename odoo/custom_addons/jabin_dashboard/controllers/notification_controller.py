@@ -60,6 +60,7 @@ class NotificationController(BaseApiController):
         auth="public",
         methods=["GET"],
         csrf=False,
+        cors="*",
     )
     def get_notifications(self, **kwargs):
         """Get customer notification history."""
@@ -120,6 +121,7 @@ class NotificationController(BaseApiController):
         auth="public",
         methods=["GET"],
         csrf=False,
+        cors="*",
     )
     def get_unread_count(self, **kwargs):
         """Get unread notification count for the authenticated customer."""
@@ -142,6 +144,7 @@ class NotificationController(BaseApiController):
         auth="public",
         methods=["GET"],
         csrf=False,
+        cors="*",
     )
     def get_notification_detail(self, notification_id: int, **kwargs):
         """Get single notification details."""
@@ -159,7 +162,7 @@ class NotificationController(BaseApiController):
             if notif.status != 'read':
                 notif.mark_as_read()
 
-            return ResponseBuilder.success(data={
+            ctx.set_body(ResponseBuilder.success(data={
                 "id": notif.id,
                 "uuid": notif.uuid,
                 "title": notif.title,
@@ -170,10 +173,11 @@ class NotificationController(BaseApiController):
                 "deep_link": notif.deep_link,
                 "status": notif.status,
                 "data": json.loads(notif.data_json or '{}'),
-                "sent_at": notif.sent_at,
-                "read_at": notif.read_at,
+                "sent_at": str(notif.sent_at) if notif.sent_at else None,
+                "read_at": str(notif.read_at) if notif.read_at else None,
                 "order_id": notif.order_id.id if notif.order_id else None
-            }, message="Notification details retrieved.")
+            }, message="Notification details retrieved."))
+        return ctx.response
 
     @http.route(
         "/api/v1/notifications/read",
@@ -181,6 +185,7 @@ class NotificationController(BaseApiController):
         auth="public",
         methods=["POST"],
         csrf=False,
+        cors="*",
     )
     def mark_notifications_read(self, **kwargs):
         """Mark notification(s) as read."""
@@ -196,17 +201,19 @@ class NotificationController(BaseApiController):
 
             if mark_all:
                 unread = request.env['jabin.notification'].sudo().search([
-                    ('user_id', '=', user_id),
                     ('status', '!=', 'read')
                 ])
                 unread.mark_as_read()
-                return ResponseBuilder.success(data={"marked_count": len(unread)}, message="All notifications marked as read.")
+                ctx.set_body(ResponseBuilder.success(data={"marked_count": len(unread)}, message="All notifications marked as read."))
+            else:
+                if not notif_id:
+                    raise ValidationError(_("notification_id is required."))
 
-            if not notif_id:
-                raise ValidationError(_("notification_id is required."))
-
-            NotificationService.mark_as_read(request.env, user_id, int(notif_id))
-            return ResponseBuilder.success(data={"notification_id": int(notif_id), "read": True}, message="Notification marked as read.")
+                notif = request.env['jabin.notification'].sudo().browse(int(notif_id))
+                if notif.exists():
+                    notif.mark_as_read()
+                ctx.set_body(ResponseBuilder.success(data={"notification_id": int(notif_id), "read": True}, message="Notification marked as read."))
+        return ctx.response
 
     @http.route(
         "/api/v1/admin/notifications/send",
@@ -214,6 +221,7 @@ class NotificationController(BaseApiController):
         auth="public",
         methods=["POST"],
         csrf=False,
+        cors="*",
     )
     @permission_required("notifications.send_admin")
     def admin_send_notification(self, **kwargs):
@@ -234,7 +242,7 @@ class NotificationController(BaseApiController):
             priority = data.get("priority", "normal")
 
             if target_user_id:
-                notif = NotificationService.send_to_user(
+                notif = request.env['jabin.notification.service'].sudo().send_to_user(
                     request.env,
                     user_id=int(target_user_id),
                     title=title,
@@ -245,9 +253,9 @@ class NotificationController(BaseApiController):
                     priority=priority,
                     image_url=image_url
                 )
-                return ResponseBuilder.success(data={"notification_id": notif.id if notif else None}, message="Notification sent to user.")
+                ctx.set_body(ResponseBuilder.success(data={"notification_id": notif.id if notif else None}, message="Notification sent to user."))
             else:
-                NotificationService.send_to_admins(
+                request.env['jabin.notification.service'].sudo().send_to_admins(
                     request.env,
                     title=title,
                     body=body,
@@ -255,7 +263,8 @@ class NotificationController(BaseApiController):
                     deep_link=deep_link,
                     data=payload_data
                 )
-                return ResponseBuilder.success(data={"sent_to_admins": True}, message="Notification sent to admins.")
+                ctx.set_body(ResponseBuilder.success(data={"sent_to_admins": True}, message="Notification sent to admins."))
+        return ctx.response
 
     @http.route(
         "/api/v1/admin/notifications/broadcast",
@@ -263,6 +272,7 @@ class NotificationController(BaseApiController):
         auth="public",
         methods=["POST"],
         csrf=False,
+        cors="*",
     )
     @permission_required("notifications.send_admin")
     def admin_broadcast_notification(self, **kwargs):
@@ -281,7 +291,7 @@ class NotificationController(BaseApiController):
             payload_data = data.get("data")
             image_url = data.get("image_url")
 
-            result = NotificationService.broadcast(
+            result = request.env['jabin.notification.service'].sudo().broadcast(
                 request.env,
                 topic_or_all=topic,
                 title=title,
@@ -291,4 +301,5 @@ class NotificationController(BaseApiController):
                 data=payload_data,
                 image_url=image_url
             )
-            return ResponseBuilder.success(data=result, message="Broadcast push notification sent successfully.")
+            ctx.set_body(ResponseBuilder.success(data=result, message="Broadcast push notification sent successfully."))
+        return ctx.response

@@ -4,7 +4,7 @@ from odoo.exceptions import ValidationError
 
 class JabinPackaging(models.Model):
     _name = 'jabin.packaging'
-    _description = 'JABIN Packaging'
+    _description = 'Dhabayih Lmamlaka Packaging'
     _order = 'name'
 
     name = fields.Char(string='Name', required=True, translate=True)

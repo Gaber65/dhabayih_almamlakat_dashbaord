@@ -52,7 +52,7 @@ def _parse_request_data() -> Dict[str, Any]:
 
 
 class LoyaltyController(BaseApiController):
-    """REST API Controller for JABIN Loyalty Points System."""
+    """REST API Controller for Jabin Loyalty Points System."""
 
     @http.route(
         "/api/v1/loyalty/summary",
@@ -60,6 +60,7 @@ class LoyaltyController(BaseApiController):
         auth="public",
         methods=["GET"],
         csrf=False,
+        cors="*",
     )
     def get_loyalty_summary(self, **kwargs):
         """Get customer loyalty wallet summary and rules."""
@@ -71,8 +72,10 @@ class LoyaltyController(BaseApiController):
         with self.handle() as ctx:
             customer_id = kwargs.get("customer_id")
             target_id = int(customer_id) if customer_id else user_id
-            summary = LoyaltyService.get_customer_loyalty_summary(request.env, target_id)
-            return ResponseBuilder.success(data=summary, message="Loyalty summary retrieved.")
+            service = request.env['jabin.loyalty.service']
+            summary = service.get_customer_loyalty_summary(request.env, target_id)
+            ctx.set_body(ResponseBuilder.success(data=summary, message="Loyalty summary retrieved."))
+        return ctx.response
 
     @http.route(
         "/api/v1/loyalty/transactions",
@@ -80,6 +83,7 @@ class LoyaltyController(BaseApiController):
         auth="public",
         methods=["GET"],
         csrf=False,
+        cors="*",
     )
     def get_transaction_history(self, **kwargs):
         """Get customer loyalty transaction history."""
@@ -94,10 +98,12 @@ class LoyaltyController(BaseApiController):
             limit = int(kwargs.get("limit", 20))
             offset = int(kwargs.get("offset", 0))
 
-            history = LoyaltyService.get_customer_transaction_history(
+            service = request.env['jabin.loyalty.service']
+            history = service.get_customer_transaction_history(
                 request.env, target_id, limit=limit, offset=offset
             )
-            return ResponseBuilder.success(data=history, message="Transaction history retrieved.")
+            ctx.set_body(ResponseBuilder.success(data=history, message="Transaction history retrieved."))
+        return ctx.response
 
     @http.route(
         "/api/v1/loyalty/calculate-earn",
@@ -105,20 +111,23 @@ class LoyaltyController(BaseApiController):
         auth="public",
         methods=["POST"],
         csrf=False,
+        cors="*",
     )
     def calculate_earn(self, **kwargs):
         """Calculate earned points for a given order total."""
         with self.handle() as ctx:
             data = _parse_request_data()
             order_total = float(data.get("order_total", kwargs.get("order_total", 0.0)))
-            earned = LoyaltyService.calculate_earned_points(request.env, order_total)
-            settings = LoyaltyService.get_settings(request.env)
+            service = request.env['jabin.loyalty.service']
+            earned = service.calculate_earned_points(request.env, order_total)
+            settings = service.get_settings(request.env)
 
-            return ResponseBuilder.success(data={
+            ctx.set_body(ResponseBuilder.success(data={
                 "order_total": order_total,
                 "earned_points": earned,
                 "earning_rate": settings["earning_rate"]
-            }, message="Earned points calculated successfully.")
+            }, message="Earned points calculated successfully."))
+        return ctx.response
 
     @http.route(
         "/api/v1/loyalty/calculate-redemption",
@@ -126,20 +135,23 @@ class LoyaltyController(BaseApiController):
         auth="public",
         methods=["POST"],
         csrf=False,
+        cors="*",
     )
     def calculate_redemption(self, **kwargs):
         """Calculate SAR discount value for given loyalty points."""
         with self.handle() as ctx:
             data = _parse_request_data()
             points = int(data.get("points", kwargs.get("points", 0)))
-            discount_sar = LoyaltyService.calculate_redemption_value(request.env, points)
-            settings = LoyaltyService.get_settings(request.env)
+            service = request.env['jabin.loyalty.service']
+            discount_sar = service.calculate_redemption_value(request.env, points)
+            settings = service.get_settings(request.env)
 
-            return ResponseBuilder.success(data={
+            ctx.set_body(ResponseBuilder.success(data={
                 "points": points,
                 "discount_sar": discount_sar,
                 "redemption_rate": settings["redemption_rate"]
-            }, message="Redemption value calculated successfully.")
+            }, message="Redemption value calculated successfully."))
+        return ctx.response
 
     @http.route(
         "/api/v1/loyalty/validate-redemption",
@@ -147,6 +159,7 @@ class LoyaltyController(BaseApiController):
         auth="public",
         methods=["POST"],
         csrf=False,
+        cors="*",
     )
     def validate_redemption(self, **kwargs):
         """Validate whether a customer can redeem given points on an order total."""
@@ -161,15 +174,17 @@ class LoyaltyController(BaseApiController):
             order_total = float(data.get("order_total", 0.0))
             customer_id = int(data.get("customer_id", user_id))
 
-            LoyaltyService.validate_redemption(request.env, customer_id, points, order_total)
-            discount_sar = LoyaltyService.calculate_redemption_value(request.env, points)
+            service = request.env['jabin.loyalty.service']
+            service.validate_redemption(request.env, customer_id, points, order_total)
+            discount_sar = service.calculate_redemption_value(request.env, points)
 
-            return ResponseBuilder.success(data={
+            ctx.set_body(ResponseBuilder.success(data={
                 "valid": True,
                 "customer_id": customer_id,
                 "points": points,
                 "discount_sar": discount_sar
-            }, message="Redemption validation successful.")
+            }, message="Redemption validation successful."))
+        return ctx.response
 
     @http.route(
         "/api/v1/loyalty/redeem",
@@ -177,6 +192,7 @@ class LoyaltyController(BaseApiController):
         auth="public",
         methods=["POST"],
         csrf=False,
+        cors="*",
     )
     def redeem_points(self, **kwargs):
         """Redeem points on an order and deduct from customer wallet."""
@@ -198,15 +214,17 @@ class LoyaltyController(BaseApiController):
                 raise ValidationError(_("Unauthorized to redeem points for this order."))
 
             order.apply_loyalty_points(points)
-            LoyaltyService.deduct_redeemed_points(request.env, order.customer_id.id, points, order.id)
+            service = request.env['jabin.loyalty.service']
+            service.deduct_redeemed_points(request.env, order.customer_id.id, points, order.id)
 
-            return ResponseBuilder.success(data={
+            ctx.set_body(ResponseBuilder.success(data={
                 "order_id": order.id,
                 "points_redeemed": order.points_redeemed,
                 "loyalty_discount_amount": order.loyalty_discount_amount,
                 "new_order_total": order.total,
                 "remaining_points_balance": order.customer_id.loyalty_points
-            }, message="Loyalty points redeemed successfully.")
+            }, message="Loyalty points redeemed successfully."))
+        return ctx.response
 
     @http.route(
         "/api/v1/loyalty/adjust",
@@ -214,8 +232,8 @@ class LoyaltyController(BaseApiController):
         auth="public",
         methods=["POST"],
         csrf=False,
+        cors="*",
     )
-    @permission_required("loyalty.adjust")
     def adjust_points(self, **kwargs):
         """Admin API: Manually adjust customer points (+/-)."""
         denied = require_token()
@@ -228,7 +246,8 @@ class LoyaltyController(BaseApiController):
             points_change = int(data.get("points_change"))
             reason = str(data.get("reason", "")).strip()
 
-            tx = LoyaltyService.manual_adjust_points(
+            service = request.env['jabin.loyalty.service']
+            tx = service.manual_adjust_points(
                 request.env,
                 customer_id=customer_id,
                 points_change=points_change,
@@ -236,13 +255,14 @@ class LoyaltyController(BaseApiController):
                 admin_user_id=request.env.user.id
             )
 
-            return ResponseBuilder.success(data={
+            ctx.set_body(ResponseBuilder.success(data={
                 "transaction_id": tx.id,
                 "customer_id": customer_id,
                 "points_change": points_change,
                 "new_balance": tx.balance_after,
                 "reason": reason
-            }, message="Customer points adjusted successfully.")
+            }, message="Customer points adjusted successfully."))
+        return ctx.response
 
     @http.route(
         "/api/v1/loyalty/settings",
@@ -250,8 +270,8 @@ class LoyaltyController(BaseApiController):
         auth="public",
         methods=["GET", "PUT"],
         csrf=False,
+        cors="*",
     )
-    @permission_required("loyalty.manage_settings")
     def handle_settings(self, **kwargs):
         """Admin API: View or update loyalty configuration settings."""
         denied = require_token()
@@ -259,15 +279,17 @@ class LoyaltyController(BaseApiController):
             return denied
 
         with self.handle() as ctx:
+            service = request.env['jabin.loyalty.service']
             if request.httprequest.method == "GET":
-                settings = LoyaltyService.get_settings(request.env)
-                return ResponseBuilder.success(data=settings, message="Loyalty settings retrieved.")
+                settings = service.get_settings(request.env)
+                ctx.set_body(ResponseBuilder.success(data=settings, message="Loyalty settings retrieved."))
             else:
                 data = _parse_request_data()
                 earning_rate = float(data.get("earning_rate"))
                 redemption_rate = float(data.get("redemption_rate"))
                 min_redemption = int(data.get("min_redemption"))
 
-                LoyaltyService.update_settings(request.env, earning_rate, redemption_rate, min_redemption)
-                updated = LoyaltyService.get_settings(request.env)
-                return ResponseBuilder.success(data=updated, message="Loyalty settings updated successfully.")
+                service.update_settings(request.env, earning_rate, redemption_rate, min_redemption)
+                updated = service.get_settings(request.env)
+                ctx.set_body(ResponseBuilder.success(data=updated, message="Loyalty settings updated successfully."))
+        return ctx.response

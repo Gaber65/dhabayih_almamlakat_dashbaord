@@ -1,16 +1,16 @@
 {
-    "name": "JABIN Users",
+    "name": "Jabin Users",
     "version": "17.0.1.0.0",
-    "category": "Services/JABIN",
-    "summary": "JABIN ERP - User profiles, user types, and multi-address management",
+    "category": "Services/Jabin",
+    "summary": "Jabin ERP - User profiles, user types, and multi-address management",
     "description": """
-JABIN Users
+Jabin Users
 ===========
 
-User-management domain for the JABIN ERP platform.
+User-management domain for the Jabin ERP platform.
 
 Provides:
-    * Extended res.users with JABIN business fields (user type, balance,
+    * Extended res.users with Jabin business fields (user type, balance,
       status, phone, avatar, last login).
     * Multi-address model (res.users.address).
     * REST APIs under /api/v1/users and /api/v1/addresses.
@@ -18,8 +18,8 @@ Provides:
 
     User types: Admin, Customer, Manager, Employee, Driver.
     """,
-    "author": "JABIN Engineering",
-    "website": "https://github.com/Gaber65/JABIN",
+    "author": "Jabin Engineering",
+    "website": "https://github.com/Gaber65/Jabin",
     "license": "Other proprietary",
     "depends": ["base", "jabin_core"],
     "data": [

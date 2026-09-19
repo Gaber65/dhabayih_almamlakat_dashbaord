@@ -10,15 +10,15 @@ _logger = JabinLogger.get('security.authorization_service')
 
 class AuthorizationService(models.AbstractModel):
     _name = 'jabin.authorization.service'
-    _description = 'JABIN Authorization Service'
+    _description = 'Dhabayih Lmamlaka Authorization Service'
 
     @api.model
     def build_context(self, user_id: int, token_id: Optional[str] = None) -> SecurityContext:
-        user = self.env['res.users'].browse(user_id)  # Changed from res.users
+        user = self.env['res.users'].sudo().browse(user_id)  # Changed from res.users
         if not user.exists():
             raise MissingError(f'User {user_id} not found.')
-        roles: List[str] = list(user.get_role_codes())
-        permissions: Set[str] = set(user.get_permission_codes())
+        roles: List[str] = list(user.sudo().get_role_codes())
+        permissions: Set[str] = set(user.sudo().get_permission_codes())
         user_type = getattr(user, 'user_type', None) or None  # Changed from x_user_type
         email = user.login or None
         ctx = SecurityContext(
@@ -39,7 +39,7 @@ class AuthorizationService(models.AbstractModel):
 
     @api.model
     def is_account_active(self, user_id: int) -> bool:
-        user = self.env['res.users'].browse(user_id)  # Changed from res.users
+        user = self.env['res.users'].sudo().browse(user_id)  # Changed from res.users
         if not user.exists():
             return False
         # Check if user is active in res.users
@@ -98,6 +98,8 @@ class AuthorizationService(models.AbstractModel):
                     extra={'user_id': ctx.user_id, 'action': 'authz_denied_inactive'}
                 )
                 return False
+        if ctx.is_admin:
+            return True
         if permission_code and (not self.check_permission(ctx, permission_code)):
             return False
         if any_of and (not self.check_any_permission(ctx, any_of)):

@@ -12,7 +12,7 @@
             without losing their changes on the next module upgrade.
         -->
         <record id="ir_cron_cleanup_expired_highlights" model="ir.cron">
-            <field name="name">JABIN: Cleanup Expired Highlights</field>
+            <field name="name">Jabin: Cleanup Expired Highlights</field>
             <field name="model_id" ref="model_jabin_highlight_service"/>
             <field name="state">code</field>
             <field name="code">model.cleanup_expired_highlights()</field>

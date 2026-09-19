@@ -48,6 +48,7 @@ class FavoriteController(BaseApiController):
         auth="public",
         methods=["GET"],
         csrf=False,
+        cors="*",
     )
     def list_favorites(self, **kwargs):
         """List user favorite products."""
@@ -87,6 +88,7 @@ class FavoriteController(BaseApiController):
         auth="public",
         methods=["POST"],
         csrf=False,
+        cors="*",
     )
     def add_favorite(self, **kwargs):
         """Add product to user favorites."""
@@ -121,6 +123,7 @@ class FavoriteController(BaseApiController):
         auth="public",
         methods=["DELETE"],
         csrf=False,
+        cors="*",
     )
     def remove_favorite(self, product_id: int, **kwargs):
         """Remove product from user favorites."""

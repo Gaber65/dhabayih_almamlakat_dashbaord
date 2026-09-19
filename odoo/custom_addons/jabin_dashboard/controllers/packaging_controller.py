@@ -48,6 +48,12 @@ def _parse_request_data() -> Dict[str, Any]:
         # Remove id if present
         vals.pop("id", None)
 
+    # Sanitize fields for jabin.packaging model
+    if "is_active" in vals:
+        vals["active"] = bool(vals.pop("is_active"))
+    vals.pop("extra_price", None)
+    vals.pop("type", None)
+
     return vals
 
 
@@ -60,6 +66,7 @@ class PackagingController(BaseApiController):
         auth="public",
         methods=["POST"],
         csrf=False,
+        cors="*",
     )
     @permission_required("catalog.manage")
     def create_packaging(self, **kwargs):
@@ -87,6 +94,9 @@ class PackagingController(BaseApiController):
                         "name": packaging.name,
                         "description": packaging.description,
                         "active": packaging.active,
+                        "is_active": packaging.active,
+                        "extra_price": 0.0,
+                        "type": "packaging",
                     },
                     message=_("Packaging created successfully"),
                     code=201,
@@ -101,6 +111,7 @@ class PackagingController(BaseApiController):
         auth="public",
         methods=["PUT"],
         csrf=False,
+        cors="*",
     )
     @permission_required("catalog.manage")
     def update_packaging(self, packaging_id, **kwargs):
@@ -129,6 +140,9 @@ class PackagingController(BaseApiController):
                         "name": packaging.name,
                         "description": packaging.description,
                         "active": packaging.active,
+                        "is_active": packaging.active,
+                        "extra_price": 0.0,
+                        "type": "packaging",
                     },
                     message=_("Packaging updated successfully"),
                 )
@@ -142,6 +156,7 @@ class PackagingController(BaseApiController):
         auth="public",
         methods=["DELETE"],
         csrf=False,
+        cors="*",
     )
     @permission_required("catalog.manage")
     def delete_packaging(self, packaging_id, **kwargs):
@@ -173,6 +188,7 @@ class PackagingController(BaseApiController):
         auth="public",
         methods=["GET"],
         csrf=False,
+        cors="*",
     )
     def get_packaging(self, packaging_id, **kwargs):
         """Get a single packaging by ID."""
@@ -217,6 +233,7 @@ class PackagingController(BaseApiController):
         auth="public",
         methods=["GET"],
         csrf=False,
+        cors="*",
     )
     def get_packagings(self, **kwargs):
         """Get paginated list of packagings."""

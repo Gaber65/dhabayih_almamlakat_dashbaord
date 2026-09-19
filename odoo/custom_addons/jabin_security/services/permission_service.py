@@ -8,7 +8,7 @@ _logger = JabinLogger.get('security.permission_service')
 
 class PermissionService(models.AbstractModel):
     _name = 'jabin.permission.service'
-    _description = 'JABIN Permission Service'
+    _description = 'Dhabayih Lmamlaka Permission Service'
 
     @api.model
     def create_role(

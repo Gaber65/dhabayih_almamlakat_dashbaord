@@ -8,7 +8,7 @@ _logger = JabinLogger.get('security.permission')
 
 class JabinPermission(models.Model):
     _name = 'jabin.permission'
-    _description = 'JABIN Permission'
+    _description = 'Dhabayih Lmamlaka Permission'
     _order = 'resource, action'
     _rec_name = 'code'
 
@@ -19,7 +19,7 @@ class JabinPermission(models.Model):
         help="Unique identifier in '<resource>.<action>' format (e.g. 'users.create')."
     )
     name = fields.Char(
-        string='Display Name',
+        string='Permission Name',
         required=True,
         help='Human-readable label.'
     )
@@ -70,7 +70,7 @@ class JabinPermission(models.Model):
                     "convention (lowercase snake_case, single dot separator)."
                 )
 
-    @api.model
+    @api.model_create_multi
     def create(self, vals_list):
         if isinstance(vals_list, dict):
             vals_list = [vals_list]

@@ -48,6 +48,12 @@ def _parse_request_data() -> Dict[str, Any]:
         # Remove id if present
         vals.pop("id", None)
 
+    # Sanitize fields for jabin.cutting.option model
+    if "is_active" in vals:
+        vals["active"] = bool(vals.pop("is_active"))
+    vals.pop("extra_price", None)
+    vals.pop("type", None)
+
     return vals
 
 
@@ -60,6 +66,7 @@ class CuttingOptionController(BaseApiController):
         auth="public",
         methods=["POST"],
         csrf=False,
+        cors="*",
     )
     @permission_required("catalog.manage")
     def create_cutting_option(self, **kwargs):
@@ -87,6 +94,9 @@ class CuttingOptionController(BaseApiController):
                         "name": cutting_option.name,
                         "description": cutting_option.description,
                         "active": cutting_option.active,
+                        "is_active": cutting_option.active,
+                        "extra_price": 0.0,
+                        "type": "cutting",
                     },
                     message=_("Cutting option created successfully"),
                     code=201,
@@ -101,6 +111,7 @@ class CuttingOptionController(BaseApiController):
         auth="public",
         methods=["PUT"],
         csrf=False,
+        cors="*",
     )
     @permission_required("catalog.manage")
     def update_cutting_option(self, option_id, **kwargs):
@@ -129,6 +140,9 @@ class CuttingOptionController(BaseApiController):
                         "name": cutting_option.name,
                         "description": cutting_option.description,
                         "active": cutting_option.active,
+                        "is_active": cutting_option.active,
+                        "extra_price": 0.0,
+                        "type": "cutting",
                     },
                     message=_("Cutting option updated successfully"),
                 )
@@ -142,6 +156,7 @@ class CuttingOptionController(BaseApiController):
         auth="public",
         methods=["DELETE"],
         csrf=False,
+        cors="*",
     )
     @permission_required("catalog.manage")
     def delete_cutting_option(self, option_id, **kwargs):
@@ -173,6 +188,7 @@ class CuttingOptionController(BaseApiController):
         auth="public",
         methods=["GET"],
         csrf=False,
+        cors="*",
     )
     def get_cutting_option(self, option_id, **kwargs):
         """Get a single cutting option by ID."""
@@ -217,6 +233,7 @@ class CuttingOptionController(BaseApiController):
         auth="public",
         methods=["GET"],
         csrf=False,
+        cors="*",
     )
     def get_cutting_options(self, **kwargs):
         """Get paginated list of cutting options."""

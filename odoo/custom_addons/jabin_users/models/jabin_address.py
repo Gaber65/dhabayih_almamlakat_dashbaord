@@ -2,7 +2,7 @@ from odoo import api, fields, models
 
 class JabinUserAddress(models.Model):
     _name = "res.users.address"
-    _description = "JABIN User Address"
+    _description = "Dhabayih Lmamlaka User Address"
 
     user_id = fields.Many2one(
         "res.users",

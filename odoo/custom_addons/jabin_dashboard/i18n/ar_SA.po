@@ -1,0 +1,5164 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* jabin_dashboard
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 17.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-05 17:28+0000\n"
+"PO-Revision-Date: 2026-08-05 17:28+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#, python-format
+msgid "% Stock Coverage"
+msgstr "نسبة تغطية المخزون"
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#, python-format
+msgid "% covered"
+msgstr "نسبة التغطية"
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#, python-format
+msgid "% of capacity"
+msgstr "نسبة السعة"
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#, python-format
+msgid "% of inventory at risk"
+msgstr "نسبة المخزون المعرض للخطر"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/excluded_part_validator.py:0
+#: code:addons/jabin_dashboard/validators/product_validator.py:0
+#, python-format
+msgid "%(field)s must be at least %(min)d characters long."
+msgstr "يجب أن يتكون حقل %(field)s من %(min)d أحرف على الأقل."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/excluded_part_validator.py:0
+#: code:addons/jabin_dashboard/validators/product_validator.py:0
+#, python-format
+msgid "%(field)s must not exceed %(max)d characters."
+msgstr "يجب ألا يتجاوز حقل %(field)s %(max)d حرفًا."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/product_validator.py:0
+#, python-format
+msgid "%s cannot be negative."
+msgstr "%s لا يمكن أن يكون قيمة سالبة."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/excluded_part_validator.py:0
+#: code:addons/jabin_dashboard/validators/product_validator.py:0
+#, python-format
+msgid "%s must be a boolean value."
+msgstr "%s يجب أن يكون قيمة منطقية."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/excluded_part_validator.py:0
+#: code:addons/jabin_dashboard/validators/product_validator.py:0
+#, python-format
+msgid "%s must be a string."
+msgstr "%s يجب أن يكون نصًا."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/product_validator.py:0
+#, python-format
+msgid "%s must be a valid integer."
+msgstr "%s يجب أن يكون رقمًا صحيحًا صالحًا."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/product_validator.py:0
+#, python-format
+msgid "%s must be a valid number."
+msgstr "%s يجب أن يكون رقمًا صالحًا."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/product_validator.py:0
+#, python-format
+msgid "%s must be greater than 0."
+msgstr "%s يجب أن يكون أكبر من 0."
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_product_form
+msgid "<span class=\"o_stat_text\">Images</span>"
+msgstr "<span class=\"o_stat_text\">الصور</span>"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/category_validator.py:0
+#, python-format
+msgid "A category cannot be its own parent."
+msgstr "لا يمكن أن تكون الفئة فئة أصل لنفسها."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_loyalty_adjust_wizard__adjustment_type
+msgid "Action"
+msgstr "الإجراء"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_customer_activity_search
+msgid "Action Type"
+msgstr "نوع الإجراء"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_product_form
+msgid "Activate"
+msgstr "تنشيط"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_banner__active
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_branch__active
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_category__active
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_coupon__active
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cutting_option__active
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_dashboard__active
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_excluded_part__active
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_packaging__active
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__active
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_cart__status__active
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_banner_search
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_category_search
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_coupon_search
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_dashboard_search
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_product_search
+msgid "Active"
+msgstr "نشط"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_res_users__active_cart_id
+msgid "Active Cart"
+msgstr "عربة التسوق النشطة"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_send_notification_wizard__active_device_count
+msgid "Active FCM Devices"
+msgstr "أجهزة FCM النشطة"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_order_search
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_form
+msgid "Active Orders"
+msgstr "الطلبات النشطة"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_device_search
+msgid "Active Status"
+msgstr "حالة النشاط"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_device_search
+msgid "Active Tokens"
+msgstr "الرموز النشطة"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_search
+msgid "Active Users"
+msgstr "المستخدمون النشطون"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/coupon_service.py:0
+#: code:addons/jabin_dashboard/services/coupon_service.py:0
+#, python-format
+msgid "Active order not found."
+msgstr "لم يتم العثور على طلب نشط."
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_form
+msgid "Activity History"
+msgstr "سجل الأنشطة"
+
+#. module: jabin_dashboard
+#: model:ir.ui.menu,name:jabin_dashboard.menu_jabin_activity_logs
+msgid "Activity Logs"
+msgstr "سجلات الأنشطة"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_form
+msgid "Activity Metrics"
+msgstr "مقاييس الأنشطة"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_loyalty_adjust_wizard__adjustment_type__add
+msgid "Add Points"
+msgstr "إضافة نقاط"
+
+#. module: jabin_dashboard
+#: model_terms:ir.actions.act_window,help:jabin_dashboard.action_jabin_product_images
+msgid "Add images to this product"
+msgstr "إضافة صور لهذا المنتج"
+
+#. module: jabin_dashboard
+#: model_terms:ir.actions.act_window,help:jabin_dashboard.action_jabin_product
+msgid "Add products to your catalog with pricing, stock, and media."
+msgstr "أضف منتجات إلى كتالوجك مع الأسعار، المخزون، والوسائط."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_branch__address
+msgid "Address"
+msgstr "العنوان"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_form
+msgid "Addresses"
+msgstr "العناوين"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/res_users_ext.py:0
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_loyalty_adjust_wizard_form
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_form
+#, python-format
+msgid "Adjust Loyalty Points"
+msgstr "تعديل نقاط الولاء"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/loyalty_validator.py:0
+#, python-format
+msgid "Adjustment points must be a non-zero integer."
+msgstr "يجب أن تكون نقاط التعديل رقمًا صحيحًا غير صفري."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_notification__notification_type__admin
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_send_notification_wizard__notification_type__admin
+msgid "Admin Notification"
+msgstr "إشعار إداري"
+
+#. module: jabin_dashboard
+#: model:ir.ui.menu,name:jabin_dashboard.menu_jabin_highlight_all
+msgid "All Highlights"
+msgstr "جميع المميزات"
+
+#. module: jabin_dashboard
+#: model:ir.ui.menu,name:jabin_dashboard.menu_jabin_orders_all
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_form
+msgid "All Orders"
+msgstr "جميع الطلبات"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_coupon__applies_to__all
+msgid "All Products"
+msgstr "جميع المنتجات"
+
+#. module: jabin_dashboard
+#: model:ir.ui.menu,name:jabin_dashboard.menu_jabin_users_list
+msgid "All Users"
+msgstr "جميع المستخدمين"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/excluded_part_controller.py:0
+#, python-format
+msgid "An error occurred while creating the excluded part: %s"
+msgstr "حدث خطأ أثناء إنشاء الجزء المستبعد: %s"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/product_controller.py:0
+#, python-format
+msgid "An error occurred while creating the product: %s"
+msgstr "حدث خطأ أثناء إنشاء المنتج: %s"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/excluded_part_controller.py:0
+#, python-format
+msgid "An error occurred while deleting the excluded part: %s"
+msgstr "حدث خطأ أثناء حذف الجزء المستبعد: %s"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/product_controller.py:0
+#, python-format
+msgid "An error occurred while deleting the product: %s"
+msgstr "حدث خطأ أثناء حذف المنتج: %s"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/excluded_part_controller.py:0
+#, python-format
+msgid "An error occurred while retrieving excluded parts: %s"
+msgstr "حدث خطأ أثناء استرجاع الأجزاء المستبعدة: %s"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/product_controller.py:0
+#, python-format
+msgid "An error occurred while retrieving products: %s"
+msgstr "حدث خطأ أثناء استرجاع المنتجات: %s"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/excluded_part_controller.py:0
+#, python-format
+msgid "An error occurred while retrieving the excluded part: %s"
+msgstr "حدث خطأ أثناء استرجاع الجزء المستبعد: %s"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/product_controller.py:0
+#, python-format
+msgid "An error occurred while retrieving the product: %s"
+msgstr "حدث خطأ أثناء استرجاع المنتج: %s"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/product_controller.py:0
+#, python-format
+msgid "An error occurred while toggling product status: %s"
+msgstr "حدث خطأ أثناء تبديل حالة المنتج: %s"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/product_controller.py:0
+#, python-format
+msgid "An error occurred while updating stock: %s"
+msgstr "حدث خطأ أثناء تحديث المخزون: %s"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/excluded_part_controller.py:0
+#, python-format
+msgid "An error occurred while updating the excluded part: %s"
+msgstr "حدث خطأ أثناء تحديث الجزء المستبعد: %s"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/product_controller.py:0
+#, python-format
+msgid "An error occurred while updating the product: %s"
+msgstr "حدث خطأ أثناء تحديث المنتج: %s"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_device__device_type__android
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_device_search
+msgid "Android"
+msgstr "أندرويد"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_device_form
+msgid "App & OS Specs"
+msgstr "مواصفات التطبيق ونظام التشغيل"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_device__app_version
+msgid "App Version"
+msgstr "إصدار التطبيق"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_order__coupon_id
+msgid "Applied Coupon"
+msgstr "الكوبون المطبق"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_coupon__applies_to
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_coupon_search
+msgid "Applies To"
+msgstr "ينطبق على"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_loyalty_adjust_wizard_form
+msgid "Apply Adjustment"
+msgstr "تطبيق التعديل"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_banner_search
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_coupon_form
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_coupon_search
+msgid "Archived"
+msgstr "مؤرشف"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/cart_controller.py:0
+#, python-format
+msgid "Authentication required to retrieve cart."
+msgstr "المصادقة مطلوبة لاسترجاع عربة التسوق."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_loyalty_transaction__balance_after
+msgid "Balance After"
+msgstr "الرصيد بعد التعديل"
+
+#. module: jabin_dashboard
+#: model:ir.model,name:jabin_dashboard.model_banner
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_notification__notification_type__banner
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_send_notification_wizard__notification_type__banner
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_banner_form
+msgid "Banner"
+msgstr "البانر الإعلاني"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/banner_validator.py:0
+#, python-format
+msgid "Banner ID is required."
+msgstr "معرف البانر الإعلاني مطلوب."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_banner__image
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_banner_form
+msgid "Banner Image"
+msgstr "صورة البانر الإعلاني"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_banner_form
+msgid "Banner Name"
+msgstr "اسم البانر الإعلاني"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/banner_controller.py:0
+#, python-format
+msgid "Banner created successfully"
+msgstr "تم إنشاء البانر الإعلاني بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/banner_controller.py:0
+#, python-format
+msgid "Banner deleted successfully"
+msgstr "تم حذف البانر الإعلاني بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/banner_validator.py:0
+#, python-format
+msgid "Banner name cannot contain consecutive spaces."
+msgstr "اسم البانر الإعلاني لا يمكن أن يحتوي على مسافات متتالية."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/banner_validator.py:0
+#, python-format
+msgid "Banner name cannot have leading or trailing spaces."
+msgstr "اسم البانر الإعلاني لا يمكن أن يبدأ أو ينتهي بمسافات."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/banner_validator.py:0
+#, python-format
+msgid "Banner name must contain at least one alphanumeric character."
+msgstr "اسم البانر الإعلاني يجب أن يحتوي على حرف أو رقم واحد على الأقل."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/banner_service.py:0
+#: code:addons/jabin_dashboard/services/banner_service.py:0
+#: code:addons/jabin_dashboard/services/banner_service.py:0
+#: code:addons/jabin_dashboard/services/banner_service.py:0
+#: code:addons/jabin_dashboard/services/banner_service.py:0
+#: code:addons/jabin_dashboard/services/banner_service.py:0
+#: code:addons/jabin_dashboard/validators/banner_validator.py:0
+#, python-format
+msgid "Banner not found."
+msgstr "لم يتم العثور على البانر الإعلاني."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/banner_controller.py:0
+#, python-format
+msgid "Banner retrieved successfully"
+msgstr "تم استرجاع البانر الإعلاني بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/banner_controller.py:0
+#, python-format
+msgid "Banner status toggled successfully"
+msgstr "تم تغيير حالة البانر الإعلاني بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/banner_controller.py:0
+#, python-format
+msgid "Banner updated successfully"
+msgstr "تم تحديث البانر الإعلاني بنجاح"
+
+#. module: jabin_dashboard
+#: model:ir.actions.act_window,name:jabin_dashboard.action_banner
+#: model:ir.actions.act_window,name:jabin_dashboard.action_jabin_banner
+#: model:ir.ui.menu,name:jabin_dashboard.menu_jabin_banner
+msgid "Banners"
+msgstr "البانرات الإعلانية"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/banner_controller.py:0
+#, python-format
+msgid "Banners retrieved successfully"
+msgstr "تم استرجاع البانرات الإعلانية بنجاح"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__barcode
+msgid "Barcode"
+msgstr "الباركود"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/product.py:0
+#, python-format
+msgid "Barcode must be unique!"
+msgstr "يجب أن يكون الباركود فريدًا!"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/product_validator.py:0
+#, python-format
+msgid "Barcode must be unique! '%s' already exists."
+msgstr "يجب أن يكون الباركود فريدًا! '%s' موجود بالفعل."
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_product_search
+msgid "Best Seller"
+msgstr "الأكثر مبيعًا"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_notification__body
+msgid "Body"
+msgstr "النص"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_branch__code
+msgid "Branch Code"
+msgstr "كود الفرع"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_branch__name
+msgid "Branch Name"
+msgstr "اسم الفرع"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/branch_controller.py:0
+#, python-format
+msgid "Branches retrieved successfully."
+msgstr "تم استرجاع الفروع بنجاح"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_loyalty_adjust_wizard_form
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_send_notification_wizard_form
+msgid "Cancel"
+msgstr "إلغاء"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_order_form
+msgid "Cancel Order"
+msgstr "إلغاء الطلب"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_cart__status__cancelled
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_order_search
+msgid "Cancelled"
+msgstr "ملغى"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_form
+msgid "Cancelled Orders"
+msgstr "الطلبات الملغاة"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/jabin_cart.py:0
+#: code:addons/jabin_dashboard/validators/cart_validator.py:0
+#, python-format
+msgid "Cannot checkout an empty cart."
+msgstr "لا يمكن إتمام الشراء لعربة تسوق فارغة."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/loyalty_validator.py:0
+#, python-format
+msgid ""
+"Cannot deduct %s points. Customer balance (%s points) cannot go below zero."
+msgstr "لا يمكن خصم %s نقطة. رصيد العميل (%s نقطة) لا يمكن أن يكون أقل من الصفر."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/jabin_cart.py:0
+#, python-format
+msgid "Cannot delete a checked out cart."
+msgstr "لا يمكن حذف عربة تسوق تم إتمام الشراء لها."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/category_validator.py:0
+#, python-format
+msgid ""
+"Cannot delete category '%(name)s' because it has %(count)s child "
+"category(ies): %(children)s"
+msgstr "لا يمكن حذف الفئة '%(name)s' لأنها تحتوي على %(count)s فئة (فئات) فرعية: %(children)s"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/category_validator.py:0
+#, python-format
+msgid ""
+"Cannot delete category '%(name)s' because it has %(count)s product(s): "
+"%(products)s"
+msgstr "لا يمكن حذف الفئة '%(name)s' لأنها تحتوي على %(count)s منتج (منتجات): %(products)s"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/category.py:0
+#, python-format
+msgid "Cannot delete category with existing products!"
+msgstr "لا يمكن حذف فئة تحتوي على منتجات!"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/category_service.py:0
+#, python-format
+msgid "Cannot delete category with existing products."
+msgstr "لا يمكن حذف فئة تحتوي على منتجات."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/coupon_validator.py:0
+#, python-format
+msgid ""
+"Cannot delete coupon '%(code)s' because it is associated with %(count)s "
+"order(s)."
+msgstr "لا يمكن حذف الكوبون '%(code)s' لأنه مرتبط بـ %(count)s طلب (طلبات)."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/cutting_option_validator.py:0
+#, python-format
+msgid ""
+"Cannot delete cutting option '%(name)s' because it has %(count)s product(s):"
+" %(products)s"
+msgstr "لا يمكن حذف خيار التقطيع '%(name)s' لأنه مرتبط بـ %(count)s منتج (منتجات): %(products)s"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/cutting_option_service.py:0
+#, python-format
+msgid "Cannot delete cutting option with existing products."
+msgstr "لا يمكن حذف خيار تقطيع مرتبط بمنتجات."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/excluded_part_validator.py:0
+#, python-format
+msgid ""
+"Cannot delete excluded part '%(name)s' because it has %(count)s product(s): "
+"%(products)s"
+msgstr "لا يمكن حذف الجزء المستبعد '%(name)s' لأنه مرتبط بـ %(count)s منتج (منتجات): %(products)s"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/packaging_validator.py:0
+#, python-format
+msgid ""
+"Cannot delete packaging '%(name)s' because it has %(count)s product(s): "
+"%(products)s"
+msgstr "لا يمكن حذف خيار التغليف '%(name)s' لأنه مرتبط بـ %(count)s منتج (منتجات): %(products)s"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/loyalty_validator.py:0
+#, python-format
+msgid "Cannot redeem %s points. Customer currently has %s points available."
+msgstr "لا يمكن استبدال %s نقطة. رصيد العميل المتاح حاليًا هو %s نقطة."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart_line__cart_id
+msgid "Cart"
+msgstr "عربة التسوق"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart__line_ids
+msgid "Cart Lines"
+msgstr "عناصر عربة التسوق"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/cart_validator.py:0
+#, python-format
+msgid "Cart does not exist."
+msgstr "عربة التسوق غير موجودة."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/jabin_cart.py:0
+#: code:addons/jabin_dashboard/validators/cart_validator.py:0
+#, python-format
+msgid "Cart has no customer associated."
+msgstr "عربة التسوق غير مرتبطة بأي عميل."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/cart_controller.py:0
+#, python-format
+msgid "Cart retrieved successfully"
+msgstr "تم استرجاع عربة التسوق بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/cart_controller.py:0
+#, python-format
+msgid "Cart updated successfully"
+msgstr "تم تحديث عربة التسوق بنجاح"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_res_users__cart_ids
+msgid "Carts"
+msgstr "عربات التسوق"
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#: model:ir.actions.act_window,name:jabin_dashboard.action_jabin_category
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_coupon__category_ids
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_coupon__applies_to__categories
+#: model:ir.ui.menu,name:jabin_dashboard.menu_jabin_category
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_category_tree
+#, python-format
+msgid "Categories"
+msgstr "الفئات"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_coupon__category_ids
+msgid "Categories eligible for this discount when applies_to is 'categories'"
+msgstr "الفئات المؤهلة لهذا الخصم عندما يكون الخيار ينطبق على 'الفئات'"
+
+#. module: jabin_dashboard
+#: model_terms:ir.actions.act_window,help:jabin_dashboard.action_jabin_category
+msgid ""
+"Categories help organize your products for easier management and browsing."
+msgstr "تساعد الفئات في تنظيم منتجاتك لتسهيل إدارتها وتصفحها."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/category_controller.py:0
+#, python-format
+msgid "Categories retrieved successfully"
+msgstr "تم استرجاع الفئات بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__category_id
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_category_form
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_product_search
+#, python-format
+msgid "Category"
+msgstr "الفئة"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/category_validator.py:0
+#, python-format
+msgid "Category '%(name)s' has products and cannot be processed."
+msgstr "الفئة '%(name)s' تحتوي على منتجات ولا يمكن معالجتها."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/category_validator.py:0
+#, python-format
+msgid "Category ID is required."
+msgstr "معرف الفئة مطلوب."
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_category_form
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_category_search
+msgid "Category Name"
+msgstr "اسم الفئة"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/category_controller.py:0
+#, python-format
+msgid "Category created successfully"
+msgstr "تم إنشاء الفئة بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/category_controller.py:0
+#, python-format
+msgid "Category deleted successfully"
+msgstr "تم حذف الفئة بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/category_validator.py:0
+#, python-format
+msgid ""
+"Category hierarchy depth exceeds maximum allowed depth of %(max_depth)s."
+msgstr "تجاوز عمق الهيكل الهرمي للفئة الحد الأقصى المسموح به وهو %(max_depth)s."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/category_validator.py:0
+#, python-format
+msgid "Category name cannot contain consecutive spaces."
+msgstr "اسم الفئة لا يمكن أن يحتوي على مسافات متتالية."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/category_validator.py:0
+#, python-format
+msgid "Category name cannot have leading or trailing spaces."
+msgstr "اسم الفئة لا يمكن أن يبدأ أو ينتهي بمسافات."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/category.py:0
+#, python-format
+msgid "Category name must be unique!"
+msgstr "يجب أن يكون اسم الفئة فريدًا!"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/category_validator.py:0
+#, python-format
+msgid "Category name must contain at least one alphanumeric character."
+msgstr "اسم الفئة يجب أن يحتوي على حرف أو رقم واحد على الأقل."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/category_service.py:0
+#: code:addons/jabin_dashboard/services/category_service.py:0
+#: code:addons/jabin_dashboard/services/category_service.py:0
+#: code:addons/jabin_dashboard/services/category_service.py:0
+#: code:addons/jabin_dashboard/services/category_service.py:0
+#: code:addons/jabin_dashboard/services/category_service.py:0
+#: code:addons/jabin_dashboard/services/category_service.py:0
+#: code:addons/jabin_dashboard/validators/category_validator.py:0
+#, python-format
+msgid "Category not found."
+msgstr "لم يتم العثور على الفئة."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/category_controller.py:0
+#, python-format
+msgid "Category retrieved successfully"
+msgstr "تم استرجاع الفئة بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/category_controller.py:0
+#, python-format
+msgid "Category updated successfully"
+msgstr "تم تحديث الفئة بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "Check out our new offer on Dhabayih Lmamlaka!"
+msgstr "تفقد عرضنا الجديد على تطبيق ذبائح المملكة!"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "Check out what's new on Dhabayih Lmamlaka today."
+msgstr "تفقد ما هو جديد على تطبيق ذبائح المملكة اليوم."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_cart__status__checked_out
+msgid "Checked Out"
+msgstr "مكتمل الشراء"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_res_users__checked_out_cart_ids
+msgid "Checked Out Carts"
+msgstr "عربات التسوق مكتملة الشراء"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart__checked_out_order_id
+msgid "Checked Out Order"
+msgstr "الطلب مكتمل الشراء"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/category_validator.py:0
+#, python-format
+msgid "Circular parent relationship detected."
+msgstr "تم اكتشاف علاقة دائرية في التسلسل الهرمي."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_branch__city
+msgid "City"
+msgstr "المدينة"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_payment_transaction_form
+msgid "Collect Cash (COD)"
+msgstr "تحصيل النقد (الدفع عند الاستلام)"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_dashboard_search
+msgid "Color"
+msgstr "اللون"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_dashboard__color
+msgid "Color Index"
+msgstr "مؤشر اللون"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_dashboard__color
+msgid "Color accent for the dashboard section"
+msgstr "اللون المميز لقسم لوحة المعلومات"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_dashboard_setting__dashboard_layout__compact
+msgid "Compact"
+msgstr "مدمج"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_search
+msgid "Company"
+msgstr "الشركة"
+
+#. module: jabin_dashboard
+#: model:ir.model,name:jabin_dashboard.model_res_config_settings
+msgid "Config Settings"
+msgstr "تهيئة الإعدادات "
+
+#. module: jabin_dashboard
+#: model:ir.ui.menu,name:jabin_dashboard.menu_jabin_configuration
+msgid "Configuration"
+msgstr "الإعدادات"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_order_form
+msgid "Confirm Order"
+msgstr "تأكيد الطلب"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_branch__phone
+msgid "Contact Phone"
+msgstr "هاتف التواصل"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_notification__notification_type__coupon
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_send_notification_wizard__notification_type__coupon
+msgid "Coupon"
+msgstr "كوبون الخصم"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_coupon_form
+msgid "Coupon / Promo Code"
+msgstr "كوبون الخصم / الرمز الترويجي"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_coupon__code
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_order__coupon_code
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_coupon_form
+msgid "Coupon Code"
+msgstr "رمز الكوبون"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/coupon_validator.py:0
+#, python-format
+msgid "Coupon ID is required."
+msgstr "معرف الكوبون مطلوب."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_coupon__name
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_coupon_form
+msgid "Coupon Name"
+msgstr "اسم الكوبون"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/coupon_controller.py:0
+#, python-format
+msgid "Coupon active status toggled successfully"
+msgstr "تم تغيير حالة Coupon active بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/coupon_controller.py:0
+#, python-format
+msgid "Coupon applied to order successfully"
+msgstr "تم تطبيق الكوبون على الطلب بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/jabin_coupon.py:0
+#: code:addons/jabin_dashboard/validators/coupon_validator.py:0
+#, python-format
+msgid "Coupon code '%s' already exists!"
+msgstr "رمز الكوبون '%s' موجود بالفعل!"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/coupon_controller.py:0
+#, python-format
+msgid "Coupon code ('code') is required."
+msgstr "رمز الكوبون ('code') مطلوب."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/jabin_order_ext.py:0
+#, python-format
+msgid "Coupon code is required."
+msgstr "رمز الكوبون مطلوب."
+
+#. module: jabin_dashboard
+#: model:ir.model.constraint,message:jabin_dashboard.constraint_jabin_coupon_unique_code
+msgid "Coupon code must be unique!"
+msgstr "يجب أن يكون رمز الكوبون فريدًا!"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/coupon_validator.py:0
+#, python-format
+msgid ""
+"Coupon code must contain only letters, numbers, hyphens, and underscores."
+msgstr "يجب أن يحتوي رمز الكوبون على أحرف وأرقام وشرطات وشرطات سفلية فقط."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/coupon_controller.py:0
+#, python-format
+msgid "Coupon created successfully"
+msgstr "تم إنشاء الكوبون بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/coupon_controller.py:0
+#, python-format
+msgid "Coupon deleted successfully"
+msgstr "تم حذف الكوبون بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/coupon_controller.py:0
+#, python-format
+msgid "Coupon details retrieved successfully"
+msgstr "تم استرجاع تفاصيل الكوبون بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/coupon_validator.py:0
+#, python-format
+msgid "Coupon does not exist."
+msgstr "الكوبون غير موجود."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/coupon_validator.py:0
+#, python-format
+msgid "Coupon has expired."
+msgstr "انتهت صلاحية الكوبون."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/coupon_validator.py:0
+#, python-format
+msgid "Coupon is inactive or invalid."
+msgstr "الكوبون غير نشط أو غير صالح."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/coupon_validator.py:0
+#, python-format
+msgid "Coupon is not valid yet."
+msgstr "الكوبون ليس صالحًا للاستخدام بعد."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/coupon_service.py:0
+#: code:addons/jabin_dashboard/services/coupon_service.py:0
+#: code:addons/jabin_dashboard/services/coupon_service.py:0
+#: code:addons/jabin_dashboard/services/coupon_service.py:0
+#: code:addons/jabin_dashboard/validators/coupon_validator.py:0
+#, python-format
+msgid "Coupon not found."
+msgstr "لم يتم العثور على الكوبون."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_order__coupon_id
+msgid "Coupon or promo code applied to this order"
+msgstr "كوبون الخصم أو الرمز الترويجي المطبق على هذا الطلب"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/coupon_controller.py:0
+#, python-format
+msgid "Coupon removed from order successfully"
+msgstr "تمت إزالة الكوبون من الطلب بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/coupon_controller.py:0
+#, python-format
+msgid "Coupon updated successfully"
+msgstr "تم تحديث الكوبون بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/coupon_validator.py:0
+#, python-format
+msgid "Coupon usage limit has been reached."
+msgstr "تم الوصول إلى الحد الأقصى لاستخدام الكوبون."
+
+#. module: jabin_dashboard
+#: model:ir.actions.act_window,name:jabin_dashboard.action_jabin_coupons
+#: model:ir.ui.menu,name:jabin_dashboard.menu_jabin_coupons
+msgid "Coupons & Promo Codes"
+msgstr "الكوبونات والرموز الترويجية"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_coupon_tree
+msgid "Coupons / Promo Codes"
+msgstr "الكوبونات / الرموز الترويجية"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/coupon_controller.py:0
+#, python-format
+msgid "Coupons retrieved successfully"
+msgstr "تم استرجاع الكوبونات بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#, python-format
+msgid "Coverage"
+msgstr "التغطية"
+
+#. module: jabin_dashboard
+#: model_terms:ir.actions.act_window,help:jabin_dashboard.action_jabin_category
+msgid "Create and manage product categories"
+msgstr "إنشاء وإدارة فئات المنتجات"
+
+#. module: jabin_dashboard
+#: model_terms:ir.actions.act_window,help:jabin_dashboard.action_jabin_product
+msgid "Create and manage your products"
+msgstr "إنشاء وإدارة منتجاتك"
+
+#. module: jabin_dashboard
+#: model_terms:ir.actions.act_window,help:jabin_dashboard.action_jabin_coupons
+msgid "Create your first promotional coupon!"
+msgstr "أنشئ أول كوبون ترويجي لك!"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_device__created_at
+msgid "Created At"
+msgstr "تاريخ الإنشاء"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_loyalty_transaction__created_by_id
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_notification__created_by
+msgid "Created By"
+msgstr "أنشأ بواسطة"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart__created_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_favorite__created_date
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_notification_tree
+msgid "Created Date"
+msgstr "تاريخ الإنشاء"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_banner__create_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_branch__create_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart__create_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart_line__create_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_category__create_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_coupon__create_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cutting_option__create_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_dashboard__create_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_dashboard_service__create_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_dashboard_setting__create_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_device__create_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_excluded_part__create_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_favorite__create_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_loyalty_adjust_wizard__create_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_loyalty_transaction__create_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_notification__create_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_packaging__create_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__create_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product_image__create_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_send_notification_wizard__create_uid
+msgid "Created by"
+msgstr "أنشأ بواسطة"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_banner__create_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_branch__create_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart__create_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart_line__create_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_category__create_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_coupon__create_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cutting_option__create_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_dashboard__create_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_dashboard_service__create_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_dashboard_setting__create_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_device__create_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_excluded_part__create_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_favorite__create_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_loyalty_adjust_wizard__create_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_loyalty_transaction__create_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_notification__create_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_packaging__create_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__create_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product_image__create_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_send_notification_wizard__create_date
+msgid "Created on"
+msgstr "أنشئ في"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart__currency_id
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart_line__currency_id
+msgid "Currency"
+msgstr "العملة"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_loyalty_adjust_wizard__current_points
+msgid "Current Points Balance"
+msgstr "رصيد النقاط الحالي"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_loyalty_adjust_wizard__current_points
+#: model:ir.model.fields,help:jabin_dashboard.field_res_users__loyalty_points
+msgid "Current active loyalty points available for redemption."
+msgstr "نقاط الولاء النشطة الحالية المتاحة للاستبدال."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_send_notification_wizard__data_json
+msgid "Custom Payload (JSON)"
+msgstr "البيانات المخصصة (JSON)"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/wizards/jabin_send_notification_wizard.py:0
+#, python-format
+msgid "Custom payload must be a valid JSON object (dictionary)."
+msgstr "يجب أن تكون البيانات المخصصة كائن JSON صالح."
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart__customer_id
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_favorite__customer_id
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_loyalty_adjust_wizard__customer_id
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_loyalty_transaction__customer_id
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_customer_activity_search
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_customer_activity_tree
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_loyalty_transaction_search
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_order_search
+#, python-format
+msgid "Customer"
+msgstr "العميل"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_device_form
+msgid "Customer & Device Info"
+msgstr "معلومات العميل والجهاز"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_form
+msgid "Customer Activities"
+msgstr "أنشطة العملاء"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_customer_activity_tree
+msgid "Customer Activity History"
+msgstr "سجل أنشطة العميل"
+
+#. module: jabin_dashboard
+#: model:ir.actions.act_window,name:jabin_dashboard.action_jabin_customer_activities
+msgid "Customer Activity Logs"
+msgstr "سجلات أنشطة العملاء"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_device_form
+msgid "Customer Device"
+msgstr "جهاز العميل"
+
+#. module: jabin_dashboard
+#: model:ir.actions.act_window,name:jabin_dashboard.action_jabin_device
+#: model:ir.ui.menu,name:jabin_dashboard.menu_jabin_devices
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_device_tree
+msgid "Customer Devices"
+msgstr "أجهزة العملاء"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/cart_controller.py:0
+#: code:addons/jabin_dashboard/controllers/cart_controller.py:0
+#: code:addons/jabin_dashboard/controllers/cart_controller.py:0
+#: code:addons/jabin_dashboard/controllers/cart_controller.py:0
+#: code:addons/jabin_dashboard/controllers/cart_controller.py:0
+#, python-format
+msgid "Customer authentication session not found."
+msgstr "لم يتم العثور على جلسة مصادقة العميل."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/jabin_cart.py:0
+#: code:addons/jabin_dashboard/validators/cart_validator.py:0
+#, python-format
+msgid "Customer is not active."
+msgstr "العميل غير نشط."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/loyalty_validator.py:0
+#, python-format
+msgid "Customer is required for points adjustment."
+msgstr "العميل مطلوب لتعديل النقاط."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/cart_service.py:0
+#: code:addons/jabin_dashboard/services/loyalty_service.py:0
+#: code:addons/jabin_dashboard/services/loyalty_service.py:0
+#: code:addons/jabin_dashboard/services/loyalty_service.py:0
+#: code:addons/jabin_dashboard/services/loyalty_service.py:0
+#: code:addons/jabin_dashboard/services/loyalty_service.py:0
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "Customer not found."
+msgstr "لم يتم العثور على العميل."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_loyalty_transaction__balance_after
+msgid "Customer points balance after this transaction"
+msgstr "رصيد نقاط العميل بعد هذه المعاملة"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/loyalty_validator.py:0
+#, python-format
+msgid "Customer record is required for point redemption."
+msgstr "سجل العميل مطلوب لاستبدال النقاط."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart_line__cutting_option_id
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_order_line__cutting_option_id
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_cutting_option_form
+msgid "Cutting Option"
+msgstr "خيار التقطيع"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_cutting_option_form
+msgid "Cutting Option Name"
+msgstr "اسم خيار التقطيع"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/cutting_option.py:0
+#: model:ir.model.constraint,message:jabin_dashboard.constraint_jabin_cutting_option_name_uniq
+#, python-format
+msgid "Cutting Option name must be unique!"
+msgstr "يجب أن يكون اسم خيار التقطيع فريدًا!"
+
+#. module: jabin_dashboard
+#: model:ir.actions.act_window,name:jabin_dashboard.action_jabin_cutting_option
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__cutting_option_ids
+#: model:ir.ui.menu,name:jabin_dashboard.menu_jabin_cutting_option
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_cutting_option_tree
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_product_form
+msgid "Cutting Options"
+msgstr "خيارات التقطيع"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/cutting_option_validator.py:0
+#, python-format
+msgid "Cutting option '%(name)s' has products and cannot be processed."
+msgstr "خيار التقطيع '%(name)s' يحتوي على منتجات ولا يمكن معالجته."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/cutting_option_validator.py:0
+#, python-format
+msgid "Cutting option ID is required."
+msgstr "معرف خيار التقطيع مطلوب."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/cutting_option_controller.py:0
+#, python-format
+msgid "Cutting option created successfully"
+msgstr "تم إنشاء خيار التقطيع بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/cutting_option_controller.py:0
+#, python-format
+msgid "Cutting option deleted successfully"
+msgstr "تم حذف خيار التقطيع بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/cutting_option_validator.py:0
+#, python-format
+msgid "Cutting option name cannot contain consecutive spaces."
+msgstr "اسم خيار التقطيع لا يمكن أن يحتوي على مسافات متتالية."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/cutting_option_validator.py:0
+#, python-format
+msgid "Cutting option name cannot have leading or trailing spaces."
+msgstr "اسم خيار التقطيع لا يمكن أن يبدأ أو ينتهي بمسافات."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/cutting_option_validator.py:0
+#, python-format
+msgid "Cutting option name must contain at least one alphanumeric character."
+msgstr "اسم خيار التقطيع يجب أن يحتوي على حرف أو رقم واحد على الأقل."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/cutting_option_service.py:0
+#: code:addons/jabin_dashboard/services/cutting_option_service.py:0
+#: code:addons/jabin_dashboard/services/cutting_option_service.py:0
+#: code:addons/jabin_dashboard/services/cutting_option_service.py:0
+#: code:addons/jabin_dashboard/services/cutting_option_service.py:0
+#: code:addons/jabin_dashboard/services/cutting_option_service.py:0
+#: code:addons/jabin_dashboard/validators/cutting_option_validator.py:0
+#, python-format
+msgid "Cutting option not found."
+msgstr "لم يتم العثور على خيار التقطيع."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/cutting_option_controller.py:0
+#, python-format
+msgid "Cutting option retrieved successfully"
+msgstr "تم استرجاع خيار التقطيع بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/cutting_option_controller.py:0
+#, python-format
+msgid "Cutting option updated successfully"
+msgstr "تم تحديث خيار التقطيع بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/cutting_option_controller.py:0
+#, python-format
+msgid "Cutting options retrieved successfully"
+msgstr "تم استرجاع خيارات التقطيع بنجاح"
+
+#. module: jabin_dashboard
+#: model:ir.actions.client,name:jabin_dashboard.action_jabin_dashboard_view
+#: model:ir.ui.menu,name:jabin_dashboard.menu_jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_dashboard_form
+msgid "Dashboard"
+msgstr "لوحة المعلومات"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_dashboard_setting__dashboard_layout
+msgid "Dashboard Layout"
+msgstr "تخطيط لوحة المعلومات"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_dashboard__name
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_dashboard_form
+msgid "Dashboard Name"
+msgstr "اسم لوحة المعلومات"
+
+#. module: jabin_dashboard
+#: model:ir.actions.act_window,name:jabin_dashboard.action_jabin_dashboard_settings
+#: model:ir.ui.menu,name:jabin_dashboard.menu_jabin_dashboard_settings
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_dashboard_settings
+msgid "Dashboard Settings"
+msgstr "إعدادات لوحة المعلومات"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/dashboard_controller.py:0
+#, python-format
+msgid "Dashboard loaded successfully"
+msgstr "تم تحميل لوحة المعلومات بنجاح"
+
+#. module: jabin_dashboard
+#: model:ir.actions.act_window,name:jabin_dashboard.action_jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_dashboard_tree
+msgid "Dashboards"
+msgstr "لوحات المعلومات"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_notification__data_json
+msgid "Data Payload (JSON)"
+msgstr "حمولة البيانات (JSON)"
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_loyalty_transaction__date
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_loyalty_transaction_search
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_notification_search
+#, python-format
+msgid "Date"
+msgstr "التاريخ"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_coupon__start_date
+msgid "Date and time when the coupon becomes valid"
+msgstr "تاريخ ووقت بدء صلاحية الكوبون"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_coupon__end_date
+msgid "Date and time when the coupon expires"
+msgstr "تاريخ ووقت انتهاء صلاحية الكوبون"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_customer_activity_search
+msgid "Day"
+msgstr "اليوم"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_product_form
+msgid "Deactivate"
+msgstr "تعطيل"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_device_form
+msgid "Deactivate Token"
+msgstr "تعطيل الرمز"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_loyalty_adjust_wizard__adjustment_type__remove
+msgid "Deduct Points"
+msgstr "خصم النقاط"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_notification__deep_link
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_send_notification_wizard__deep_link
+msgid "Deep Link"
+msgstr "الرابط المباشر"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_order_search
+msgid "Delivered"
+msgstr "تم التوصيل"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_notification__delivered_at
+msgid "Delivered At"
+msgstr "تاريخ التوصيل"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart__delivery_address_id
+msgid "Delivery Address"
+msgstr "عنوان التوصيل"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_category__description
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_coupon__description
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cutting_option__description
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_dashboard__description
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_excluded_part__description
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_loyalty_transaction__description
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_packaging__description
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__description
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_dashboard_form
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_payment_method_form
+msgid "Description"
+msgstr "الوصف"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_coupon_form
+msgid "Description & Terms"
+msgstr "الوصف والشروط"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_dashboard__description
+msgid "Description of the dashboard section"
+msgstr "وصف قسم لوحة المعلومات"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_coupon__name
+msgid "Descriptive name of the coupon"
+msgstr "الاسم الوصفي للكوبون"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_dashboard_setting__dashboard_layout__detailed
+msgid "Detailed"
+msgstr "مفصّل"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_loyalty_transaction_form
+msgid "Details"
+msgstr "التفاصيل"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_device__device_name
+msgid "Device Name"
+msgstr "اسم الجهاز"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_device__device_type
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_device_search
+msgid "Device Type"
+msgstr "نوع الجهاز"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_device__uuid
+msgid "Device UUID"
+msgstr "المعرف الفريد للجهاز (UUID)"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart_line__discount_percent
+msgid "Discount (%)"
+msgstr "الخصم (%)"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart__discount_amount
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart_line__discount_amount
+msgid "Discount Amount"
+msgstr "قيمة الخصم"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "Discount Coupon Available! 🎉"
+msgstr "كوبون خصم متاح! 🎉"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_coupon_form
+msgid "Discount Rules"
+msgstr "قواعد الخصم"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_coupon__discount_type
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__discount_type
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_coupon_search
+msgid "Discount Type"
+msgstr "نوع الخصم"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_coupon__discount_value
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__discount_value
+msgid "Discount Value"
+msgstr "قيمة الخصم"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_order__loyalty_discount_amount
+msgid "Discount amount in SAR from redeemed loyalty points."
+msgstr "مبلغ الخصم بالريال السعودي من نقاط الولاء المستبدلة."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/product_validator.py:0
+#, python-format
+msgid "Discount type must be one of: %s"
+msgstr "يجب أن يكون نوع الخصم أحد الخيارات التالية: %s"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/jabin_coupon.py:0
+#, python-format
+msgid "Discount value must be greater than zero."
+msgstr "يجب أن تكون قيمة الخصم أكبر من صفر."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_banner__display_name
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_branch__display_name
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart__display_name
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart_line__display_name
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_category__display_name
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_coupon__display_name
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cutting_option__display_name
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_dashboard__display_name
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_dashboard_service__display_name
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_dashboard_setting__display_name
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_device__display_name
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_excluded_part__display_name
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_favorite__display_name
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_loyalty_adjust_wizard__display_name
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_loyalty_transaction__display_name
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_notification__display_name
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_packaging__display_name
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__display_name
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product_image__display_name
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_send_notification_wizard__display_name
+msgid "Display Name"
+msgstr "اسم العرض"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_dashboard_settings
+msgid "Display Options"
+msgstr "خيارات العرض"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_loyalty_transaction__transaction_type__earn
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_loyalty_transaction_search
+msgid "Earned"
+msgstr "المكتسبة"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/loyalty_service.py:0
+#, python-format
+msgid "Earned %s points from completed Order %s"
+msgstr "تم اكتساب %s نقطة من الطلب المكتمل %s"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.res_config_settings_view_form_jabin_loyalty
+msgid "Earning Rate"
+msgstr "معدل الاكتساب"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/loyalty_validator.py:0
+#, python-format
+msgid "Earning rate must be greater than zero."
+msgstr "يجب أن يكون معدل الاكتساب أكبر من صفر."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_coupon__end_date
+msgid "End Date"
+msgstr "تاريخ الانتهاء"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_coupon_form
+msgid "Enter coupon description, promotion terms, or internal notes..."
+msgstr "أدخل وصف الكوبون، شروط العرض الترويجي، أو الملاحظات الداخلية..."
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_excluded_part_form
+msgid "Excluded Part"
+msgstr "الجزء المستبعد"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_excluded_part_form
+msgid "Excluded Part Name"
+msgstr "اسم الجزء المستبعد"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/excluded_part.py:0
+#: model:ir.model.constraint,message:jabin_dashboard.constraint_jabin_excluded_part_unique_name
+#, python-format
+msgid "Excluded Part name must be unique!"
+msgstr "يجب أن يكون اسم الجزء المستبعد فريدًا!"
+
+#. module: jabin_dashboard
+#: model:ir.actions.act_window,name:jabin_dashboard.action_jabin_excluded_part
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart_line__excluded_part_ids
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_order_line__excluded_part_ids
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__excluded_part_ids
+#: model:ir.ui.menu,name:jabin_dashboard.menu_jabin_excluded_part
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_excluded_part_tree
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_product_form
+msgid "Excluded Parts"
+msgstr "الأجزاء المستبعدة"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/excluded_part_controller.py:0
+#, python-format
+msgid "Excluded part created successfully"
+msgstr "تم إنشاء الجزء المستبعد بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/excluded_part_controller.py:0
+#, python-format
+msgid "Excluded part deleted successfully"
+msgstr "تم حذف الجزء المستبعد بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/excluded_part_validator.py:0
+#, python-format
+msgid "Excluded part name cannot contain consecutive spaces."
+msgstr "اسم الجزء المستبعد لا يمكن أن يحتوي على مسافات متتالية."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/excluded_part_validator.py:0
+#, python-format
+msgid "Excluded part name cannot have leading or trailing spaces."
+msgstr "اسم الجزء المستبعد لا يمكن أن يبدأ أو ينتهي بمسافات."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/excluded_part_validator.py:0
+#, python-format
+msgid "Excluded part name must be unique! '%(name)s' already exists."
+msgstr "يجب أن يكون اسم الجزء المستبعد فريدًا! '%(name)s' موجود بالفعل."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/excluded_part_validator.py:0
+#, python-format
+msgid "Excluded part name must contain at least one alphanumeric character."
+msgstr "اسم الجزء المستبعد يجب أن يحتوي على حرف أو رقم واحد على الأقل."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/excluded_part_validator.py:0
+#, python-format
+msgid "Excluded part not found."
+msgstr "لم يتم العثور على الجزء المستبعد."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/excluded_part_controller.py:0
+#, python-format
+msgid "Excluded part retrieved successfully"
+msgstr "تم استرجاع الجزء المستبعد بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/excluded_part_controller.py:0
+#, python-format
+msgid "Excluded part updated successfully"
+msgstr "تم تحديث الجزء المستبعد بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/excluded_part_controller.py:0
+#, python-format
+msgid "Excluded parts retrieved successfully"
+msgstr "تم استرجاع الأجزاء المستبعدة بنجاح"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_cart__status__expired
+msgid "Expired"
+msgstr "منتهي الصلاحية"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_loyalty_adjust_wizard_form
+msgid "Explain the reason for this manual point adjustment..."
+msgstr "اشرح سبب هذا التعديل اليدوي للنقاط..."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "Explore our new item: %s."
+msgstr "اكتشف منتجنا الجديد: %s."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/wizards/jabin_send_notification_wizard.py:0
+#, python-format
+msgid "FCM Notification Result"
+msgstr "نتيجة إشعار FCM"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/wizards/jabin_send_notification_wizard.py:0
+#, python-format
+msgid ""
+"FCM Push Notification sent successfully to user %s (%d active device(s))."
+msgstr "تم إرسال إشعار FCM للمستخدم %s بنجاح (%d جهاز نشط)."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_device__fcm_token
+msgid "FCM Token"
+msgstr "رمز FCM"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/device_validator.py:0
+#, python-format
+msgid "FCM token cannot be empty."
+msgstr "لا يمكن أن يكون رمز FCM فارغًا."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_notification__status__failed
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_notification_search
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_payment_transaction_search
+msgid "Failed"
+msgstr "فشل"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/wizards/jabin_send_notification_wizard.py:0
+#, python-format
+msgid "Failed to process notification for user %s."
+msgstr "فشلت معالجة الإشعار للمستخدم %s."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/favorite_controller.py:0
+#, python-format
+msgid "Favorites retrieved successfully."
+msgstr "تم استرجاع العناصر المفضلة بنجاح"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_product_search
+msgid "Featured"
+msgstr "مميز"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/excluded_part_validator.py:0
+#: code:addons/jabin_dashboard/validators/product_validator.py:0
+#, python-format
+msgid "Field '%s' is required."
+msgstr "الحقل '%s' مطلوب."
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_order_form
+msgid "Financial"
+msgstr "مالي"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_form
+msgid "Financial Information"
+msgstr "المعلومات المالية"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_payment_transaction_form
+msgid "Financials"
+msgstr "الشؤون المالية"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_coupon__discount_type__fixed
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_product__discount_type__fixed
+msgid "Fixed Amount"
+msgstr "مبلغ ثابت"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_coupon_search
+msgid "Fixed Amount Discounts"
+msgstr "خصومات بالمبلغ الثابت"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_order__loyalty_points_awarded
+msgid ""
+"Flag indicating whether earned points have been posted to customer wallet."
+msgstr "علامة تشير إلى ما إذا كانت النقاط المكتسبة قد أضيفت إلى محفظة العميل."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_order__loyalty_points_deducted
+msgid ""
+"Flag indicating whether redeemed points have been deducted from customer "
+"wallet."
+msgstr "علامة تشير إلى ما إذا كانت النقاط المستبدلة قد خصمت من محفظة العميل."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_dashboard__icon
+msgid "FontAwesome icon class for this dashboard section"
+msgstr "فئة أيقونة FontAwesome لقسم لوحة المعلومات هذا"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.res_config_settings_view_form_jabin_loyalty
+msgid ""
+"Formula: Discount (SAR) = Points / Redemption Rate (Default: 100 Points = 1 "
+"SAR)."
+msgstr "المعادلة: الخصم (ريال سعودي) = النقاط / معدل الاستبدال (الافتراضي: 100 نقطة = 1 ريال سعودي)."
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.res_config_settings_view_form_jabin_loyalty
+msgid ""
+"Formula: Earned Points = Order Total (SAR) * Earning Rate (Default: 1 SAR = "
+"1 Point)."
+msgstr "المعادلة: النقاط المكتسبة = إجمالي الطلب (ريال سعودي) * معدل الاكتساب (الافتراضي: 1 ريال سعودي = 1 نقطة)."
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_payment_method_form
+msgid "General"
+msgstr "عام"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_coupon_form
+msgid "Generate Random Code"
+msgstr "إنشاء رمز عشوائي"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart__grand_total
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_order_tree
+msgid "Grand Total"
+msgstr "الإجمالي الكلي"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_dashboard_setting__dashboard_layout__grid
+msgid "Grid"
+msgstr "شبكة"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_category_search
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_coupon_search
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_customer_activity_search
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_dashboard_search
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_device_search
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_loyalty_transaction_search
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_notification_search
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_order_search
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_payment_transaction_search
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_product_search
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_search
+msgid "Group By"
+msgstr "تجميع حسب"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_category_search
+msgid "Has Products"
+msgstr "يحتوي على منتجات"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_notification__priority__high
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_send_notification_wizard__priority__high
+msgid "High"
+msgstr "مرتفع"
+
+#. module: jabin_dashboard
+#: model:ir.ui.menu,name:jabin_dashboard.menu_jabin_highlight
+msgid "Highlight"
+msgstr "إبراز / تمييز"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/home_controller.py:0
+#, python-format
+msgid "Home data retrieved successfully"
+msgstr "تم استرجاع Home data بنجاح"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_banner__id
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_branch__id
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart__id
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart_line__id
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_category__id
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_coupon__id
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cutting_option__id
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_dashboard__id
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_dashboard_service__id
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_dashboard_setting__id
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_device__id
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_excluded_part__id
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_favorite__id
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_loyalty_adjust_wizard__id
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_loyalty_transaction__id
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_notification__id
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_packaging__id
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__id
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product_image__id
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_send_notification_wizard__id
+msgid "ID"
+msgstr "المعرّف"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_dashboard__icon
+msgid "Icon"
+msgstr "الأيقونة"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_category__image
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product_image__image
+msgid "Image"
+msgstr "الصورة"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_notification__image_url
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_send_notification_wizard__image_url
+msgid "Image URL"
+msgstr "رابط الصورة"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/banner_validator.py:0
+#: code:addons/jabin_dashboard/validators/category_validator.py:0
+#, python-format
+msgid "Image size must not exceed %(size)d MB."
+msgstr "يجب ألا يتجاوز حجم الصورة %(size)d ميجابايت."
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_product_search
+msgid "In Stock"
+msgstr "متوفر في المخزون"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_category_search
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_dashboard_search
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_product_search
+msgid "Inactive"
+msgstr "غير نشط"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_device_search
+msgid "Inactive Tokens"
+msgstr "الرموز غير النشطة"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_search
+msgid "Inactive Users"
+msgstr "المستخدمون غير النشطين"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_payment_transaction_form
+msgid "Installment Details"
+msgstr "تفاصيل التقسيط"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_payment_transaction_search
+msgid "Installment Provider"
+msgstr "مزود خدمة التقسيط"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_payment_method_form
+msgid "Installment Settings"
+msgstr "إعدادات التقسيط"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_payment_transaction_search
+msgid "Installments"
+msgstr "الأقساط"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/product_validator.py:0
+#, python-format
+msgid "Insufficient stock! Current stock: %(stock)s, Requested: %(requested)s"
+msgstr "المخزون غير كافٍ! المخزون الحالي: %(stock)s، المطلوب: %(requested)s"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_order_form
+msgid "Internal Notes"
+msgstr "ملاحظات داخلية"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/wizards/jabin_send_notification_wizard.py:0
+#, python-format
+msgid "Invalid JSON format in custom payload: %s"
+msgstr "تنسيق JSON غير صالح في حمولة البيانات المخصصة: %s"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/favorite_controller.py:0
+#, python-format
+msgid "Invalid JSON payload."
+msgstr "حمولة JSON غير صالحة."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/loyalty_validator.py:0
+#, python-format
+msgid "Invalid system redemption rate."
+msgstr "معدل استبدال النظام غير صالح."
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#, python-format
+msgid "Inventory Summary"
+msgstr "ملخص المخزون"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_device__is_active
+msgid "Is Active"
+msgstr "نشط"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__is_available
+msgid "Is Available"
+msgstr "متاح"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__is_best_seller
+msgid "Is Best Seller"
+msgstr "الأكثر مبيعًا"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__is_featured
+msgid "Is Featured"
+msgstr "مميز"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__is_on_offer
+msgid "Is On Offer"
+msgstr "عليه عرض"
+
+#. module: jabin_dashboard
+#: model:ir.ui.menu,name:jabin_dashboard.menu_jabin_root
+msgid "Dhabayih Lmamlaka"
+msgstr "ذبائح المملكة"
+
+#. module: jabin_dashboard
+#: model:ir.model,name:jabin_dashboard.model_jabin_cart_line
+msgid "Dhabayih Lmamlaka Cart Line"
+msgstr "عنصر عربة تسوق ذبائح المملكة"
+
+#. module: jabin_dashboard
+#: model:ir.model,name:jabin_dashboard.model_jabin_category
+msgid "Dhabayih Lmamlaka Category"
+msgstr "فئة ذبائح المملكة"
+
+#. module: jabin_dashboard
+#: model:ir.model,name:jabin_dashboard.model_jabin_coupon
+msgid "Dhabayih Lmamlaka Coupon / Promo Code"
+msgstr "كوبون / رمز ترويجي ذبائح المملكة"
+
+#. module: jabin_dashboard
+#: model:ir.model,name:jabin_dashboard.model_jabin_device
+msgid "Dhabayih Lmamlaka Customer Device"
+msgstr "جهاز عميل ذبائح المملكة"
+
+#. module: jabin_dashboard
+#: model:ir.model,name:jabin_dashboard.model_jabin_favorite
+msgid "Dhabayih Lmamlaka Customer Favorite Product"
+msgstr "المنتج المفضل لعميل ذبائح المملكة"
+
+#. module: jabin_dashboard
+#: model:ir.model,name:jabin_dashboard.model_jabin_cutting_option
+msgid "Dhabayih Lmamlaka Cutting Option"
+msgstr "خيار تقطيع ذبائح المملكة"
+
+#. module: jabin_dashboard
+#: model:ir.model,name:jabin_dashboard.model_jabin_dashboard
+msgid "Dhabayih Lmamlaka Dashboard"
+msgstr "لوحة معلومات ذبائح المملكة"
+
+#. module: jabin_dashboard
+#: model:ir.model,name:jabin_dashboard.model_jabin_dashboard_service
+msgid "Dhabayih Lmamlaka Dashboard Service"
+msgstr "خدمة لوحة معلومات ذبائح المملكة"
+
+#. module: jabin_dashboard
+#: model:ir.model,name:jabin_dashboard.model_jabin_dashboard_setting
+msgid "Dhabayih Lmamlaka Dashboard Settings"
+msgstr "إعدادات لوحة معلومات ذبائح المملكة"
+
+#. module: jabin_dashboard
+#: model:ir.model,name:jabin_dashboard.model_jabin_excluded_part
+msgid "Dhabayih Lmamlaka Excluded Part"
+msgstr "الجزء المستبعد في ذبائح المملكة"
+
+#. module: jabin_dashboard
+#: model:ir.model,name:jabin_dashboard.model_jabin_firebase_service
+msgid "Dhabayih Lmamlaka Firebase Cloud Messaging Service"
+msgstr "خدمة رسائل Firebase في ذبائح المملكة"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.res_config_settings_view_form_jabin_loyalty
+msgid "Dhabayih Lmamlaka Loyalty"
+msgstr "ولاء ذبائح المملكة"
+
+#. module: jabin_dashboard
+#: model:ir.model,name:jabin_dashboard.model_jabin_loyalty_service
+msgid "Dhabayih Lmamlaka Loyalty Points Service"
+msgstr "خدمة نقاط ولاء ذبائح المملكة"
+
+#. module: jabin_dashboard
+#: model:ir.model,name:jabin_dashboard.model_jabin_loyalty_transaction
+msgid "Dhabayih Lmamlaka Loyalty Transaction"
+msgstr "معاملة ولاء ذبائح المملكة"
+
+#. module: jabin_dashboard
+#: model:ir.model,name:jabin_dashboard.model_jabin_notification
+msgid "Dhabayih Lmamlaka Notification History"
+msgstr "سجل إشعارات ذبائح المملكة"
+
+#. module: jabin_dashboard
+#: model:ir.model,name:jabin_dashboard.model_jabin_notification_service
+msgid "Dhabayih Lmamlaka Notification Management Service"
+msgstr "خدمة إدارة إشعارات ذبائح المملكة"
+
+#. module: jabin_dashboard
+#: model:ir.model,name:jabin_dashboard.model_jabin_order
+msgid "Dhabayih Lmamlaka Order"
+msgstr "طلب ذبائح المملكة"
+
+#. module: jabin_dashboard
+#: model:ir.model,name:jabin_dashboard.model_jabin_order_line
+msgid "Dhabayih Lmamlaka Order Line"
+msgstr "عنصر طلب ذبائح المملكة"
+
+#. module: jabin_dashboard
+#: model:ir.model,name:jabin_dashboard.model_jabin_packaging
+msgid "Dhabayih Lmamlaka Packaging"
+msgstr "تغليف ذبائح المملكة"
+
+#. module: jabin_dashboard
+#: model:ir.model,name:jabin_dashboard.model_jabin_product
+msgid "Dhabayih Lmamlaka Product"
+msgstr "منتج ذبائح المملكة"
+
+#. module: jabin_dashboard
+#: model:ir.model,name:jabin_dashboard.model_jabin_product_image
+msgid "Dhabayih Lmamlaka Product Image"
+msgstr "صورة منتج ذبائح المملكة"
+
+#. module: jabin_dashboard
+#: model:ir.model,name:jabin_dashboard.model_jabin_cart
+msgid "Dhabayih Lmamlaka Shopping Cart"
+msgstr "عربة تسوق ذبائح المملكة"
+
+#. module: jabin_dashboard
+#: model:ir.model,name:jabin_dashboard.model_jabin_branch
+msgid "Dhabayih Lmamlaka Store Branch"
+msgstr "فرع متجر ذبائح المملكة"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_tree
+msgid "Dhabayih Lmamlaka Users"
+msgstr "مستخدمو ذبائح المملكة"
+
+#. module: jabin_dashboard
+#: model:ir.model,name:jabin_dashboard.model_res_users
+msgid "Dhabayih Lmamlaka User (Extended)"
+msgstr "المستخدم"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_device__language
+msgid "Language"
+msgstr "اللغة"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_device__last_seen
+msgid "Last Seen"
+msgstr "آخر ظهور"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_banner__write_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_branch__write_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart__write_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart_line__write_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_category__write_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_coupon__write_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cutting_option__write_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_dashboard__write_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_dashboard_service__write_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_dashboard_setting__write_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_device__write_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_excluded_part__write_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_favorite__write_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_loyalty_adjust_wizard__write_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_loyalty_transaction__write_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_notification__write_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_packaging__write_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__write_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product_image__write_uid
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_send_notification_wizard__write_uid
+msgid "Last Updated by"
+msgstr "آخر تحديث بواسطة"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_banner__write_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_branch__write_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart__write_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart_line__write_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_category__write_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_coupon__write_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cutting_option__write_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_dashboard__write_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_dashboard_service__write_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_dashboard_setting__write_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_device__write_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_excluded_part__write_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_favorite__write_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_loyalty_adjust_wizard__write_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_loyalty_transaction__write_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_notification__write_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_packaging__write_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__write_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product_image__write_date
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_send_notification_wizard__write_date
+msgid "Last Updated on"
+msgstr "تاريخ آخر تحديث"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_branch__latitude
+msgid "Latitude"
+msgstr "خط العرض"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_res_users__total_earned_points
+msgid "Lifetime total loyalty points earned by this customer."
+msgstr "إجمالي نقاط الولاء التي اكتسبها هذا العميل مدى الحياة."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_res_users__total_redeemed_points
+msgid "Lifetime total loyalty points redeemed by this customer."
+msgstr "إجمالي نقاط الولاء التي استبدلها هذا العميل مدى الحياة."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart__line_count
+msgid "Line Count"
+msgstr "عدد العناصر"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart_line__line_total
+msgid "Line Total"
+msgstr "إجمالي السطر"
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#, python-format
+msgid "Loading Dashboard..."
+msgstr "جاري تحميل لوحة المعلومات..."
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_customer_activity_search
+msgid "Logins"
+msgstr "تسجيلات الدخول"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_customer_activity_search
+msgid "Logouts"
+msgstr "تسجيلات الخروج"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_branch__longitude
+msgid "Longitude"
+msgstr "خط الطول"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_notification__priority__low
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_send_notification_wizard__priority__low
+msgid "Low"
+msgstr "منخفض"
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_product_search
+#, python-format
+msgid "Low Stock"
+msgstr "مخزون منخفض"
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#, python-format
+msgid "Low Stock Alert"
+msgstr "تنبيه انخفاض المخزون"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_order_form
+msgid "Loyalty Details"
+msgstr "تفاصيل الولاء"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_order__loyalty_discount_amount
+msgid "Loyalty Discount"
+msgstr "خصم الولاء"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_res_config_settings__loyalty_earning_rate
+msgid "Loyalty Earning Rate (Points per 1 SAR)"
+msgstr "معدل اكتساب الولاء (النقاط لكل 1 ريال سعودي)"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_notification__notification_type__loyalty
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_send_notification_wizard__notification_type__loyalty
+msgid "Loyalty Points"
+msgstr "نقاط الولاء"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_order__loyalty_points_awarded
+msgid "Loyalty Points Awarded"
+msgstr "نقاط الولاء الممنوحة"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_res_users__loyalty_points
+msgid "Loyalty Points Balance"
+msgstr "رصيد نقاط الولاء"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_order__loyalty_points_deducted
+msgid "Loyalty Points Deducted"
+msgstr "نقاط الولاء المخصومة"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "Loyalty Points Earned!"
+msgstr "تم اكتساب نقاط ولاء!"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "Loyalty Points Redeemed"
+msgstr "نقاط الولاء المستبدلة"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.res_config_settings_view_form_jabin_loyalty
+msgid "Loyalty Program Settings"
+msgstr "إعدادات برنامج الولاء"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_res_config_settings__loyalty_redemption_rate
+msgid "Loyalty Redemption Rate (Points per 1 SAR Discount)"
+msgstr "معدل استبدال الولاء (النقاط لكل 1 ريال خصم)"
+
+#. module: jabin_dashboard
+#: model:ir.actions.act_window,name:jabin_dashboard.action_jabin_loyalty_settings
+#: model:ir.ui.menu,name:jabin_dashboard.menu_jabin_loyalty_settings
+msgid "Loyalty Settings"
+msgstr "إعدادات الولاء"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_form
+msgid "Loyalty Summary"
+msgstr "ملخص الولاء"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_loyalty_transaction_form
+msgid "Loyalty Transaction"
+msgstr "معاملة الولاء"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_form
+msgid "Loyalty Transaction History"
+msgstr "سجل معاملات الولاء"
+
+#. module: jabin_dashboard
+#: model:ir.actions.act_window,name:jabin_dashboard.action_jabin_loyalty_transaction
+#: model:ir.model.fields,field_description:jabin_dashboard.field_res_users__loyalty_transaction_ids
+#: model:ir.ui.menu,name:jabin_dashboard.menu_jabin_loyalty_transactions
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_loyalty_transaction_tree
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_form
+msgid "Loyalty Transactions"
+msgstr "معاملات الولاء"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_form
+msgid "Loyalty Wallet"
+msgstr "محفظة الولاء"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_order__loyalty_points_earned
+msgid "Loyalty points earned by customer upon order delivery."
+msgstr "نقاط الولاء المكتسبة بواسطة العميل عند توصيل الطلب."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__main_image
+msgid "Main Image"
+msgstr "الصورة الرئيسية"
+
+#. module: jabin_dashboard
+#: model_terms:ir.actions.act_window,help:jabin_dashboard.action_jabin_coupons
+msgid ""
+"Manage percentage or fixed amount promo codes, set usage limits, date ranges, and category/product\n"
+"                restrictions."
+msgstr "إدارة الرموز الترويجية للخصم بالنسبة المئوية أو المبلغ الثابت، وتحديد حدود الاستخدام، والتواريخ، وقيود المنتجات والفئات."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_loyalty_adjust_wizard__reason
+msgid "Mandatory notes explaining why points are being manually adjusted."
+msgstr "ملاحظات إلزامية تشرح سبب التعديل اليدوي للنقاط."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_loyalty_transaction__transaction_type__manual_adjustment
+msgid "Manual Adjustment"
+msgstr "تعديل يدوي"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_loyalty_transaction_search
+msgid "Manual Adjustments"
+msgstr "التعديلات اليدوية"
+
+#. module: jabin_dashboard
+#: model:ir.model,name:jabin_dashboard.model_jabin_loyalty_adjust_wizard
+msgid "Manual Loyalty Points Adjustment Wizard"
+msgstr "معالج التعديل اليدوي لنقاط الولاء"
+
+#. module: jabin_dashboard
+#: model:ir.actions.act_window,name:jabin_dashboard.action_jabin_loyalty_adjust_wizard
+msgid "Manual Point Adjustment"
+msgstr "التعديل اليدوي للنقاط"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_order_form
+msgid "Mark Ready for Pickup"
+msgstr "تحديد کجاهز للاستلام"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_order_form
+msgid "Mark as Delivered"
+msgstr "تحديد كتم التوصيل"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_coupon__usage_limit_per_customer
+msgid "Max usages per single customer (0 for unlimited)"
+msgstr "الحد الأقصى للاستخدام لكل عميل (0 لغير محدودة)"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_coupon__maximum_discount
+msgid "Maximum Discount"
+msgstr "الحد الأقصى للخصم"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_coupon__maximum_discount
+msgid ""
+"Maximum discount amount allowed for percentage discounts (0 for unlimited)"
+msgstr "أقصى مبلغ خصم مسموح به في الخصومات المئوية (0 لغير محدود)"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/jabin_coupon.py:0
+#, python-format
+msgid "Maximum discount cannot be negative."
+msgstr "لا يمكن أن يكون الحد الأقصى للخصم قيمة سالبة."
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_product_form
+msgid "Media"
+msgstr "الوسائط"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_send_notification_wizard__body
+msgid "Message / Body"
+msgstr "الرسالة / النص"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_send_notification_wizard_form
+msgid "Message Content"
+msgstr "محتوى الرسالة"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_notification_form
+msgid "Message Payload"
+msgstr "حمولة الرسالة"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_coupon__minimum_order_amount
+msgid "Minimum Order Amount"
+msgstr "الحد الأدنى لمبلغ الطلب"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.res_config_settings_view_form_jabin_loyalty
+msgid "Minimum Redemption Threshold"
+msgstr "الحد الأدنى للاستبدال"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_res_config_settings__loyalty_min_redemption
+msgid "Minimum Redemption Threshold (Points)"
+msgstr "الحد الأدنى للاستبدال (نقاط)"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__minimum_stock
+msgid "Minimum Stock"
+msgstr "الحد الأدنى للمخزون"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/product.py:0
+#, python-format
+msgid "Minimum Stock cannot be negative!"
+msgstr "لا يمكن أن يكون الحد الأدنى للمخزون سالباً!"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.res_config_settings_view_form_jabin_loyalty
+msgid ""
+"Minimum loyalty points balance required before a customer can redeem points "
+"(Default: 500 Points)."
+msgstr "الحد الأدنى لرصيد نقاط الولاء المطلوب قبل أن يتمكن العميل من استبدال النقاط (الافتراضي: 500 نقطة)."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/jabin_coupon.py:0
+#, python-format
+msgid "Minimum order amount cannot be negative."
+msgstr "لا يمكن أن يكون الحد الأدنى للطلب سالباً."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_res_config_settings__loyalty_min_redemption
+msgid ""
+"Minimum points required in wallet to perform redemption. Default is 500 "
+"Points."
+msgstr "الحد الأدنى من النقاط المطلوب في المحفظة لإجراء الاستبدال. الافتراضي هو 500 نقطة."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/loyalty_validator.py:0
+#, python-format
+msgid ""
+"Minimum redemption requirement is %s points (value: %s SAR). You entered %s "
+"points."
+msgstr "الحد الأدنى لمتطلبات الاستبدال هو %s نقطة (القيمة: %s ريال سعودي). لقد أدخلت %s نقطة."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/loyalty_validator.py:0
+#, python-format
+msgid "Minimum redemption threshold cannot be negative."
+msgstr "لا يمكن أن يكون الحد الأدنى للاستبدال سالباً."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_coupon__minimum_order_amount
+msgid "Minimum subtotal required to apply this coupon (0 for no minimum)"
+msgstr "الحد الأدنى للمجموع الفرعي المطلوب لتطبيق هذا الكوبون (0 بدون حد أدنى)"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_send_notification_wizard_form
+msgid "Mobile Routing & Payload (Optional)"
+msgstr "توجيه الهاتف والمحتوى (اختياري)"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_send_notification_wizard__deep_link
+msgid "Mobile app navigation link (e.g. jabin://offers or jabin://orders/123)"
+msgstr "رابط الانتقال داخل تطبيق الهاتف (مثال: jabin://offers أو jabin://orders/123)"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_notification__deep_link
+msgid "Mobile app navigation link (e.g. jabin://orders/123)"
+msgstr "رابط الانتقال داخل تطبيق الهاتف (مثال: jabin://orders/123)"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_order_search
+msgid "Month"
+msgstr "الشهر"
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#, python-format
+msgid "Monthly Sales"
+msgstr "المبيعات الشهرية"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_banner__name
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_category__name
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cutting_option__name
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_excluded_part__name
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_packaging__name
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__name
+msgid "Name"
+msgstr "الاسم"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_dashboard__name
+msgid "Name of the dashboard section"
+msgstr "اسم قسم لوحة المعلومات"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/device_validator.py:0
+#, python-format
+msgid "New FCM token is required."
+msgstr "رمز FCM الجديد مطلوب."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "New Highlight!"
+msgstr "ميزة جديدة!"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "New Order Created"
+msgstr "تم إنشاء طلب جديد"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "New Product Arrived!"
+msgstr "وصل منتج جديد!"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "New order #%s placed by %s for %s SAR."
+msgstr "طلب جديد رقم %s بواسطة %s بقيمة %s ريال سعودي."
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_category_search
+msgid "No Products"
+msgstr "لا توجد منتجات"
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#, python-format
+msgid "No Sales Data"
+msgstr "لا توجد بيانات مبيعات"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/banner_validator.py:0
+#, python-format
+msgid "No banners selected."
+msgstr "لم يتم تحديد أي بانرات."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/category_validator.py:0
+#, python-format
+msgid "No categories selected."
+msgstr "لم يتم تحديد أي فئات."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/cutting_option_validator.py:0
+#, python-format
+msgid "No cutting options selected."
+msgstr "لم يتم تحديد أي خيارات تقطيع."
+
+#. module: jabin_dashboard
+#: model_terms:ir.actions.act_window,help:jabin_dashboard.action_jabin_loyalty_transaction
+msgid "No loyalty transactions recorded yet!"
+msgstr "لم يتم تسجيل أي معاملات ولاء بعد!"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/packaging_validator.py:0
+#, python-format
+msgid "No packagings selected."
+msgstr "لم يتم تحديد أي خيارات تغليف."
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#, python-format
+msgid "No product data available"
+msgstr "لا توجد بيانات متاحة للمنتج"
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#, python-format
+msgid "No recent orders found"
+msgstr "لم يتم العثور على طلبات حديثة"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_notification__priority__normal
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_send_notification_wizard__priority__normal
+msgid "Normal"
+msgstr "عادي"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart__notes
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart_line__notes
+msgid "Notes"
+msgstr "ملاحظات"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_loyalty_transaction__description
+msgid "Notes or justification for this points transaction"
+msgstr "ملاحظات أو مبرر لمعاملة النقاط هذه"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_notification_form
+msgid "Notification Details"
+msgstr "تفاصيل الإشعار"
+
+#. module: jabin_dashboard
+#: model:ir.actions.act_window,name:jabin_dashboard.action_jabin_notification
+msgid "Notification History"
+msgstr "سجل الإشعارات"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_send_notification_wizard_form
+msgid "Notification Parameters"
+msgstr "معلمات الإشعار"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_send_notification_wizard__notification_type
+msgid "Notification Type"
+msgstr "نوع الإشعار"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_notification__uuid
+msgid "Notification UUID"
+msgstr "المعرف الفريد للإشعار (UUID)"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/wizards/jabin_send_notification_wizard.py:0
+#, python-format
+msgid "Notification message body is required."
+msgstr "نص رسالة الإشعار مطلوب."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/notification_controller.py:0
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "Notification not found."
+msgstr "لم يتم العثور على Notification."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/wizards/jabin_send_notification_wizard.py:0
+#, python-format
+msgid ""
+"Notification record created, but FCM push notification failed to deliver."
+msgstr "تم إنشاء سجل الإشعار، ولكن فشل إرسال إشعار FCM."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/wizards/jabin_send_notification_wizard.py:0
+#, python-format
+msgid ""
+"Notification saved in history for user %s. (Note: User has no active "
+"registered FCM devices)."
+msgstr "تم حفظ الإشعار في السجل للمستخدم %s. (ملاحظة: لا يملك المستخدم أجهزة FCM نشطة مسجلة)."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/wizards/jabin_send_notification_wizard.py:0
+#, python-format
+msgid "Notification title is required."
+msgstr "عنوان الإشعار مطلوب."
+
+#. module: jabin_dashboard
+#: model:ir.ui.menu,name:jabin_dashboard.menu_jabin_notifications
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_notification_tree
+msgid "Notifications History"
+msgstr "سجل الإشعارات"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/notification_controller.py:0
+#, python-format
+msgid "Notifications retrieved successfully."
+msgstr "تم استرجاع Notifications بنجاح"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_send_notification_wizard__active_device_count
+msgid "Number of active mobile devices registered for this user."
+msgstr "عدد أجهزة الهاتف النشطة المسجلة لهذا المستخدم."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_res_config_settings__loyalty_earning_rate
+msgid ""
+"Number of loyalty points earned for every 1 SAR spent. Default is 1 SAR = 1 "
+"Point."
+msgstr "عدد نقاط الولاء المكتسبة لكل 1 ريال سعودي يتم إنفاقه. الافتراضي هو 1 ريال = 1 نقطة."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_order__points_redeemed
+msgid "Number of loyalty points redeemed for a discount on this order."
+msgstr "عدد نقاط الولاء المستبدلة للحصول على خصم في هذا الطلب."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_res_config_settings__loyalty_redemption_rate
+msgid ""
+"Number of loyalty points required for 1 SAR discount. Default is 100 Points "
+"= 1 SAR."
+msgstr "عدد نقاط الولاء المطلوبة للحصول على خصم 1 ريال سعودي. الافتراضي هو 100 نقطة = 1 ريال."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_loyalty_transaction__points
+msgid "Number of points added (+) or deducted (-)"
+msgstr "عدد النقاط المضافة (+) أو المخصومة (-)"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_coupon__used_count
+msgid "Number of times this coupon has been used in confirmed orders"
+msgstr "عدد مرات استخدام هذا الكوبون في الطلبات المؤكدة"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_device__os_version
+msgid "OS Version"
+msgstr "إصدار نظام التشغيل"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_notification__notification_type__offer
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_send_notification_wizard__notification_type__offer
+msgid "Offer"
+msgstr "عرض"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__offer_end_date
+msgid "Offer End Date"
+msgstr "تاريخ انتهاء العرض"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__offer_price
+msgid "Offer Price"
+msgstr "سعر العرض"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__offer_profit
+msgid "Offer Profit"
+msgstr "ربح العرض"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__offer_start_date
+msgid "Offer Start Date"
+msgstr "تاريخ بدء العرض"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/product_validator.py:0
+#, python-format
+msgid "Offer end date is required when start date is set."
+msgstr "تاريخ انتهاء العرض مطلوب عند تحديد تاريخ البدء."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/product_validator.py:0
+#, python-format
+msgid "Offer start date cannot be after end date."
+msgstr "لا يمكن أن يكون تاريخ بدء العرض بعد تاريخ الانتهاء."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/product_validator.py:0
+#, python-format
+msgid "Offer start date is required when end date is set."
+msgstr "تاريخ بدء العرض مطلوب عند تحديد تاريخ الانتهاء."
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_product_search
+msgid "On Offer"
+msgstr "عليه عرض"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/cart_validator.py:0
+#, python-format
+msgid "One of the products in the cart does not exist."
+msgstr "أحد المنتجات الموجودة في عربة التسوق غير موجود."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/banner_validator.py:0
+#, python-format
+msgid "One or more banners not found."
+msgstr "لم يتم العثور على One or more banners."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/category_validator.py:0
+#, python-format
+msgid "One or more categories not found."
+msgstr "لم يتم العثور على One or more categories."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/cutting_option_validator.py:0
+#, python-format
+msgid "One or more cutting options not found."
+msgstr "لم يتم العثور على One or more cutting options."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/packaging_validator.py:0
+#, python-format
+msgid "One or more packagings not found."
+msgstr "لم يتم العثور على One or more packagings."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/cart_validator.py:0
+#, python-format
+msgid "Only active carts can be checked out."
+msgstr "يمكن إتمام الشراء فقط لعربات التسوق النشطة."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/jabin_cart.py:0
+#, python-format
+msgid "Only active carts can be modified."
+msgstr "يمكن تعديل عربات التسوق النشطة فقط."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_branch__opening_hours
+msgid "Opening Hours"
+msgstr "ساعات العمل"
+
+#. module: jabin_dashboard
+#: model:jabin.dashboard,description:jabin_dashboard.dashboard_operations
+msgid "Operational metrics dashboard"
+msgstr "لوحة معلومات المقاييس التشغيلية"
+
+#. module: jabin_dashboard
+#: model:jabin.dashboard,name:jabin_dashboard.dashboard_operations
+msgid "Operations Dashboard"
+msgstr "لوحة معلومات العمليات"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_send_notification_wizard__image_url
+msgid "Optional URL of an image to display in the push notification."
+msgstr "رابط اختياري لصورة تُعرض في الإشعار الفوري."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_send_notification_wizard__data_json
+msgid ""
+"Optional custom JSON key-value object passed to the mobile application."
+msgstr "كائن بيانات JSON مخصص اختياري يُمرر إلى تطبيق الهاتف."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_coupon__description
+msgid "Optional details or terms of the coupon"
+msgstr "تفاصيل أو شروط اختيارية للكوبون"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_product_form
+msgid "Options"
+msgstr "الخيارات"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_order_form
+msgid "Order"
+msgstr "الطلب"
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#, python-format
+msgid "Order #"
+msgstr "طلب رقم"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "Order #%s for customer %s is now %s."
+msgstr "الطلب رقم %s للعميل %s أصبح الآن %s."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "Order %s"
+msgstr "الطلب %s"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/loyalty_controller.py:0
+#, python-format
+msgid "Order %s not found."
+msgstr "لم يتم العثور على Order %s."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "Order Cancelled"
+msgstr "تم إلغاء الطلب"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "Order Confirmed"
+msgstr "تم تأكيد الطلب"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "Order Created"
+msgstr "تم إنشاء الطلب"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "Order Delivered"
+msgstr "تم توصيل الطلب"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_order_form
+msgid "Order Details"
+msgstr "تفاصيل الطلب"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_order_form
+msgid "Order Lines"
+msgstr "عناصر الطلب"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "Order Preparing"
+msgstr "جاري تجهيز الطلب"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "Order Ready"
+msgstr "الطلب جاهز"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_order_search
+msgid "Order Reference"
+msgstr "مرجع الطلب"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "Order Refunded"
+msgstr "تم استرجاع مبلغ الطلب"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_order_form
+msgid "Order Timeline"
+msgstr "الخط الزمني للطلب"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_notification__notification_type__order
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_send_notification_wizard__notification_type__order
+msgid "Order Update"
+msgstr "تحديث الطلب"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/coupon_service.py:0
+#: code:addons/jabin_dashboard/services/coupon_service.py:0
+#, python-format
+msgid "Order does not belong to the authenticated user."
+msgstr "الطلب لا يتبع للمستخدم المصادق عليه."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/banner_validator.py:0
+#: code:addons/jabin_dashboard/validators/category_validator.py:0
+#: code:addons/jabin_dashboard/validators/cutting_option_validator.py:0
+#: code:addons/jabin_dashboard/validators/packaging_validator.py:0
+#, python-format
+msgid "Order must be a string."
+msgstr "يجب أن يكون الطلب نصاً."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/coupon_validator.py:0
+#, python-format
+msgid "Order object is required to validate coupon application."
+msgstr "كائن الطلب مطلوب للتحقق من صلاحية تطبيق الكوبون."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_dashboard__sequence
+msgid "Order of display"
+msgstr "ترتيب العرض"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_order__total_after_discount
+msgid "Order subtotal minus total discount amount"
+msgstr "المجموع الفرعي للطلب ناقص إجمالي الخصم"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/coupon_validator.py:0
+#, python-format
+msgid "Order subtotal must be at least %(min)s to use coupon '%(code)s'."
+msgstr "يجب أن يكون المجموع الفرعي للطلب %(min)s على الأقل لاستخدام الكوبون '%(code)s'."
+
+#. module: jabin_dashboard
+#: model:ir.actions.act_window,name:jabin_dashboard.action_jabin_orders
+#: model:ir.ui.menu,name:jabin_dashboard.menu_jabin_orders_root
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_customer_activity_search
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_order_tree
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_form
+msgid "Orders"
+msgstr "الطلبات"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_order_form
+#, python-format
+msgid "Out for Delivery"
+msgstr "خرج للتوصيل"
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#, python-format
+msgid "Out of Stock"
+msgstr "غير متوفر في المخزون"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_form
+msgid "Overview"
+msgstr "نظرة عامة"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_packaging_form
+msgid "Packaging"
+msgstr "التغليف"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/packaging_validator.py:0
+#, python-format
+msgid "Packaging '%(name)s' has products and cannot be processed."
+msgstr "خيار التغليف '%(name)s' مرتبط بمنتجات ولا يمكن معالجته."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/packaging_validator.py:0
+#, python-format
+msgid "Packaging ID is required."
+msgstr "معرف التغليف مطلوب."
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_packaging_form
+msgid "Packaging Name"
+msgstr "اسم خيار التغليف"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_order_line__packaging_id
+msgid "Packaging Option"
+msgstr "خيار التغليف"
+
+#. module: jabin_dashboard
+#: model:ir.actions.act_window,name:jabin_dashboard.action_jabin_packaging
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart_line__packaging_ids
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__packaging_ids
+#: model:ir.ui.menu,name:jabin_dashboard.menu_jabin_packaging
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_packaging_tree
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_product_form
+msgid "Packaging Options"
+msgstr "خيارات التغليف"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/packaging_controller.py:0
+#, python-format
+msgid "Packaging created successfully"
+msgstr "تم إنشاء التغليف بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/packaging_controller.py:0
+#, python-format
+msgid "Packaging deleted successfully"
+msgstr "تم حذف التغليف بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/packaging_validator.py:0
+#, python-format
+msgid "Packaging name cannot contain consecutive spaces."
+msgstr "اسم التغليف لا يمكن أن يحتوي على مسافات متتالية."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/packaging_validator.py:0
+#, python-format
+msgid "Packaging name cannot have leading or trailing spaces."
+msgstr "اسم التغليف لا يمكن أن يبدأ أو ينتهي بمسافات."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/packaging.py:0
+#: code:addons/jabin_dashboard/validators/packaging_validator.py:0
+#: code:addons/jabin_dashboard/validators/packaging_validator.py:0
+#: model:ir.model.constraint,message:jabin_dashboard.constraint_jabin_packaging_unique_name
+#, python-format
+msgid "Packaging name must be unique!"
+msgstr "يجب أن يكون اسم التغليف فريدًا!"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/packaging_validator.py:0
+#, python-format
+msgid "Packaging name must contain at least one alphanumeric character."
+msgstr "اسم التغليف يجب أن يحتوي على حرف أو رقم واحد على الأقل."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/packaging_service.py:0
+#: code:addons/jabin_dashboard/services/packaging_service.py:0
+#: code:addons/jabin_dashboard/services/packaging_service.py:0
+#: code:addons/jabin_dashboard/services/packaging_service.py:0
+#: code:addons/jabin_dashboard/services/packaging_service.py:0
+#: code:addons/jabin_dashboard/services/packaging_service.py:0
+#: code:addons/jabin_dashboard/validators/packaging_validator.py:0
+#, python-format
+msgid "Packaging not found."
+msgstr "لم يتم العثور على التغليف."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/packaging_controller.py:0
+#, python-format
+msgid "Packaging retrieved successfully"
+msgstr "تم استرجاع التغليف بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/packaging_controller.py:0
+#, python-format
+msgid "Packaging updated successfully"
+msgstr "تم تحديث التغليف بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/packaging_controller.py:0
+#, python-format
+msgid "Packagings retrieved successfully"
+msgstr "تم استرجاع خيارات التغليف بنجاح"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_order_search
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_payment_transaction_search
+msgid "Paid"
+msgstr "مدفوع"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/category_validator.py:0
+#: code:addons/jabin_dashboard/validators/category_validator.py:0
+#, python-format
+msgid "Parent category not found."
+msgstr "لم يتم العثور على Parent category."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_notification__notification_type__payment
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_send_notification_wizard__notification_type__payment
+msgid "Payment"
+msgstr "الدفع / السداد"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "Payment Failed"
+msgstr "فشل الدفع"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "Payment Failed Alert"
+msgstr "تنبيه فشل الدفع"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_form
+msgid "Payment Management"
+msgstr "إدارة المدفوعات"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_order_search
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_payment_method_form
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_payment_transaction_search
+msgid "Payment Method"
+msgstr "طريقة الدفع"
+
+#. module: jabin_dashboard
+#: model:ir.actions.act_window,name:jabin_dashboard.action_jabin_payment_methods
+#: model:ir.ui.menu,name:jabin_dashboard.menu_jabin_payment_methods
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_payment_method_tree
+msgid "Payment Methods"
+msgstr "طرق الدفع"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "Payment Successful"
+msgstr "نجح الدفع"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_payment_transaction_form
+msgid "Payment Transaction"
+msgstr "معاملة الدفع"
+
+#. module: jabin_dashboard
+#: model:ir.actions.act_window,name:jabin_dashboard.action_jabin_payment_transactions
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_order_form
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_payment_transaction_tree
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_form
+msgid "Payment Transactions"
+msgstr "معاملات الدفع"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "Payment attempt for order #%s failed. Please retry your payment."
+msgstr "فشلت محاولة الدفع للطلب رقم %s. يرجى إعادة المحاولة."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "Payment failed for order #%s (Customer: %s)."
+msgstr "فشل الدفع للطلب رقم %s (العميل: %s)."
+
+#. module: jabin_dashboard
+#: model:ir.ui.menu,name:jabin_dashboard.menu_jabin_payments_root
+msgid "Payments"
+msgstr "المدفوعات"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_notification__status__pending
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_notification_search
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_payment_transaction_search
+msgid "Pending"
+msgstr "معلق"
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#, python-format
+msgid "Pending Orders"
+msgstr "الطلبات المعلقة"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_search
+msgid "Pending Users"
+msgstr "المستخدمون المعلقون"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_coupon__discount_type__percentage
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_product__discount_type__percentage
+msgid "Percentage"
+msgstr "النسبة المئوية"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_coupon__discount_value
+msgid "Percentage (0-100) or fixed amount value of discount"
+msgstr "النسبة المئوية (0-100) أو قيمة المبلغ الثابت للخصم"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_coupon_search
+msgid "Percentage Discounts"
+msgstr "الخصومات المئوية"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/jabin_coupon.py:0
+#: code:addons/jabin_dashboard/validators/coupon_validator.py:0
+#: code:addons/jabin_dashboard/validators/coupon_validator.py:0
+#, python-format
+msgid "Percentage discount value cannot exceed 100%."
+msgstr "لا يمكن أن تتجاوز قيمة الخصم المئوي 100%."
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_form
+msgid "Personal Information"
+msgstr "المعلومات الشخصية"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/jabin_coupon.py:0
+#: code:addons/jabin_dashboard/validators/coupon_validator.py:0
+#: code:addons/jabin_dashboard/validators/coupon_validator.py:0
+#, python-format
+msgid ""
+"Please select at least one category when applies_to is set to Categories."
+msgstr "يرجى اختيار فئة واحدة على الأقل عندما يكون الخيار ينطبق على الفئات."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/jabin_coupon.py:0
+#: code:addons/jabin_dashboard/validators/coupon_validator.py:0
+#: code:addons/jabin_dashboard/validators/coupon_validator.py:0
+#, python-format
+msgid "Please select at least one product when applies_to is set to Products."
+msgstr "يرجى اختيار منتج واحد على الأقل عندما يكون الخيار ينطبق على المنتجات."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_loyalty_transaction__points
+msgid "Points"
+msgstr "النقاط"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/wizards/jabin_loyalty_adjust_wizard.py:0
+#, python-format
+msgid "Points Adjusted"
+msgstr "النقاط المعدلة"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_loyalty_adjust_wizard__points
+msgid "Points Amount"
+msgstr "مقدار النقاط"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_order__loyalty_points_earned
+msgid "Points Earned"
+msgstr "النقاط المكتسبة"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_order__points_redeemed
+msgid "Points Redeemed"
+msgstr "النقاط المستبدلة"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/wizards/jabin_loyalty_adjust_wizard.py:0
+#, python-format
+msgid "Points amount must be greater than zero."
+msgstr "يجب أن يكون مقدار النقاط أكبر من صفر."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__preparation_time
+msgid "Preparation Time (minutes)"
+msgstr "وقت التجهيز (بالدقائق)"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_form
+msgid "Previous Orders"
+msgstr "الطلبات السابقة"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_product_form
+msgid "Pricing & Offers"
+msgstr "الأسعار والعروض"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_notification__priority
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_send_notification_wizard__priority
+msgid "Priority"
+msgstr "الأولوية"
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart_line__product_id
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_favorite__product_id
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_order_line__product_id
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product_image__product_id
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_notification__notification_type__product
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_send_notification_wizard__notification_type__product
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_product_form
+#, python-format
+msgid "Product"
+msgstr "المنتج"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/jabin_cart.py:0
+#, python-format
+msgid "Product %s is not active."
+msgstr "المنتج %s غير نشط."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/jabin_cart.py:0
+#, python-format
+msgid "Product %s is not available (out of stock)."
+msgstr "المنتج %s غير متوفر (نفد من المخزون)."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/cart_validator.py:0
+#: code:addons/jabin_dashboard/validators/cart_validator.py:0
+#, python-format
+msgid "Product '%s' is inactive."
+msgstr "المنتج '%s' غير نشط."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/cart_validator.py:0
+#: code:addons/jabin_dashboard/validators/cart_validator.py:0
+#, python-format
+msgid "Product '%s' is not available (out of stock)."
+msgstr "المنتج '%s' غير متوفر (نفد من المخزون)."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_category__product_count
+msgid "Product Count"
+msgstr "عدد المنتجات"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_product_form
+msgid "Product Description"
+msgstr "وصف المنتج"
+
+#. module: jabin_dashboard
+#: model:ir.actions.act_window,name:jabin_dashboard.action_jabin_product_images
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__product_image_ids
+msgid "Product Images"
+msgstr "صور المنتج"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_product_form
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_product_search
+msgid "Product Name"
+msgstr "اسم المنتج"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/cart_controller.py:0
+#, python-format
+msgid "Product added to cart successfully"
+msgstr "تمت إضافة المنتج إلى عربة التسوق بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/favorite_controller.py:0
+#, python-format
+msgid "Product added to favorites."
+msgstr "تمت إضافة المنتج إلى المفضلة."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/product_controller.py:0
+#, python-format
+msgid "Product created successfully"
+msgstr "تم إنشاء المنتج بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/product_controller.py:0
+#, python-format
+msgid "Product deleted successfully"
+msgstr "تم حذف المنتج بنجاح"
+
+#. module: jabin_dashboard
+#: model:ir.model.constraint,message:jabin_dashboard.constraint_jabin_favorite_customer_product_unique
+msgid "Product is already in customer favorites."
+msgstr "المنتج موجود بالفعل في مفضلة العميل."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/favorite_controller.py:0
+#, python-format
+msgid "Product is already in favorites."
+msgstr "المنتج موجود بالفعل في المفضلة."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/jabin_cart.py:0
+#: code:addons/jabin_dashboard/models/jabin_cart.py:0
+#, python-format
+msgid "Product is inactive."
+msgstr "المنتج غير نشط."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/jabin_cart.py:0
+#: code:addons/jabin_dashboard/models/jabin_cart.py:0
+#, python-format
+msgid "Product is not available."
+msgstr "المنتج غير متوفر."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/product_validator.py:0
+#, python-format
+msgid "Product name cannot contain consecutive spaces."
+msgstr "اسم المنتج لا يمكن أن يحتوي على مسافات متتالية."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/product_validator.py:0
+#, python-format
+msgid "Product name cannot have leading or trailing spaces."
+msgstr "اسم المنتج لا يمكن أن يبدأ أو ينتهي بمسافات."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/product_validator.py:0
+#, python-format
+msgid "Product name must contain at least one alphanumeric character."
+msgstr "اسم المنتج يجب أن يحتوي على حرف أو رقم واحد على الأقل."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/favorite_controller.py:0
+#: code:addons/jabin_dashboard/models/jabin_cart.py:0
+#: code:addons/jabin_dashboard/models/jabin_cart.py:0
+#: code:addons/jabin_dashboard/validators/cart_validator.py:0
+#: code:addons/jabin_dashboard/validators/cart_validator.py:0
+#: code:addons/jabin_dashboard/validators/product_validator.py:0
+#: code:addons/jabin_dashboard/validators/product_validator.py:0
+#, python-format
+msgid "Product not found."
+msgstr "لم يتم العثور على المنتج."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/cart_controller.py:0
+#, python-format
+msgid "Product removed from cart successfully"
+msgstr "تمت إزالة المنتج من عربة التسوق بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/favorite_controller.py:0
+#, python-format
+msgid "Product removed from favorites."
+msgstr "تمت إزالة المنتج من المفضلة."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/product_controller.py:0
+#, python-format
+msgid "Product retrieved successfully"
+msgstr "تم استرجاع المنتج بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/product_controller.py:0
+#, python-format
+msgid "Product status toggled successfully"
+msgstr "تم تغيير حالة المنتج بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/product_controller.py:0
+#, python-format
+msgid "Product updated successfully"
+msgstr "تم تحديث المنتج بنجاح"
+
+#. module: jabin_dashboard
+#: model:ir.actions.act_window,name:jabin_dashboard.action_jabin_product
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_category__product_ids
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_coupon__product_ids
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cutting_option__product_ids
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_excluded_part__product_ids
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_packaging__product_ids
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_coupon__applies_to__products
+#: model:ir.ui.menu,name:jabin_dashboard.menu_jabin_product
+#: model:ir.ui.menu,name:jabin_dashboard.menu_jabin_products
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_category_form
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_product_tree
+msgid "Products"
+msgstr "المنتجات"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_coupon__product_ids
+msgid "Products eligible for this discount when applies_to is 'products'"
+msgstr "المنتجات المؤهلة لهذا الخصم عندما يكون الخيار ينطبق على 'المنتجات'"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/category_controller.py:0
+#: code:addons/jabin_dashboard/controllers/product_controller.py:0
+#, python-format
+msgid "Products retrieved successfully"
+msgstr "تم استرجاع المنتجات بنجاح"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_customer_activity_search
+msgid "Profile Changes"
+msgstr "تعديلات الملف الشخصي"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__profit
+msgid "Profit"
+msgstr "الربح"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__profit_percentage
+msgid "Profit Percentage"
+msgstr "نسبة الربح"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__purchase_price
+msgid "Purchase Price"
+msgstr "سعر الشراء"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/product.py:0
+#, python-format
+msgid "Purchase Price cannot be negative!"
+msgstr "لا يمكن أن يكون سعر الشراء قيمة سالبة!"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart_line__quantity
+msgid "Quantity"
+msgstr "الكمية"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/cart_controller.py:0
+#, python-format
+msgid "Quantity decreased successfully"
+msgstr "تم تقليل الكمية بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/cart_controller.py:0
+#, python-format
+msgid "Quantity increased successfully"
+msgstr "تم زيادة الكمية بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/cart_controller.py:0
+#, python-format
+msgid "Quantity is required."
+msgstr "الكمية مطلوبة."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/jabin_cart.py:0
+#: code:addons/jabin_dashboard/models/jabin_cart.py:0
+#, python-format
+msgid "Quantity must be greater than zero."
+msgstr "يجب أن تكون الكمية أكبر من صفر."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/search_controller.py:0
+#, python-format
+msgid "Query term is empty."
+msgstr "عبارة البحث فارغة."
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_notification_form
+msgid "Raw Data (JSON)"
+msgstr "البيانات الخام (JSON)"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_notification__status__read
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_notification_search
+msgid "Read"
+msgstr "مقروء"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_notification__read_at
+msgid "Read At"
+msgstr "تاريخ القراءة"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_loyalty_adjust_wizard_form
+msgid "Reason & Justification"
+msgstr "السبب والمبرر"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_loyalty_adjust_wizard__reason
+msgid "Reason / Justification"
+msgstr "السبب / المبرر"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/wizards/jabin_loyalty_adjust_wizard.py:0
+#, python-format
+msgid "Reason for manual adjustment is required."
+msgstr "سبب التعديل اليدوي مطلوب."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/loyalty_validator.py:0
+#, python-format
+msgid "Reason/justification is required for manual points adjustment."
+msgstr "السبب/المبرر مطلوب للتعديل اليدوي للنقاط."
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#, python-format
+msgid "Recent Orders"
+msgstr "الطلبات الحديثة"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_notification_form
+msgid "Recipient & Status"
+msgstr "المستلم والحالة"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_send_notification_wizard_form
+msgid "Recipient Information"
+msgstr "معلومات المستلم"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_notification__user_id
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_send_notification_wizard__user_id
+msgid "Recipient User"
+msgstr "المستخدم المستلم"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_loyalty_transaction__transaction_type__redeem
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_loyalty_transaction_search
+msgid "Redeemed"
+msgstr "تم الاستبدال"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/loyalty_service.py:0
+#, python-format
+msgid "Redeemed %s points"
+msgstr "تم استبدال %s نقطة"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/loyalty_service.py:0
+#, python-format
+msgid "Redeemed %s points on Order %s"
+msgstr "تم استبدال %s نقطة في الطلب %s"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.res_config_settings_view_form_jabin_loyalty
+msgid "Redemption Rate"
+msgstr "معدل الاستبدال"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/loyalty_validator.py:0
+#, python-format
+msgid ""
+"Redemption discount (%s SAR) exceeds the order total (%s SAR). Maximum "
+"redeemable points for this order is %s points."
+msgstr "خصم الاستبدال (%s ريال) يتجاوز إجمالي الطلب (%s ريال). الحد الأقصى للنقاط القابلة للاستبدال لهذا الطلب هو %s نقطة."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/loyalty_validator.py:0
+#, python-format
+msgid "Redemption points must be a positive integer."
+msgstr "يجب أن تكون نقاط الاستبدال رقمًا صحيحًا موجبًا."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/loyalty_validator.py:0
+#, python-format
+msgid "Redemption rate must be greater than zero."
+msgstr "يجب أن يكون معدل الاستبدال أكبر من صفر."
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_payment_transaction_form
+msgid "References"
+msgstr "المراجع"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_dashboard_setting__refresh_interval
+msgid "Refresh Interval (seconds)"
+msgstr "فترة التحديث (بالثواني)"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_loyalty_transaction__transaction_type__refund_adjustment
+msgid "Refund Adjustment"
+msgstr "تعديل الاسترجاع"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_loyalty_transaction_search
+msgid "Refund Adjustments"
+msgstr "تعديلات الاسترجاع"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_order_search
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_payment_transaction_search
+msgid "Refunded"
+msgstr "مسترد"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_form
+msgid "Refunded Orders"
+msgstr "الطلبات المستردة"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_form
+msgid "Registration Date"
+msgstr "تاريخ التسجيل"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_customer_activity_search
+msgid "Registrations"
+msgstr "التسجيلات"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_loyalty_transaction__order_id
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_notification__order_id
+msgid "Related Order"
+msgstr "الطلب المرتبط"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_order_form
+msgid "Request Refund"
+msgstr "طلب استرجاع المبلغ"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/jabin_cart.py:0
+#: code:addons/jabin_dashboard/models/jabin_cart.py:0
+#: code:addons/jabin_dashboard/models/jabin_cart.py:0
+#: code:addons/jabin_dashboard/validators/cart_validator.py:0
+#, python-format
+msgid ""
+"Requested quantity (%(requested)s) exceeds available stock (%(stock)s) for "
+"product '%(product)s'."
+msgstr "الكمية المطلوبة (%(requested)s) تتجاوز المخزون المتاح (%(stock)s) للمنتج '%(product)s'."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/loyalty_service.py:0
+#, python-format
+msgid "Restored %s redeemed points for cancelled/refunded Order %s"
+msgstr "تم استرجاع %s نقطة مستبدلة للطلب الملغى/المسترد %s"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_coupon_form
+msgid "Restrictions / Applicability"
+msgstr "القيود / إمكانية التطبيق"
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#, python-format
+msgid "Retry"
+msgstr "إعادة المحاولة"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/loyalty_service.py:0
+#, python-format
+msgid "Reversed %s earned points for cancelled/refunded Order %s"
+msgstr "تم عكس %s نقطة مكتسبة للطلب الملغى/المسترد %s"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__sku
+msgid "SKU"
+msgstr "كود التخزين (SKU)"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/product_validator.py:0
+#, python-format
+msgid "SKU cannot have leading or trailing spaces."
+msgstr "لا يمكن أن يبدأ أو ينتهي كود التخزين (SKU) بمسافات."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/product_validator.py:0
+#, python-format
+msgid "SKU is required."
+msgstr "كود التخزين (SKU) مطلوب."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/product.py:0
+#: model:ir.model.constraint,message:jabin_dashboard.constraint_jabin_product_unique_sku
+#, python-format
+msgid "SKU must be unique!"
+msgstr "يجب أن يكون كود التخزين (SKU) فريدًا!"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/product_validator.py:0
+#, python-format
+msgid "SKU must be unique! '%s' already exists."
+msgstr "يجب أن يكون كود التخزين (SKU) فريدًا! '%s' موجود بالفعل."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/product_validator.py:0
+#, python-format
+msgid ""
+"SKU must contain only uppercase letters, numbers, hyphens, and underscores."
+msgstr "يجب أن يحتوي كود التخزين (SKU) على أحرف إنجليزية كبيرة وأرقام وشرطات وشرطات سفلية فقط."
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#, python-format
+msgid "Sales"
+msgstr "المبيعات"
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#, python-format
+msgid "Sales data will appear here once orders are placed."
+msgstr "ستظهر بيانات المبيعات هنا بمجرد تقديم الطلبات."
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_customer_activity_search
+msgid "Search Activity Logs"
+msgstr "البحث في سجلات الأنشطة"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_category_search
+msgid "Search Categories"
+msgstr "البحث في الفئات"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_coupon_search
+msgid "Search Coupons"
+msgstr "البحث في الكوبونات"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_device_search
+msgid "Search Devices"
+msgstr "البحث في الأجهزة"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_loyalty_transaction_search
+msgid "Search Loyalty Transactions"
+msgstr "البحث في معاملات الولاء"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_notification_search
+msgid "Search Notifications"
+msgstr "البحث في الإشعارات"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_order_search
+msgid "Search Orders"
+msgstr "البحث في الطلبات"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_product_search
+msgid "Search Products"
+msgstr "البحث في المنتجات"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_payment_transaction_search
+msgid "Search Transactions"
+msgstr "البحث في المعاملات"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_search
+msgid "Search Users"
+msgstr "البحث في المستخدمين"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/search_controller.py:0
+#, python-format
+msgid "Search executed successfully."
+msgstr "تم تنفيذ البحث بنجاح."
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_coupon_form
+msgid "Select eligible categories..."
+msgstr "حدد الفئات المؤهلة..."
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_coupon_form
+msgid "Select eligible products..."
+msgstr "حدد المنتجات المؤهلة..."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/cart_validator.py:0
+#, python-format
+msgid "Selected cutting option is not available for product '%s'."
+msgstr "خيار التقطيع المحدد غير متاح للمنتج '%s'."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/cart_validator.py:0
+#, python-format
+msgid "Selected excluded part option is not available for product '%s'."
+msgstr "خيار الجزء المستبعد المحدد غير متاح للمنتج '%s'."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/cart_validator.py:0
+#, python-format
+msgid "Selected packaging option is not available for product '%s'."
+msgstr "خيار التغليف المحدد غير متاح للمنتج '%s'."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__selling_price
+msgid "Selling Price"
+msgstr "سعر البيع"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/product.py:0
+#, python-format
+msgid "Selling Price cannot be negative!"
+msgstr "لا يمكن أن يكون سعر البيع قيمة سالبة!"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/res_users_ext.py:0
+#: model:ir.actions.act_window,name:jabin_dashboard.action_jabin_send_notification_wizard
+#: model:ir.ui.menu,name:jabin_dashboard.menu_jabin_send_notification
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_notification_form
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_send_notification_wizard_form
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_form
+#, python-format
+msgid "Send FCM Notification"
+msgstr "إرسال إشعار FCM"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_send_notification_wizard_form
+msgid "Send FCM Push Notification"
+msgstr "إرسال إشعار FCM فوري"
+
+#. module: jabin_dashboard
+#: model:ir.model,name:jabin_dashboard.model_jabin_send_notification_wizard
+msgid "Send FCM Push Notification to User Wizard"
+msgstr "معالج إرسال إشعار FCM فوري للمستخدم"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_notification__status__sent
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_notification_search
+msgid "Sent"
+msgstr "تم الإرسال"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_notification__sent_at
+msgid "Sent At"
+msgstr "تاريخ الإرسال"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_category__sequence
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_dashboard__sequence
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product_image__sequence
+msgid "Sequence"
+msgstr "التسلسل"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_dashboard_setting__show_inventory_summary
+msgid "Show Inventory Summary"
+msgstr "عرض ملخص المخزون"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_dashboard_setting__show_kpi
+msgid "Show KPI Cards"
+msgstr "عرض بطاقات مؤشرات الأداء (KPI)"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_dashboard_setting__show_recent_orders
+msgid "Show Recent Orders"
+msgstr "عرض الطلبات الحديثة"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_dashboard_setting__show_sales_chart
+msgid "Show Sales Chart"
+msgstr "عرض رسم المبيعات البياني"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_dashboard_setting__show_top_products
+msgid "Show Top Products"
+msgstr "عرض المنتجات الأكثر مبيعًا"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_order__cart_id
+msgid "Source Cart"
+msgstr "عربة التسوق المصدر"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "Special Offer!"
+msgstr "عرض خاص!"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_coupon__start_date
+msgid "Start Date"
+msgstr "تاريخ البدء"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_order_form
+msgid "Start Preparing"
+msgstr "بدء التجهيز"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/jabin_coupon.py:0
+#, python-format
+msgid "Start date cannot be after end date."
+msgstr "لا يمكن أن يكون تاريخ البدء بعد تاريخ الانتهاء."
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart__status
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_notification__status
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_notification_search
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_order_search
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_payment_transaction_search
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_search
+#, python-format
+msgid "Status"
+msgstr "الحالة"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_order_form
+msgid "Status Timeline"
+msgstr "الخط الزمني للحالة"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_product_form
+msgid "Stock & Details"
+msgstr "المخزون والتفاصيل"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__stock_quantity
+msgid "Stock Quantity"
+msgstr "كمية المخزون"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/product.py:0
+#, python-format
+msgid "Stock Quantity cannot be negative!"
+msgstr "لا يمكن أن تكون كمية المخزون قيمة سالبة!"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/product_controller.py:0
+#, python-format
+msgid "Stock updated by %(quantity)s units"
+msgstr "تم تحديث المخزون بمقدار %(quantity)s وحدة"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart__subtotal
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart_line__price_subtotal
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_order_form
+msgid "Subtotal"
+msgstr "المجموع الفرعي"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/wizards/jabin_loyalty_adjust_wizard.py:0
+#, python-format
+msgid "Successfully adjusted loyalty points for customer %s."
+msgstr "تم تعديل نقاط الولاء للعميل %s بنجاح."
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_search
+msgid "Suspended Users"
+msgstr "المستخدمون الموقوفون"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_notification__notification_type__system
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_send_notification_wizard__notification_type__system
+msgid "System Alert"
+msgstr "تنبيه النظام"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart_line__tax_percent
+msgid "Tax (%)"
+msgstr "الضريبة (%)"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart__tax_amount
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart_line__tax_amount
+msgid "Tax Amount"
+msgstr "مبلغ الضريبة"
+
+#. module: jabin_dashboard
+#: model:ir.model.constraint,message:jabin_dashboard.constraint_jabin_device_fcm_token_unique
+msgid "The FCM device token must be unique across all devices."
+msgstr "يجب أن يكون رمز جهاز FCM فريدًا بين جميع الأجهزة."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/coupon_validator.py:0
+#: code:addons/jabin_dashboard/validators/coupon_validator.py:0
+#, python-format
+msgid "This coupon does not apply to any products in your order."
+msgstr "لا ينطبق هذا الكوبون على أي من المنتجات الموجودة في طلبك."
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_dashboard_setting__refresh_interval
+msgid "Time in seconds between auto-refresh of dashboard data"
+msgstr "الوقت بالثواني بين التحديث التلقائي لبيانات لوحة المعلومات"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_notification_form
+msgid "Timestamps & References"
+msgstr "الطوابع الزمنية والمراجع"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_device__timezone
+msgid "Timezone"
+msgstr "المنطقة الزمنية"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_notification__title
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_send_notification_wizard__title
+msgid "Title"
+msgstr "العنوان"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_category_form
+msgid "Toggle Active"
+msgstr "تبديل حالة النشاط"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_dashboard__active
+msgid "Toggle to hide/unhide this dashboard section"
+msgstr "تبديل لإخفاء/إظهار قسم لوحة المعلومات هذا"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_device_form
+msgid "Token & Identification"
+msgstr "الرمز والتعريف"
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#, python-format
+msgid "Top Products"
+msgstr "المنتجات الأكثر مبيعاً"
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_payment_transaction_tree
+#, python-format
+msgid "Total"
+msgstr "الإجمالي"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_form
+msgid "Total Active Purchases"
+msgstr "إجمالي المشتريات النشطة"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_order__total_after_discount
+msgid "Total After Discount"
+msgstr "الإجمالي بعد الخصم"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_tree
+msgid "Total Balance"
+msgstr "الإجمالي الكلي للرصيد"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_form
+msgid "Total Completed Purchases"
+msgstr "إجمالي المشتريات المكتملة"
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#, python-format
+msgid "Total Customers"
+msgstr "إجمالي العملاء"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_res_users__total_earned_points
+msgid "Total Earned Points"
+msgstr "إجمالي النقاط المكتسبة"
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#, python-format
+msgid "Total Items"
+msgstr "إجمالي العناصر"
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#, python-format
+msgid "Total Orders"
+msgstr "إجمالي الطلبات"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_loyalty_transaction_tree
+msgid "Total Points"
+msgstr "إجمالي النقاط"
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_category_tree
+#, python-format
+msgid "Total Products"
+msgstr "إجمالي المنتجات"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_form
+msgid "Total Purchases"
+msgstr "إجمالي المشتريات"
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart__total_quantity
+#, python-format
+msgid "Total Quantity"
+msgstr "إجمالي الكمية"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_res_users__total_redeemed_points
+msgid "Total Redeemed Points"
+msgstr "إجمالي النقاط المستبدلة"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_form
+msgid "Total Refunded Amount"
+msgstr "إجمالي المبلغ المسترد"
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#, python-format
+msgid "Total Revenue"
+msgstr "إجمالي الإيرادات"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_product_tree
+msgid "Total Selling Price"
+msgstr "إجمالي سعر البيع"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_coupon__usage_limit
+msgid ""
+"Total number of times this coupon can be redeemed across all customers (0 "
+"for unlimited)"
+msgstr "إجمالي عدد المرات التي يمكن فيها استبدال هذا الكوبون لجميع العملاء (0 لغير محدد)"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_loyalty_transaction__transaction_type
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_loyalty_transaction_search
+msgid "Transaction Type"
+msgstr "نوع المعاملة"
+
+#. module: jabin_dashboard
+#: model:ir.ui.menu,name:jabin_dashboard.menu_jabin_payment_transactions
+msgid "Transactions"
+msgstr "المعاملات"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_notification__notification_type
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_notification_search
+msgid "Type"
+msgstr "النوع"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_send_notification_wizard_form
+msgid "Type your push notification message here..."
+msgstr "اكتب نص الإشعار الفوري هنا..."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/loyalty_controller.py:0
+#, python-format
+msgid "Unauthorized to redeem points for this order."
+msgstr "غير مصرح لك باستبدال النقاط لهذا الطلب."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/dashboard_service.py:0
+#, python-format
+msgid "Uncategorized"
+msgstr "غير مصنف"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_coupon__code
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_order__coupon_code
+msgid ""
+"Unique promotional discount code (e.g. SAVE10 or auto-generated "
+"Dhabayih Lmamlaka-X9K2L4)"
+msgstr "رمز خصم ترويجي فريد (مثال: SAVE10 أو منشأ تلقائياً Dhabayih Lmamlaka-X9K2L4)"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart_line__price_unit
+msgid "Unit Price"
+msgstr "سعر الوحدة"
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#, python-format
+msgid "Units"
+msgstr "الوحدات"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/dashboard_service.py:0
+#, python-format
+msgid "Unknown Customer"
+msgstr "عميل غير معروف"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_order_search
+msgid "Unpaid"
+msgstr "غير مدفوع"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/notification_controller.py:0
+#, python-format
+msgid "Unread count retrieved."
+msgstr "تم استرجاع عدد الرسائل غير المقروءة."
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_form
+msgid "Update Last Login"
+msgstr "تحديث آخر تسجيل دخول"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/product.py:0
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_product_form
+#, python-format
+msgid "Update Stock"
+msgstr "تحديث المخزون"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_device__updated_at
+msgid "Updated At"
+msgstr "تاريخ التحديث"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_cart__updated_date
+msgid "Updated Date"
+msgstr "تاريخ التحديث"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_notification__priority__urgent
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_send_notification_wizard__priority__urgent
+msgid "Urgent"
+msgstr "عاجل"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_coupon_form
+msgid "Usage & Timing"
+msgstr "الاستخدام والتوقيت"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_coupon__usage_limit
+msgid "Usage Limit"
+msgstr "حد الاستخدام"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_coupon__usage_limit_per_customer
+msgid "Usage Limit Per Customer"
+msgstr "حد الاستخدام لكل عميل"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/jabin_coupon.py:0
+#, python-format
+msgid "Usage limit cannot be negative."
+msgstr "لا يمكن أن يكون حد الاستخدام قيمة سالبة."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/models/jabin_coupon.py:0
+#, python-format
+msgid "Usage limit per customer cannot be negative."
+msgstr "لا يمكن أن يكون حد الاستخدام لكل عميل قيمة سالبة."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "Use promo code '%s' to get discounts on your next order!"
+msgstr "استخدم الرمز الترويجي '%s' للحصول على خصم على طلبك القادم!"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_coupon__used_count
+msgid "Used Count"
+msgstr "عدد مرات الاستخدام"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_device__user_id
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_device_search
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_notification_search
+msgid "User"
+msgstr "المستخدم"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_users_search
+msgid "User Type"
+msgstr "نوع المستخدم"
+
+#. module: jabin_dashboard
+#: model:ir.actions.act_window,name:jabin_dashboard.action_jabin_users
+#: model:ir.ui.menu,name:jabin_dashboard.menu_jabin_users_root
+msgid "Users"
+msgstr "المستخدمون"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_device__device_type__web
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_device_search
+msgid "Web"
+msgstr "الويب (Web)"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,field_description:jabin_dashboard.field_jabin_product__weight
+msgid "Weight (kg)"
+msgstr "الوزن (كجم)"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_coupon__active
+msgid "Whether this coupon is active and usable"
+msgstr "ما إذا كان هذا الكوبون نشطاً وقابلاً للاستخدام"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields,help:jabin_dashboard.field_jabin_device__is_active
+msgid ""
+"Whether this device token is active and eligible for push notifications."
+msgstr "ما إذا كان رمز هذا الجهاز نشطاً ومؤهلاً لاستلام الإشعارات الفورية."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "You have earned %s loyalty points on your recent purchase!"
+msgstr "لقد اكتسبت %s نقطة ولاء على عملية الشراء الأخيرة!"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/coupon_validator.py:0
+#, python-format
+msgid "You have reached the maximum usage limit for this coupon."
+msgstr "لقد وصلت إلى الحد الأقصى لاستخدام هذا الكوبون."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "You redeemed %s loyalty points for a discount."
+msgstr "لقد استبدلت %s نقطة ولاء مقابل خصم."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "Your order #%s has been cancelled."
+msgstr "تم إلغاء طلبك رقم %s."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "Your order #%s has been confirmed by restaurant/store."
+msgstr "تم تأكيد طلبك رقم %s من قبل المتجر/المطعم."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "Your order #%s has been created successfully."
+msgstr "تم إنشاء Your order #%s has been بنجاح"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "Your order #%s has been delivered. Enjoy! "
+msgstr "تم توصيل طلبك رقم %s. استمتع! "
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "Your order #%s has been refunded."
+msgstr "تم استرجاع مبلغ طلبك رقم %s."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "Your order #%s is now being prepared."
+msgstr "جاري تجهيز طلبك رقم %s الآن."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "Your order #%s is out for delivery with our driver."
+msgstr "طلبك رقم %s خرج للتوصيل مع المندوب الآن."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "Your order #%s is ready for pickup!"
+msgstr "طلبك رقم %s جاهز للاستلام!"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/services/notification_service.py:0
+#, python-format
+msgid "Your payment of %s SAR for order #%s was completed."
+msgstr "تمت عملية الدفع بمبلغ %s ريال سعودي للطلب رقم %s بنجاح."
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#, python-format
+msgid "categories"
+msgstr "الفئات (categories)"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_coupon_form
+msgid "e.g. SAVE10"
+msgstr "مثال: SAVE10"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_send_notification_wizard_form
+msgid "e.g. Special Discount Just For You!"
+msgstr "مثال: خصم خاص لك فقط!"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_coupon_form
+msgid "e.g. Summer Special 10% Off"
+msgstr "مثال: عرض الصيف خصم 10%"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_send_notification_wizard_form
+msgid "e.g. jabin://offers or jabin://products/45"
+msgstr "مثال: jabin://offers أو jabin://products/45"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_dashboard_form
+msgid "fa-icon-name"
+msgstr "fa-icon-name"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_send_notification_wizard_form
+msgid "https://example.com/images/promo.png"
+msgstr "https://example.com/images/promo.png"
+
+#. module: jabin_dashboard
+#: model:ir.model.fields.selection,name:jabin_dashboard.selection__jabin_device__device_type__ios
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_device_search
+msgid "iOS"
+msgstr "iOS"
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#, python-format
+msgid "items"
+msgstr "عناصر"
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#, python-format
+msgid "items out of stock"
+msgstr "عناصر نفدت من المخزون"
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#, python-format
+msgid "months"
+msgstr "أشهر"
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#, python-format
+msgid "new this month"
+msgstr "جديد هذا الشهر"
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/controllers/notification_controller.py:0
+#, python-format
+msgid "notification_id is required."
+msgstr "معرف الإشعار (notification_id) مطلوب."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/favorite_validator.py:0
+#, python-format
+msgid "product_id is required."
+msgstr "معرف المنتج (product_id) مطلوب."
+
+#. module: jabin_dashboard
+#. odoo-python
+#: code:addons/jabin_dashboard/validators/favorite_validator.py:0
+#, python-format
+msgid "product_id must be an integer."
+msgstr "معرف المنتج (product_id) يجب أن يكون رقماً صحيحاً."
+
+#. module: jabin_dashboard
+#. odoo-javascript
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#: code:addons/jabin_dashboard/static/src/xml/dashboard_templates.xml:0
+#, python-format
+msgid "this month"
+msgstr "هذا الشهر"
+
+#. module: jabin_dashboard
+#: model_terms:ir.ui.view,arch_db:jabin_dashboard.view_jabin_send_notification_wizard_form
+msgid "{\"promo_code\": \"VIP10\", \"category\": \"special\"}"
+msgstr "{\: \, \: \}"
+
+#. module: jabin_dashboard
+#: model:jabin.dashboard,description:jabin_dashboard.dashboard_sales
+msgid "أداء المبيعات والتحليلات"
+msgstr "أداء المبيعات والتحليلات"
+
+#. module: jabin_dashboard
+#: model:jabin.excluded.part,description:jabin_dashboard.excluded_skin
+msgid "إزالة الجلد"
+msgstr "إزالة الجلد"
+
+#. module: jabin_dashboard
+#: model:jabin.excluded.part,description:jabin_dashboard.excluded_fat
+msgid "إزالة الشحوم والدهون"
+msgstr "إزالة الشحوم والدهون"
+
+#. module: jabin_dashboard
+#: model:jabin.excluded.part,description:jabin_dashboard.excluded_bone
+msgid "إزالة العظام"
+msgstr "إزالة العظام"
+
+#. module: jabin_dashboard
+#: model:jabin.branch,name:jabin_dashboard.branch_main
+msgid "الفرع الرئيسي"
+msgstr "الفرع الرئيسي"
+
+#. module: jabin_dashboard
+#: model:jabin.cutting.option,description:jabin_dashboard.cutting_whole
+msgid "بدون تقطيع"
+msgstr "بدون تقطيع"
+
+#. module: jabin_dashboard
+#: model:jabin.excluded.part,name:jabin_dashboard.excluded_skin
+msgid "بدون جلد"
+msgstr "بدون جلد"
+
+#. module: jabin_dashboard
+#: model:jabin.excluded.part,name:jabin_dashboard.excluded_fat
+msgid "بدون دهن"
+msgstr "بدون دهن"
+
+#. module: jabin_dashboard
+#: model:jabin.excluded.part,name:jabin_dashboard.excluded_bone
+msgid "بدون عظم"
+msgstr "بدون عظم"
+
+#. module: jabin_dashboard
+#: model:jabin.dashboard,name:jabin_dashboard.dashboard_sales
+msgid "تحليلات المبيعات"
+msgstr "تحليلات المبيعات"
+
+#. module: jabin_dashboard
+#: model:jabin.packaging,description:jabin_dashboard.packaging_vacuum
+msgid "تغليف للحفاظ على الطزاجة"
+msgstr "تغليف للحفاظ على الطزاجة"
+
+#. module: jabin_dashboard
+#: model:jabin.packaging,name:jabin_dashboard.packaging_vacuum
+msgid "تغليف مفرغ من الهواء"
+msgstr "تغليف مفرغ من الهواء"
+
+#. module: jabin_dashboard
+#: model:jabin.category,name:jabin_dashboard.category_chicken
+msgid "دجاج"
+msgstr "دجاج"
+
+#. module: jabin_dashboard
+#: model:jabin.category,description:jabin_dashboard.category_chicken
+msgid "دجاج طازج ومبرد"
+msgstr "دجاج طازج ومبرد"
+
+#. module: jabin_dashboard
+#: model:jabin.product,name:jabin_dashboard.product_lamb_chops
+msgid "ريش ضأن"
+msgstr "ريش ضأن"
+
+#. module: jabin_dashboard
+#: model:jabin.product,description:jabin_dashboard.product_lamb_chops
+msgid "ريش ضأن طازجة للشرواء"
+msgstr "ريش ضأن طازجة للشرواء"
+
+#. module: jabin_dashboard
+#: model:jabin.cutting.option,name:jabin_dashboard.cutting_slices
+msgid "شرائح"
+msgstr "شرائح"
+
+#. module: jabin_dashboard
+#: model:jabin.cutting.option,description:jabin_dashboard.cutting_slices
+msgid "شرائح رقيقة"
+msgstr "شرائح رقيقة"
+
+#. module: jabin_dashboard
+#: model:jabin.product,name:jabin_dashboard.product_chicken_breast
+msgid "صدور دجاج"
+msgstr "صدور دجاج"
+
+#. module: jabin_dashboard
+#: model:jabin.product,description:jabin_dashboard.product_chicken_breast
+msgid "صدور دجاج طازجة بدون عظم"
+msgstr "صدور دجاج طازجة بدون عظم"
+
+#. module: jabin_dashboard
+#: model:jabin.packaging,name:jabin_dashboard.packaging_tray
+msgid "طبق فوم"
+msgstr "طبق فوم"
+
+#. module: jabin_dashboard
+#: model:jabin.packaging,description:jabin_dashboard.packaging_tray
+msgid "طبق فوم مع تغليف بلاستيك"
+msgstr "طبق فوم مع تغليف بلاستيك"
+
+#. module: jabin_dashboard
+#: model:jabin.cutting.option,description:jabin_dashboard.cutting_minced
+msgid "فرم ناعم أو خشن"
+msgstr "فرم ناعم أو خشن"
+
+#. module: jabin_dashboard
+#: model:jabin.cutting.option,name:jabin_dashboard.cutting_whole
+msgid "كامل"
+msgstr "كامل"
+
+#. module: jabin_dashboard
+#: model:jabin.category,name:jabin_dashboard.category_beef
+msgid "لحم بقر"
+msgstr "لحم بقر"
+
+#. module: jabin_dashboard
+#: model:jabin.product,name:jabin_dashboard.product_beef_mince
+msgid "لحم بقر مفروم"
+msgstr "لحم بقر مفروم"
+
+#. module: jabin_dashboard
+#: model:jabin.product,description:jabin_dashboard.product_beef_mince
+msgid "لحم بقر مفروم طازج ممتاز"
+msgstr "لحم بقر مفروم طازج ممتاز"
+
+#. module: jabin_dashboard
+#: model:jabin.category,name:jabin_dashboard.category_lamb
+msgid "لحم ضأن"
+msgstr "لحم ضأن"
+
+#. module: jabin_dashboard
+#: model:jabin.category,description:jabin_dashboard.category_beef
+msgid "لحوم بقر طازجة"
+msgstr "لحوم بقر طازجة"
+
+#. module: jabin_dashboard
+#: model:jabin.category,description:jabin_dashboard.category_lamb
+msgid "لحوم ضأن طازجة"
+msgstr "لحوم ضأن طازجة"
+
+#. module: jabin_dashboard
+#: model:jabin.cutting.option,name:jabin_dashboard.cutting_minced
+msgid "مفروم"
+msgstr "مفروم"
+
+#. module: jabin_dashboard
+#: model:jabin.cutting.option,name:jabin_dashboard.cutting_cubes
+msgid "مكعبات"
+msgstr "مكعبات"
+
+#. module: jabin_dashboard
+#: model:jabin.cutting.option,description:jabin_dashboard.cutting_cubes
+msgid "مكعبات للطبخ"
+msgstr "مكعبات للطبخ"
+
+#. module: jabin_dashboard
+#: model:jabin.dashboard,name:jabin_dashboard.dashboard_overview
+msgid "نظرة عامة"
+msgstr "نظرة عامة"
+
+#. module: jabin_dashboard
+#: model:jabin.dashboard,description:jabin_dashboard.dashboard_overview
+msgid "نظرة عامة على لوحة القيادة مع المقاييس الرئيسية"
+msgstr "نظرة عامة على لوحة القيادة مع المقاييس الرئيسية"

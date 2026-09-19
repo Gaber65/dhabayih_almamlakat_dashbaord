@@ -20,7 +20,16 @@
                     </div>
 
                     <group>
-                        <field name="active"/>
+                        <group>
+                            <field name="banner_type"/>
+                            <field name="offer_id" invisible="banner_type != 'offer'" required="banner_type == 'offer'"/>
+                            <field name="category_id" invisible="banner_type != 'category'" required="banner_type == 'category'"/>
+                            <field name="product_id" invisible="banner_type != 'product'" required="banner_type == 'product'"/>
+                        </group>
+                        <group>
+                            <field name="deep_link"/>
+                            <field name="active"/>
+                        </group>
                     </group>
 
                     <separator string="Banner Image"/>

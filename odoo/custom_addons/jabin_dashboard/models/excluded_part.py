@@ -4,7 +4,7 @@ from odoo.exceptions import ValidationError
 
 class JabinExcludedPart(models.Model):
     _name = 'jabin.excluded.part'
-    _description = 'JABIN Excluded Part'
+    _description = 'Dhabayih Lmamlaka Excluded Part'
     _order = 'name'
 
     name = fields.Char(string='Name', required=True, translate=True)

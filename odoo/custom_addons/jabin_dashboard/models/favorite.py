@@ -3,7 +3,7 @@ from odoo import api, fields, models, _
 
 class JabinFavorite(models.Model):
     _name = "jabin.favorite"
-    _description = "JABIN Customer Favorite Product"
+    _description = "Dhabayih Lmamlaka Customer Favorite Product"
     _order = "created_date desc, id desc"
 
     customer_id = fields.Many2one(

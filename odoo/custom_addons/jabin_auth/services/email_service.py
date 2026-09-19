@@ -16,13 +16,13 @@ _logger = JabinLogger.get("jabin.email")
 
 class EmailService(models.AbstractModel):
     _name = "jabin.email.service"
-    _description = "JABIN Email Service"
+    _description = "Dhabayih Lmamlaka Email Service"
 
     TEMPLATES = {
         "register": {
-            "subject": "JABIN Registration Verification Code",
+            "subject": "Jabin Registration Verification Code",
             "message": """
-Welcome to JABIN.
+Welcome to Jabin.
 
 Your registration verification code is:
 
@@ -32,15 +32,15 @@ This code expires in 5 minutes.
 If you didn't request this code, please ignore this email.
 
 Best regards,
-The JABIN Team
+The Jabin Team
 """
         },
         "login": {
-            "subject": "JABIN Login Verification Code",
+            "subject": "Jabin Login Verification Code",
             "message": """
 Hello,
 
-Your JABIN login verification code is:
+Your Jabin login verification code is:
 
 {code}
 
@@ -48,15 +48,15 @@ This code expires in 5 minutes.
 If you didn't request this code, please ignore this email.
 
 Best regards,
-The JABIN Team
+The Jabin Team
 """
         },
         "password_reset": {
-            "subject": "JABIN Password Reset Code",
+            "subject": "Jabin Password Reset Code",
             "message": """
 Hello,
 
-You requested to reset your JABIN password.
+You requested to reset your Jabin password.
 
 Your password reset verification code is:
 
@@ -66,15 +66,15 @@ This code expires in 5 minutes.
 If you didn't request this, please ignore this email.
 
 Best regards,
-The JABIN Team
+The Jabin Team
 """
         },
         "email_change": {
-            "subject": "JABIN Email Change Verification",
+            "subject": "Jabin Email Change Verification",
             "message": """
 Hello,
 
-You requested to change your JABIN email address.
+You requested to change your Jabin email address.
 
 Your verification code is:
 
@@ -84,7 +84,7 @@ This code expires in 5 minutes.
 If you didn't request this, please ignore this email.
 
 Best regards,
-The JABIN Team
+The Jabin Team
 """
         }
     }
@@ -282,4 +282,4 @@ The JABIN Team
             "password": env_password or config.get("smtp_password", ""),
             "tls": tls_enabled,
             "ssl": ssl_enabled,
-        }
+        }

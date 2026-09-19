@@ -44,6 +44,7 @@ class AddressController(BaseApiController):
         auth="public",
         methods=["GET"],
         csrf=False,
+        cors="*",
     )
     def list_addresses(self, **kwargs):
         """List addresses for the logged-in customer."""
@@ -78,6 +79,7 @@ class AddressController(BaseApiController):
         auth="public",
         methods=["POST"],
         csrf=False,
+        cors="*",
     )
     def create_address(self, **kwargs):
         """Create a new delivery address for the logged-in customer."""
@@ -141,6 +143,7 @@ class AddressController(BaseApiController):
         auth="public",
         methods=["PUT"],
         csrf=False,
+        cors="*",
     )
     def update_address(self, address_id: int, **kwargs):
         """Update an existing address for the logged-in customer."""
@@ -191,6 +194,7 @@ class AddressController(BaseApiController):
         auth="public",
         methods=["DELETE"],
         csrf=False,
+        cors="*",
     )
     def delete_address(self, address_id: int, **kwargs):
         """Delete an address."""
@@ -214,6 +218,7 @@ class AddressController(BaseApiController):
         auth="public",
         methods=["POST"],
         csrf=False,
+        cors="*",
     )
     def set_default_address(self, address_id: int, **kwargs):
         """Set an address as default."""

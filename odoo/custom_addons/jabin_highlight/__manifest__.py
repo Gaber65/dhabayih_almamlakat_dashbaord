@@ -1,13 +1,13 @@
 {
-    "name": "JABIN Highlight",
+    "name": "Jabin Highlight",
     "version": "17.0.1.0.0",
-    "category": "Services/JABIN",
-    "summary": "JABIN ERP – Highlights (Stories): temporary image/video posts that expire after 24 hours",
+    "category": "Services/Jabin",
+    "summary": "Jabin ERP – Highlights (Stories): temporary image/video posts that expire after 24 hours",
     "description": """
-JABIN Highlight
+Jabin Highlight
 ===============
 
-Temporary media stories feature for the JABIN ERP platform.
+Temporary media stories feature for the Jabin ERP platform.
 
 Provides:
     * Highlights model (jabin.highlight) backed by ir.attachment.
@@ -20,8 +20,8 @@ Provides:
     * System parameters for expiry hours, max file sizes, and max video duration.
     * Odoo backend views for administrator management.
     """,
-    "author": "JABIN Engineering",
-    "website": "https://github.com/Gaber65/JABIN",
+    "author": "Jabin Engineering",
+    "website": "https://github.com/Gaber65/Jabin",
     "license": "Other proprietary",
     "depends": ["base", "jabin_core", "jabin_users", "jabin_security", "jabin_api"],
     "data": [

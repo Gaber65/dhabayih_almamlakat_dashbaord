@@ -14,7 +14,7 @@ _logger = JabinLogger.get("notification.service")
 
 class NotificationService(models.AbstractModel):
     _name = 'jabin.notification.service'
-    _description = 'JABIN Notification Management Service'
+    _description = 'Dhabayih Lmamlaka Notification Management Service'
 
     # --- Device Management Methods ---
     @api.model
@@ -167,7 +167,7 @@ class NotificationService(models.AbstractModel):
         tokens = active_devices.mapped('fcm_token')
 
         if len(tokens) == 1:
-            success = FirebaseService.send(
+            success = env['jabin.firebase.service'].send(
                 env=env,
                 token=tokens[0],
                 title=title,
@@ -180,7 +180,7 @@ class NotificationService(models.AbstractModel):
             else:
                 notif.mark_as_failed("FCM send failed.")
         else:
-            result = FirebaseService.send_multicast(
+            result = env['jabin.firebase.service'].send_multicast(
                 env=env,
                 tokens=tokens,
                 title=title,
@@ -257,7 +257,7 @@ class NotificationService(models.AbstractModel):
 
         if topic_or_all and topic_or_all.startswith('topic:'):
             topic_name = topic_or_all.split(':', 1)[1]
-            return FirebaseService.send_topic(
+            return env['jabin.firebase.service'].send_topic(
                 env=env,
                 topic=topic_name,
                 title=title,
@@ -271,7 +271,7 @@ class NotificationService(models.AbstractModel):
         tokens = devices.mapped('fcm_token')
 
         if tokens:
-            return FirebaseService.send_multicast(
+            return env['jabin.firebase.service'].send_multicast(
                 env=env,
                 tokens=tokens,
                 title=title,
@@ -366,15 +366,15 @@ class NotificationService(models.AbstractModel):
     def send_new_offer(self, env, offer_title: str, offer_desc: str, deep_link: Optional[str] = None):
         """Broadcast new promotion offer notification."""
         title = offer_title or _("Special Offer!")
-        body = offer_desc or _("Check out our new offer on JABIN!")
+        body = offer_desc or _("Check out our new offer on Jabin!")
         link = deep_link or "jabin://offers"
         self.broadcast(env, topic_or_all='topic:offers', title=title, body=body, notification_type='offer', deep_link=link)
 
     @api.model
     def send_new_banner(self, env, banner):
         """Notification for new banner promo."""
-        title = banner.title if hasattr(banner, 'title') and banner.title else _("New Highlight!")
-        body = banner.description if hasattr(banner, 'description') and banner.description else _("Check out what's new on JABIN today.")
+        title = getattr(banner, 'name', None) or getattr(banner, 'title', None) or _("New Highlight!")
+        body = getattr(banner, 'description', None) or _("Check out what's new on Jabin today.")
         deep_link = f"jabin://banners/{banner.id}" if hasattr(banner, 'id') else "jabin://home"
         self.broadcast(env, topic_or_all='topic:all', title=title, body=body, notification_type='banner', deep_link=deep_link)
 
@@ -384,7 +384,15 @@ class NotificationService(models.AbstractModel):
         title = _("New Product Arrived!")
         body = _("Explore our new item: %s.") % (product.display_name if hasattr(product, 'display_name') else product.name)
         deep_link = f"jabin://products/{product.id}"
-        self.broadcast(env, topic_or_all='topic:products', title=title, body=body, notification_type='product', deep_link=deep_link)
+        self.broadcast(env, topic_or_all='topic:all', title=title, body=body, notification_type='product', deep_link=deep_link)
+
+    @api.model
+    def send_new_category(self, env, category):
+        """Notification for new category."""
+        title = _("New Category Added!")
+        body = _("Check out our new category: %s.") % (category.name)
+        deep_link = f"jabin://categories/{category.id}" if hasattr(category, 'id') else "jabin://home"
+        self.broadcast(env, topic_or_all='topic:all', title=title, body=body, notification_type='category', deep_link=deep_link)
 
     @api.model
     def send_coupon(self, env, coupon, customer_id: Optional[int] = None):

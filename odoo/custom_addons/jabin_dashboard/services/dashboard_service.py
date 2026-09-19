@@ -5,7 +5,7 @@ from dateutil.relativedelta import relativedelta
 
 class JabinDashboardService(models.Model):
     _name = 'jabin.dashboard.service'
-    _description = 'JABIN Dashboard Service'
+    _description = 'Dhabayih Lmamlaka Dashboard Service'
     _transient = True
 
     def get_dashboard_data(self):

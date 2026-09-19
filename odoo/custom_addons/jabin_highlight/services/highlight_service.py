@@ -44,7 +44,7 @@ class HighlightService(models.AbstractModel):
     """
 
     _name = "jabin.highlight.service"
-    _description = "JABIN Highlight Service"
+    _description = "Dhabayih Lmamlaka Highlight Service"
 
     # ==================================================================
     # Public API
@@ -56,6 +56,7 @@ class HighlightService(models.AbstractModel):
         user_id: int,
         media_type: str,
         file_storage,
+        name: str = None,
     ) -> Dict[str, Any]:
         """Store a new highlight with the uploaded media file.
 
@@ -105,6 +106,7 @@ class HighlightService(models.AbstractModel):
             "media_type": media_type,
             "media_filename": filename,
             "media_mimetype": mimetype,
+            "name": name,
         }
 
         # Store media in the appropriate field

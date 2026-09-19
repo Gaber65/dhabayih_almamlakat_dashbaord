@@ -59,6 +59,7 @@ class DeviceController(BaseApiController):
         auth="public",
         methods=["POST"],
         csrf=False,
+        cors="*",
     )
     def register_device(self, **kwargs):
         """Register or update customer device FCM token."""
@@ -69,9 +70,9 @@ class DeviceController(BaseApiController):
         user_id = _get_auth_user_id() or request.env.user.id
         with self.handle() as ctx:
             data = _parse_request_data()
-            device = NotificationService.register_device(request.env, user_id, data)
+            device = request.env['jabin.notification.service'].sudo().register_device(request.env, user_id, data)
 
-            return ResponseBuilder.success(data={
+            ctx.set_body(ResponseBuilder.success(data={
                 "id": device.id,
                 "uuid": device.uuid,
                 "user_id": device.user_id.id,
@@ -80,7 +81,8 @@ class DeviceController(BaseApiController):
                 "fcm_token": device.fcm_token,
                 "is_active": device.is_active,
                 "last_seen": device.last_seen
-            }, message="Device registered successfully.")
+            }, message="Device registered successfully."))
+        return ctx.response
 
     @http.route(
         "/api/v1/device/update-token",
@@ -88,6 +90,7 @@ class DeviceController(BaseApiController):
         auth="public",
         methods=["POST"],
         csrf=False,
+        cors="*",
     )
     def update_token(self, **kwargs):
         """Update FCM token for existing customer device."""
@@ -101,15 +104,16 @@ class DeviceController(BaseApiController):
             old_token = data.get("old_token") or data.get("uuid")
             new_token = data.get("fcm_token") or data.get("new_token")
 
-            device = NotificationService.update_token(request.env, user_id, old_token, new_token)
+            device = request.env['jabin.notification.service'].sudo().update_token(request.env, user_id, old_token, new_token)
 
-            return ResponseBuilder.success(data={
+            ctx.set_body(ResponseBuilder.success(data={
                 "id": device.id,
                 "uuid": device.uuid,
                 "user_id": device.user_id.id,
                 "fcm_token": device.fcm_token,
                 "is_active": device.is_active
-            }, message="Device FCM token updated successfully.")
+            }, message="Device FCM token updated successfully."))
+        return ctx.response
 
     @http.route(
         "/api/v1/device/logout",
@@ -117,6 +121,7 @@ class DeviceController(BaseApiController):
         auth="public",
         methods=["POST"],
         csrf=False,
+        cors="*",
     )
     def logout_device(self, **kwargs):
         """Deactivate customer device upon logout."""
@@ -129,8 +134,9 @@ class DeviceController(BaseApiController):
             data = _parse_request_data()
             token_or_uuid = data.get("fcm_token") or data.get("uuid")
 
-            NotificationService.logout_device(request.env, user_id, token_or_uuid)
-            return ResponseBuilder.success(data={
+            request.env['jabin.notification.service'].sudo().logout_device(request.env, user_id, token_or_uuid)
+            ctx.set_body(ResponseBuilder.success(data={
                 "user_id": user_id,
                 "logged_out": True
-            }, message="Device deactivated successfully.")
+            }, message="Device deactivated successfully."))
+        return ctx.response

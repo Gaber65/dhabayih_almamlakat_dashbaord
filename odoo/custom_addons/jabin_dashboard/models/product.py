@@ -5,7 +5,7 @@ from datetime import datetime
 
 class JabinProduct(models.Model):
     _name = 'jabin.product'
-    _description = 'JABIN Product'
+    _description = 'Dhabayih Lmamlaka Product'
     _order = 'name'
 
     # Basic Information
@@ -54,6 +54,13 @@ class JabinProduct(models.Model):
     )
     offer_start_date = fields.Date(string='Offer Start Date')
     offer_end_date = fields.Date(string='Offer End Date')
+    offer_ids = fields.Many2many(
+        'jabin.offer',
+        'jabin_offer_product_rel',
+        'product_id',
+        'offer_id',
+        string='Promotional Offers'
+    )
     is_on_offer = fields.Boolean(
         string='Is On Offer',
         compute='_compute_is_on_offer',
@@ -172,30 +179,40 @@ class JabinProduct(models.Model):
                 raise ValidationError(_('Minimum Stock cannot be negative!'))
 
     # Computed Fields
-    @api.depends('selling_price', 'discount_type', 'discount_value')
+    @api.depends('selling_price', 'discount_type', 'discount_value', 'offer_ids', 'offer_ids.discount_type', 'offer_ids.discount_value', 'offer_ids.active', 'offer_ids.start_date', 'offer_ids.end_date')
     def _compute_offer_price(self):
+        today = fields.Date.context_today(self)
         for record in self:
-            if record.discount_type == 'percentage':
-                record.offer_price = record.selling_price - (
-                        record.selling_price * record.discount_value / 100
-                )
-            else:  # fixed
-                record.offer_price = record.selling_price - record.discount_value
+            best_price = record.selling_price
 
-            # Ensure offer price is not negative
-            if record.offer_price < 0:
-                record.offer_price = 0.0
+            # 1. Check individual offer
+            has_individual = bool(record.discount_value > 0 and (not record.offer_start_date or record.offer_start_date <= today) and (not record.offer_end_date or record.offer_end_date >= today))
+            if has_individual:
+                if record.discount_type == 'percentage':
+                    best_price = record.selling_price - (record.selling_price * record.discount_value / 100.0)
+                else:
+                    best_price = record.selling_price - record.discount_value
 
-    @api.depends('offer_start_date', 'offer_end_date')
+            # 2. Check group promotional offers
+            for offer in record.offer_ids:
+                if offer.is_currently_active:
+                    offer_calc = offer.calculate_discounted_price(record.selling_price)
+                    if offer_calc < best_price:
+                        best_price = offer_calc
+
+            record.offer_price = max(0.0, round(best_price, 2))
+
+    @api.depends('offer_start_date', 'offer_end_date', 'discount_value', 'offer_ids', 'offer_ids.active', 'offer_ids.start_date', 'offer_ids.end_date')
     def _compute_is_on_offer(self):
-        today = datetime.now().date()
+        today = fields.Date.context_today(self)
         for record in self:
-            if record.offer_start_date and record.offer_end_date:
-                record.is_on_offer = (
-                        record.offer_start_date <= today <= record.offer_end_date
-                )
-            else:
-                record.is_on_offer = False
+            individual_active = bool(
+                record.discount_value > 0 and
+                (not record.offer_start_date or record.offer_start_date <= today) and
+                (not record.offer_end_date or record.offer_end_date >= today)
+            )
+            group_active = any(o.is_currently_active for o in record.offer_ids)
+            record.is_on_offer = individual_active or group_active
 
     @api.depends('selling_price', 'purchase_price')
     def _compute_profit(self):
@@ -222,6 +239,17 @@ class JabinProduct(models.Model):
     def _compute_is_available(self):
         for record in self:
             record.is_available = record.stock_quantity > 0
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        records = super(JabinProduct, self).create(vals_list)
+        for record in records:
+            if record.active:
+                try:
+                    self.env["jabin.notification.service"].sudo().send_new_product(self.env, record)
+                except Exception:
+                    pass
+        return records
 
     def action_activate(self):
         self.active = True
