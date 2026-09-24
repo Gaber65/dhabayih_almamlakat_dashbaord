@@ -24,6 +24,7 @@
         'data/dashboard_data.xml',
         'data/loyalty_data.xml',
         'data/firebase_data.xml',
+        'data/initial_dhabayih_data.xml',
         'views/jabin_users_views.xml',  # Users views and actions FIRST
 
         'views/dashboard_views.xml',      

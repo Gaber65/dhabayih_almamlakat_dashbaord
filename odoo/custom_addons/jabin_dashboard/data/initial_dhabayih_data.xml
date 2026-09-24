@@ -1,0 +1,580 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- ======================================================== -->
+        <!--                   1. CATEGORIES                          -->
+        <!-- ======================================================== -->
+        <record id="cat_sheep_goats" model="jabin.category">
+            <field name="name">ذبائح غنم وماعز</field>
+            <field name="description">ذبائح الأغنام والماعز البلدية والمستوردة الطازجة بأعلى معايير الجودة والنظافة</field>
+            <field name="sequence">10</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cat_camels" model="jabin.category">
+            <field name="name">حاشي وإبل</field>
+            <field name="description">لحوم حاشي لباني بلدي طازجة ومختارة بعناية فائقة</field>
+            <field name="sequence">20</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cat_calves" model="jabin.category">
+            <field name="name">عجول وأبقار</field>
+            <field name="description">لحوم عجول بلدية طازجة مسمنة بأفضل الأعلاف الطبيعية</field>
+            <field name="sequence">30</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cat_cuts_halves" model="jabin.category">
+            <field name="name">أجزاء وأنصاف ذبائح</field>
+            <field name="description">أنصاف وأرباع الذبائح مجهزة ومقطعة لتناسب احتياجاتكم اليومية</field>
+            <field name="sequence">40</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cat_meat_kg" model="jabin.category">
+            <field name="name">لحوم ومفروم بالكيلو</field>
+            <field name="description">لحوم طازجة يومياً بالعظم وبدون عظم ومفروم فاخر بالكيلو</field>
+            <field name="sequence">50</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cat_bbq_boxes" model="jabin.category">
+            <field name="name">بوكسات وعروض الشواء</field>
+            <field name="description">بوكسات شواء متكاملة ومتبلة ومجهزة للطلعات والجمعات والمناسبات</field>
+            <field name="sequence">60</field>
+            <field name="active">True</field>
+        </record>
+
+        <!-- ======================================================== -->
+        <!--                   2. CUTTING OPTIONS                     -->
+        <!-- ======================================================== -->
+        <record id="cut_fridge" model="jabin.cutting.option">
+            <field name="name">تفصيل ثلاجة</field>
+            <field name="description">تقطيع قطع صغيرة مع العظم مخصصة للطبخ المنزلي والتفريز</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cut_mufattah" model="jabin.cutting.option">
+            <field name="name">تفصيل مفطح</field>
+            <field name="description">ذبيحة كاملة مجهزة ومفتوحة على الظهر للولائم والمناسبات والعزائم</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cut_kabsa" model="jabin.cutting.option">
+            <field name="name">تقطيع كبسة وإيدام</field>
+            <field name="description">قطع متوسطة متناسقة الحجم ومناسبة لكافة أنواع الطبخ والكبسات</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cut_mandi" model="jabin.cutting.option">
+            <field name="name">تقطيع مندي ومظبي وحنيذ</field>
+            <field name="description">تقطيع أنصاف أو أرباع مفرودة مخصصة للشواء في البراميل وأفران المندي</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cut_quarters" model="jabin.cutting.option">
+            <field name="name">تفصيل أرباع</field>
+            <field name="description">تقسيم الذبيحة إلى أربعة أرباع متساوية لسهولة الحفظ والتوزيع</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cut_halves" model="jabin.cutting.option">
+            <field name="name">تفصيل أنصاف</field>
+            <field name="description">تقسيم الذبيحة إلى نصفين متساويين بالطول</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cut_steaks" model="jabin.cutting.option">
+            <field name="name">شرائح وستيك</field>
+            <field name="description">شرائح لحم وفيليه مقطعة خصيصاً للقلي والشواء السريع</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cut_minced_fine" model="jabin.cutting.option">
+            <field name="name">فرم ناعم</field>
+            <field name="description">فرم ناعم مخصص للكباب والكفتة والبرجر والحشوات</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cut_minced_coarse" model="jabin.cutting.option">
+            <field name="name">فرم خشن</field>
+            <field name="description">فرم خشن مخصص للصواني والطبخ والإيدامات</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cut_bbq_skewers" model="jabin.cutting.option">
+            <field name="name">تقطيع شواء وأسياخ</field>
+            <field name="description">قطع أوصال وشيش مجهزة ومعتنى بها لأسياخ الشوي</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="cut_none" model="jabin.cutting.option">
+            <field name="name">كاملة بدون تقطيع</field>
+            <field name="description">تسليم الذبيحة كاملة وسليمة معلقة دون تقطيع</field>
+            <field name="active">True</field>
+        </record>
+
+        <!-- ======================================================== -->
+        <!--                   3. PACKAGING OPTIONS                   -->
+        <!-- ======================================================== -->
+        <record id="pkg_vacuum" model="jabin.packaging">
+            <field name="name">تغليف سحب هواء (فكيوم)</field>
+            <field name="description">تفريغ كامل للهواء للحفاظ على الطزاجة واللون وحماية اللحم من حروق التجميد</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="pkg_foam_trays" model="jabin.packaging">
+            <field name="name">أطباق فوم مغلفة بسلوفان</field>
+            <field name="description">أطباق فوم صحية مرتبة ومحكمة الغلق برول استرتش سلوفان شفاف</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="pkg_portion_bags" model="jabin.packaging">
+            <field name="name">أكياس تفريز مقسمة بالكيلو</field>
+            <field name="description">توزيع وتعبئة اللحم في أكياس سميكة مخصصة للفريزر ومقسمة بوزن 1-2 كجم</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="pkg_thermal_box" model="jabin.packaging">
+            <field name="name">كرتون حفظ حراري مبرد</field>
+            <field name="description">صندوق كرتوني فاخر مبطن بعازل حراري لحفظ البرودة الفائقة أثناء التوصيل</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="pkg_banquet" model="jabin.packaging">
+            <field name="name">تغليف مناسبات وولائم</field>
+            <field name="description">تجهيز الذبيحة على صواني تغليف خاصة للمناسبات والعزائم الفاخرة</field>
+            <field name="active">True</field>
+        </record>
+
+        <!-- ======================================================== -->
+        <!--                   4. EXCLUDED PARTS                      -->
+        <!-- ======================================================== -->
+        <record id="excl_head" model="jabin.excluded.part">
+            <field name="name">بدون رأس</field>
+            <field name="description">استبعاد الرأس وعدم إرفاقه مع الذبيحة</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="excl_trotters" model="jabin.excluded.part">
+            <field name="name">بدون كراعين (مقادم)</field>
+            <field name="description">استبعاد الكراعين والمقادم</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="excl_viscera" model="jabin.excluded.part">
+            <field name="name">بدون أحشاء (كرشة ومصارين)</field>
+            <field name="description">استبعاد الكرش والأمعاء والأحشاء الداخلية بالكامل</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="excl_fat_tail" model="jabin.excluded.part">
+            <field name="name">بدون لية وشحم</field>
+            <field name="description">تنظيف الذبيحة واستبعاد اللية والشحم الزائد</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="excl_separate_fat" model="jabin.excluded.part">
+            <field name="name">فرم الشحم منفصلاً</field>
+            <field name="description">عزل الشحم وفرمه وتغليفه في طبق أو كيس مستقل</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="excl_isolate_offal" model="jabin.excluded.part">
+            <field name="name">عزل الكبدة والقلب والكلاوي</field>
+            <field name="description">تنظيف المساليق (كبدة، قلب، كلاوي) وتغليفها بطبق مستقل مبرد</field>
+            <field name="active">True</field>
+        </record>
+
+        <record id="excl_boneless" model="jabin.excluded.part">
+            <field name="name">بدون عظم (لحم مشفى)</field>
+            <field name="description">تشفية اللحم وسحب كافة العظام بالكامل</field>
+            <field name="active">True</field>
+        </record>
+
+        <!-- ======================================================== -->
+        <!--                   5. PRODUCTS (14 ITEMS)                 -->
+        <!-- ======================================================== -->
+
+        <!-- 1. خروف نجدي بلدي -->
+        <record id="product_najdi" model="jabin.product">
+            <field name="name">خروف نجدي بلدي</field>
+            <field name="sku">PRD-NAJDI-01</field>
+            <field name="category_id" ref="cat_sheep_goats"/>
+            <field name="description">خروف نجدي بلدي طازج من أفضل مراعي المملكة، يمتاز باللحم الطري والنكهة الأصيلة، مذبوح ومجهز تحت إشراف بيطري كامل.</field>
+            <field name="purchase_price">1500.0</field>
+            <field name="selling_price">1750.0</field>
+            <field name="weight">18.0</field>
+            <field name="preparation_time">45.0</field>
+            <field name="stock_quantity">25.0</field>
+            <field name="minimum_stock">5.0</field>
+            <field name="active">True</field>
+            <field name="is_featured">True</field>
+            <field name="is_best_seller">True</field>
+            <field name="main_image" type="base64" file="jabin_dashboard/static/src/img/products/najdi.jpeg"/>
+            <field name="cutting_option_ids" eval="[(6, 0, [
+                ref('cut_fridge'), ref('cut_mufattah'), ref('cut_kabsa'), ref('cut_mandi'), ref('cut_quarters'), ref('cut_none')
+            ])]"/>
+            <field name="packaging_ids" eval="[(6, 0, [
+                ref('pkg_vacuum'), ref('pkg_foam_trays'), ref('pkg_portion_bags'), ref('pkg_thermal_box'), ref('pkg_banquet')
+            ])]"/>
+            <field name="excluded_part_ids" eval="[(6, 0, [
+                ref('excl_head'), ref('excl_trotters'), ref('excl_viscera'), ref('excl_fat_tail'), ref('excl_separate_fat'), ref('excl_isolate_offal')
+            ])]"/>
+        </record>
+
+        <!-- 2. تيس عارضي بلدي -->
+        <record id="product_tees_aredi" model="jabin.product">
+            <field name="name">تيس عارضي بلدي</field>
+            <field name="sku">PRD-TEES-01</field>
+            <field name="category_id" ref="cat_sheep_goats"/>
+            <field name="description">تيس عارضي بلدي صغير السن (جذع لباني)، لحم هبر أحمر وقليل الدهن، مناسب جداً للمندي والمظبي والطبخ المنزلي الفاخر.</field>
+            <field name="purchase_price">1050.0</field>
+            <field name="selling_price">1250.0</field>
+            <field name="weight">12.0</field>
+            <field name="preparation_time">45.0</field>
+            <field name="stock_quantity">20.0</field>
+            <field name="minimum_stock">4.0</field>
+            <field name="active">True</field>
+            <field name="is_featured">True</field>
+            <field name="is_best_seller">False</field>
+            <field name="main_image" type="base64" file="jabin_dashboard/static/src/img/products/tees_aredi.jpg"/>
+            <field name="cutting_option_ids" eval="[(6, 0, [
+                ref('cut_fridge'), ref('cut_mufattah'), ref('cut_mandi'), ref('cut_kabsa'), ref('cut_quarters'), ref('cut_none')
+            ])]"/>
+            <field name="packaging_ids" eval="[(6, 0, [
+                ref('pkg_vacuum'), ref('pkg_foam_trays'), ref('pkg_portion_bags'), ref('pkg_thermal_box')
+            ])]"/>
+            <field name="excluded_part_ids" eval="[(6, 0, [
+                ref('excl_head'), ref('excl_trotters'), ref('excl_viscera'), ref('excl_fat_tail'), ref('excl_separate_fat'), ref('excl_isolate_offal')
+            ])]"/>
+        </record>
+
+        <!-- 3. خروف سواكني مرابي -->
+        <record id="product_swakni_murabi" model="jabin.product">
+            <field name="name">خروف سواكني مرابي</field>
+            <field name="sku">PRD-SWAKNI-01</field>
+            <field name="category_id" ref="cat_sheep_goats"/>
+            <field name="description">خروف سواكني مرابي مسمن ومربى في مزارعنا بعناية فائقة، وفير اللحم وقليل الشحم، يقدم أفضل قيمة ونكهة مميزة.</field>
+            <field name="purchase_price">950.0</field>
+            <field name="selling_price">1150.0</field>
+            <field name="weight">20.0</field>
+            <field name="preparation_time">45.0</field>
+            <field name="stock_quantity">30.0</field>
+            <field name="minimum_stock">5.0</field>
+            <field name="active">True</field>
+            <field name="is_featured">False</field>
+            <field name="is_best_seller">True</field>
+            <field name="main_image" type="base64" file="jabin_dashboard/static/src/img/products/swakni_murabi.jpeg"/>
+            <field name="cutting_option_ids" eval="[(6, 0, [
+                ref('cut_fridge'), ref('cut_mufattah'), ref('cut_kabsa'), ref('cut_quarters'), ref('cut_none')
+            ])]"/>
+            <field name="packaging_ids" eval="[(6, 0, [
+                ref('pkg_vacuum'), ref('pkg_foam_trays'), ref('pkg_portion_bags'), ref('pkg_thermal_box')
+            ])]"/>
+            <field name="excluded_part_ids" eval="[(6, 0, [
+                ref('excl_head'), ref('excl_trotters'), ref('excl_viscera'), ref('excl_fat_tail'), ref('excl_separate_fat'), ref('excl_isolate_offal')
+            ])]"/>
+        </record>
+
+        <!-- 4. حاشي لباني بلدي كامل -->
+        <record id="product_hashi_baladi" model="jabin.product">
+            <field name="name">حاشي لباني بلدي كامل</field>
+            <field name="sku">PRD-HASHI-01</field>
+            <field name="category_id" ref="cat_camels"/>
+            <field name="description">حاشي لباني بلدي طازج صغير السن، يتميز باللحم الهبر الفاتح والطري وسريع النضج، مثالي للمناسبات والكبسات الأصيلة.</field>
+            <field name="purchase_price">4200.0</field>
+            <field name="selling_price">4800.0</field>
+            <field name="weight">75.0</field>
+            <field name="preparation_time">90.0</field>
+            <field name="stock_quantity">10.0</field>
+            <field name="minimum_stock">2.0</field>
+            <field name="active">True</field>
+            <field name="is_featured">True</field>
+            <field name="is_best_seller">True</field>
+            <field name="main_image" type="base64" file="jabin_dashboard/static/src/img/products/hashi_baladi.jpg"/>
+            <field name="cutting_option_ids" eval="[(6, 0, [
+                ref('cut_fridge'), ref('cut_kabsa'), ref('cut_quarters'), ref('cut_halves'), ref('cut_none')
+            ])]"/>
+            <field name="packaging_ids" eval="[(6, 0, [
+                ref('pkg_portion_bags'), ref('pkg_thermal_box'), ref('pkg_vacuum')
+            ])]"/>
+            <field name="excluded_part_ids" eval="[(6, 0, [
+                ref('excl_head'), ref('excl_trotters'), ref('excl_viscera'), ref('excl_separate_fat'), ref('excl_isolate_offal')
+            ])]"/>
+        </record>
+
+        <!-- 5. عجل بلدي كامل -->
+        <record id="product_ajal_baladi" model="jabin.product">
+            <field name="name">عجل بلدي كامل</field>
+            <field name="sku">PRD-AJAL-01</field>
+            <field name="category_id" ref="cat_calves"/>
+            <field name="description">عجل بلدي كامل طازج ومسمن، لحم بقري أحمر عالي الجودة والبروتين، مقطع ومجهز حسب أدق التفاصيل لثلاجتك أو وليمتك.</field>
+            <field name="purchase_price">4800.0</field>
+            <field name="selling_price">5500.0</field>
+            <field name="weight">130.0</field>
+            <field name="preparation_time">120.0</field>
+            <field name="stock_quantity">8.0</field>
+            <field name="minimum_stock">2.0</field>
+            <field name="active">True</field>
+            <field name="is_featured">True</field>
+            <field name="is_best_seller">False</field>
+            <field name="main_image" type="base64" file="jabin_dashboard/static/src/img/products/ajal_baladi.jpg"/>
+            <field name="cutting_option_ids" eval="[(6, 0, [
+                ref('cut_fridge'), ref('cut_kabsa'), ref('cut_quarters'), ref('cut_steaks'), ref('cut_halves'), ref('cut_none')
+            ])]"/>
+            <field name="packaging_ids" eval="[(6, 0, [
+                ref('pkg_portion_bags'), ref('pkg_thermal_box'), ref('pkg_vacuum')
+            ])]"/>
+            <field name="excluded_part_ids" eval="[(6, 0, [
+                ref('excl_head'), ref('excl_trotters'), ref('excl_viscera'), ref('excl_separate_fat'), ref('excl_boneless')
+            ])]"/>
+        </record>
+
+        <!-- 6. نصف ذبيحة غنم طازج -->
+        <record id="product_sheep_half" model="jabin.product">
+            <field name="name">نصف ذبيحة غنم طازج</field>
+            <field name="sku">PRD-GHNM-HALF-01</field>
+            <field name="category_id" ref="cat_cuts_halves"/>
+            <field name="description">نصف ذبيحة غنم طازجة ومختارة، مقطعة ومغلفة بعناية ومناسبة للاستهلاك الأسري المتوسط.</field>
+            <field name="purchase_price">550.0</field>
+            <field name="selling_price">650.0</field>
+            <field name="weight">9.0</field>
+            <field name="preparation_time">30.0</field>
+            <field name="stock_quantity">25.0</field>
+            <field name="minimum_stock">5.0</field>
+            <field name="active">True</field>
+            <field name="is_featured">False</field>
+            <field name="is_best_seller">True</field>
+            <field name="main_image" type="base64" file="jabin_dashboard/static/src/img/products/sheep_half.jpg"/>
+            <field name="cutting_option_ids" eval="[(6, 0, [
+                ref('cut_fridge'), ref('cut_kabsa'), ref('cut_mandi'), ref('cut_quarters')
+            ])]"/>
+            <field name="packaging_ids" eval="[(6, 0, [
+                ref('pkg_vacuum'), ref('pkg_foam_trays'), ref('pkg_portion_bags'), ref('pkg_thermal_box')
+            ])]"/>
+            <field name="excluded_part_ids" eval="[(6, 0, [
+                ref('excl_head'), ref('excl_trotters'), ref('excl_viscera'), ref('excl_separate_fat')
+            ])]"/>
+        </record>
+
+        <!-- 7. ربع ذبيحة غنم طازج -->
+        <record id="product_sheep_quarter" model="jabin.product">
+            <field name="name">ربع ذبيحة غنم طازج</field>
+            <field name="sku">PRD-GHNM-QRT-01</field>
+            <field name="category_id" ref="cat_cuts_halves"/>
+            <field name="description">ربع ذبيحة غنم طازج يشمل تشكيلة متوازنة من الضلوع والفخذ أو الكتف، مقطع ومجهز بأعلى جودة ونظافة.</field>
+            <field name="purchase_price">280.0</field>
+            <field name="selling_price">340.0</field>
+            <field name="weight">4.5</field>
+            <field name="preparation_time">25.0</field>
+            <field name="stock_quantity">35.0</field>
+            <field name="minimum_stock">5.0</field>
+            <field name="active">True</field>
+            <field name="is_featured">False</field>
+            <field name="is_best_seller">False</field>
+            <field name="main_image" type="base64" file="jabin_dashboard/static/src/img/products/sheep_quarter.jpg"/>
+            <field name="cutting_option_ids" eval="[(6, 0, [
+                ref('cut_fridge'), ref('cut_kabsa')
+            ])]"/>
+            <field name="packaging_ids" eval="[(6, 0, [
+                ref('pkg_vacuum'), ref('pkg_foam_trays'), ref('pkg_portion_bags')
+            ])]"/>
+            <field name="excluded_part_ids" eval="[(6, 0, [
+                ref('excl_separate_fat')
+            ])]"/>
+        </record>
+
+        <!-- 8. نصف حاشي لباني بلدي -->
+        <record id="product_hashi_half" model="jabin.product">
+            <field name="name">نصف حاشي لباني بلدي</field>
+            <field name="sku">PRD-HASHI-HALF-01</field>
+            <field name="category_id" ref="cat_cuts_halves"/>
+            <field name="description">نصف حاشي لباني بلدي طازج مقسوم بالطول مع السنام والضلوع ولحم الفخذ الطري والشهي.</field>
+            <field name="purchase_price">2150.0</field>
+            <field name="selling_price">2450.0</field>
+            <field name="weight">37.0</field>
+            <field name="preparation_time">45.0</field>
+            <field name="stock_quantity">12.0</field>
+            <field name="minimum_stock">2.0</field>
+            <field name="active">True</field>
+            <field name="is_featured">True</field>
+            <field name="is_best_seller">False</field>
+            <field name="main_image" type="base64" file="jabin_dashboard/static/src/img/products/hashi_half.jpg"/>
+            <field name="cutting_option_ids" eval="[(6, 0, [
+                ref('cut_fridge'), ref('cut_kabsa'), ref('cut_quarters')
+            ])]"/>
+            <field name="packaging_ids" eval="[(6, 0, [
+                ref('pkg_portion_bags'), ref('pkg_thermal_box'), ref('pkg_vacuum')
+            ])]"/>
+            <field name="excluded_part_ids" eval="[(6, 0, [
+                ref('excl_separate_fat'), ref('excl_isolate_offal')
+            ])]"/>
+        </record>
+
+        <!-- 9. ربع حاشي لباني بلدي -->
+        <record id="product_hashi_quarter" model="jabin.product">
+            <field name="name">ربع حاشي لباني بلدي</field>
+            <field name="sku">PRD-HASHI-QRT-01</field>
+            <field name="category_id" ref="cat_cuts_halves"/>
+            <field name="description">ربع حاشي لباني بلدي طازج يشمل ربع متكامل (كتف وضلوع أو فخذ وسنام) مجهز حسب طلبك.</field>
+            <field name="purchase_price">1100.0</field>
+            <field name="selling_price">1250.0</field>
+            <field name="weight">18.5</field>
+            <field name="preparation_time">35.0</field>
+            <field name="stock_quantity">15.0</field>
+            <field name="minimum_stock">3.0</field>
+            <field name="active">True</field>
+            <field name="is_featured">False</field>
+            <field name="is_best_seller">False</field>
+            <field name="main_image" type="base64" file="jabin_dashboard/static/src/img/products/hashi_quarter.jpg"/>
+            <field name="cutting_option_ids" eval="[(6, 0, [
+                ref('cut_fridge'), ref('cut_kabsa')
+            ])]"/>
+            <field name="packaging_ids" eval="[(6, 0, [
+                ref('pkg_portion_bags'), ref('pkg_thermal_box'), ref('pkg_vacuum')
+            ])]"/>
+            <field name="excluded_part_ids" eval="[(6, 0, [
+                ref('excl_separate_fat')
+            ])]"/>
+        </record>
+
+        <!-- 10. نصف عجل بلدي -->
+        <record id="product_ajal_half" model="jabin.product">
+            <field name="name">نصف عجل بلدي</field>
+            <field name="sku">PRD-AJAL-HALF-01</field>
+            <field name="category_id" ref="cat_cuts_halves"/>
+            <field name="description">نصف عجل بلدي طازج مشمول بالضلوع والفخذ ولحم الصدر والستيك، مقطع ومحفوظ مبرداً بأعلى جودة.</field>
+            <field name="purchase_price">2450.0</field>
+            <field name="selling_price">2800.0</field>
+            <field name="weight">65.0</field>
+            <field name="preparation_time">60.0</field>
+            <field name="stock_quantity">10.0</field>
+            <field name="minimum_stock">2.0</field>
+            <field name="active">True</field>
+            <field name="is_featured">False</field>
+            <field name="is_best_seller">False</field>
+            <field name="main_image" type="base64" file="jabin_dashboard/static/src/img/products/ajal_half.jpg"/>
+            <field name="cutting_option_ids" eval="[(6, 0, [
+                ref('cut_fridge'), ref('cut_kabsa'), ref('cut_steaks'), ref('cut_quarters')
+            ])]"/>
+            <field name="packaging_ids" eval="[(6, 0, [
+                ref('pkg_portion_bags'), ref('pkg_thermal_box'), ref('pkg_vacuum')
+            ])]"/>
+            <field name="excluded_part_ids" eval="[(6, 0, [
+                ref('excl_separate_fat'), ref('excl_boneless')
+            ])]"/>
+        </record>
+
+        <!-- 11. ربع عجل بلدي -->
+        <record id="product_ajal_quarter" model="jabin.product">
+            <field name="name">ربع عجل بلدي</field>
+            <field name="sku">PRD-AJAL-QRT-01</field>
+            <field name="category_id" ref="cat_cuts_halves"/>
+            <field name="description">ربع عجل بلدي طازج لحم صافي ومقسم، مناسب للعائلات الباحثة عن الجودة العالية والكميات التوفيرية.</field>
+            <field name="purchase_price">1250.0</field>
+            <field name="selling_price">1450.0</field>
+            <field name="weight">32.5</field>
+            <field name="preparation_time">45.0</field>
+            <field name="stock_quantity">15.0</field>
+            <field name="minimum_stock">3.0</field>
+            <field name="active">True</field>
+            <field name="is_featured">False</field>
+            <field name="is_best_seller">False</field>
+            <field name="main_image" type="base64" file="jabin_dashboard/static/src/img/products/ajal_quarter.jpg"/>
+            <field name="cutting_option_ids" eval="[(6, 0, [
+                ref('cut_fridge'), ref('cut_kabsa'), ref('cut_steaks')
+            ])]"/>
+            <field name="packaging_ids" eval="[(6, 0, [
+                ref('pkg_portion_bags'), ref('pkg_thermal_box'), ref('pkg_vacuum')
+            ])]"/>
+            <field name="excluded_part_ids" eval="[(6, 0, [
+                ref('excl_separate_fat'), ref('excl_boneless')
+            ])]"/>
+        </record>
+
+        <!-- 12. بوكس الشواء المشكل الفاخر -->
+        <record id="product_bbq_box" model="jabin.product">
+            <field name="name">بوكس الشواء المشكل الفاخر</field>
+            <field name="sku">PRD-BBQ-BOX-01</field>
+            <field name="category_id" ref="cat_bbq_boxes"/>
+            <field name="description">بوكس شواء متكامل يحتوي على تشكيلة فاخرة من ريش الغنم، أوصال لحم طري متبلة، وأسياخ كباب طازج، مجهز للرحلات والجمعات الفورية.</field>
+            <field name="purchase_price">220.0</field>
+            <field name="selling_price">290.0</field>
+            <field name="weight">4.5</field>
+            <field name="preparation_time">30.0</field>
+            <field name="stock_quantity">40.0</field>
+            <field name="minimum_stock">5.0</field>
+            <field name="active">True</field>
+            <field name="is_featured">True</field>
+            <field name="is_best_seller">True</field>
+            <field name="main_image" type="base64" file="jabin_dashboard/static/src/img/products/bbq_box.jpg"/>
+            <field name="cutting_option_ids" eval="[(6, 0, [
+                ref('cut_bbq_skewers'), ref('cut_steaks')
+            ])]"/>
+            <field name="packaging_ids" eval="[(6, 0, [
+                ref('pkg_vacuum'), ref('pkg_thermal_box'), ref('pkg_foam_trays')
+            ])]"/>
+            <field name="excluded_part_ids" eval="[(6, 0, [
+                ref('excl_separate_fat')
+            ])]"/>
+        </record>
+
+        <!-- 13. لحم طازج بالعظم بالكيلو -->
+        <record id="product_meat_kg" model="jabin.product">
+            <field name="name">لحم طازج بالعظم بالكيلو</field>
+            <field name="sku">PRD-MEAT-KG-01</field>
+            <field name="category_id" ref="cat_meat_kg"/>
+            <field name="description">لحم أحمر طازج يومياً بالعظم منتقى من أفضل الذبائح، مقطع وجاهز للطبخ والكبسات والإيدامات.</field>
+            <field name="purchase_price">52.0</field>
+            <field name="selling_price">65.0</field>
+            <field name="weight">1.0</field>
+            <field name="preparation_time">15.0</field>
+            <field name="stock_quantity">100.0</field>
+            <field name="minimum_stock">15.0</field>
+            <field name="active">True</field>
+            <field name="is_featured">False</field>
+            <field name="is_best_seller">True</field>
+            <field name="main_image" type="base64" file="jabin_dashboard/static/src/img/products/meat_kg.jpg"/>
+            <field name="cutting_option_ids" eval="[(6, 0, [
+                ref('cut_fridge'), ref('cut_kabsa'), ref('cut_steaks')
+            ])]"/>
+            <field name="packaging_ids" eval="[(6, 0, [
+                ref('pkg_foam_trays'), ref('pkg_vacuum'), ref('pkg_portion_bags')
+            ])]"/>
+            <field name="excluded_part_ids" eval="[(6, 0, [
+                ref('excl_separate_fat'), ref('excl_boneless')
+            ])]"/>
+        </record>
+
+        <!-- 14. مفروم لحم طازج بالكيلو -->
+        <record id="product_minced_kg" model="jabin.product">
+            <field name="name">مفروم لحم طازج بالكيلو</field>
+            <field name="sku">PRD-MINCE-KG-01</field>
+            <field name="category_id" ref="cat_meat_kg"/>
+            <field name="description">لحم أحمر مفروم طازج عند الطلب بدون إضافات أو مواد حافظة، بنسبة دهن معتدلة ومثالي للكفتة والحشوات والبرجر.</field>
+            <field name="purchase_price">52.0</field>
+            <field name="selling_price">65.0</field>
+            <field name="weight">1.0</field>
+            <field name="preparation_time">15.0</field>
+            <field name="stock_quantity">120.0</field>
+            <field name="minimum_stock">20.0</field>
+            <field name="active">True</field>
+            <field name="is_featured">False</field>
+            <field name="is_best_seller">True</field>
+            <field name="main_image" type="base64" file="jabin_dashboard/static/src/img/products/minced_meat_kg.jpg"/>
+            <field name="cutting_option_ids" eval="[(6, 0, [
+                ref('cut_minced_fine'), ref('cut_minced_coarse')
+            ])]"/>
+            <field name="packaging_ids" eval="[(6, 0, [
+                ref('pkg_foam_trays'), ref('pkg_vacuum'), ref('pkg_portion_bags')
+            ])]"/>
+            <field name="excluded_part_ids" eval="[(6, 0, [
+                ref('excl_separate_fat')
+            ])]"/>
+        </record>
+
+    </data>
+</odoo>
