@@ -163,6 +163,15 @@ The Jabin Team
         """
         smtp = self._smtp_config()
 
+        # If SMTP credentials are not configured, log in console instead of failing
+        if not smtp.get("username") or not smtp.get("password"):
+            _logger.warning("==================================================")
+            _logger.warning("[DEV MODE - NO SMTP CREDENTIALS CONFIGURED]")
+            _logger.warning("To: %s | Subject: %s", to, subject)
+            _logger.warning("Email Body:\n%s", body)
+            _logger.warning("==================================================")
+            return True
+
         try:
             message = MIMEMultipart()
             message["From"] = smtp["username"]
