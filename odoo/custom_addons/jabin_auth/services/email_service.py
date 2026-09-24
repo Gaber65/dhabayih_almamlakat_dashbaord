@@ -287,8 +287,8 @@ The Jabin Team
         return {
             "host": env_server or config.get("smtp_server", "smtp.gmail.com"),
             "port": int(env_port or config.get("smtp_port", 587)),
-            "username": env_user or config.get("smtp_user", ""),
-            "password": env_password or config.get("smtp_password", ""),
+            "username": (env_user or config.get("smtp_user", "")).strip(),
+            "password": (env_password or config.get("smtp_password", "")).replace(" ", "").strip(),
             "tls": tls_enabled,
             "ssl": ssl_enabled,
         }
