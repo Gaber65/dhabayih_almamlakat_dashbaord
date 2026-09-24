@@ -284,11 +284,26 @@ The Jabin Team
         else:
             ssl_enabled = bool(ssl_value)
 
+        user_val = env_user if env_user is not None else config.get("smtp_user")
+        pass_val = env_password if env_password is not None else config.get("smtp_password")
+
+        username = str(user_val).strip() if user_val and not isinstance(user_val, bool) else ""
+        password = str(pass_val).replace(" ", "").strip() if pass_val and not isinstance(pass_val, bool) else ""
+
+        server_val = env_server if env_server is not None else config.get("smtp_server")
+        server_host = str(server_val).strip() if server_val and not isinstance(server_val, bool) else "smtp.gmail.com"
+
+        port_val = env_port if env_port is not None else config.get("smtp_port")
+        try:
+            port_num = int(port_val) if port_val and not isinstance(port_val, bool) else 587
+        except (ValueError, TypeError):
+            port_num = 587
+
         return {
-            "host": env_server or config.get("smtp_server", "smtp.gmail.com"),
-            "port": int(env_port or config.get("smtp_port", 587)),
-            "username": (env_user or config.get("smtp_user", "")).strip(),
-            "password": (env_password or config.get("smtp_password", "")).replace(" ", "").strip(),
+            "host": server_host,
+            "port": port_num,
+            "username": username,
+            "password": password,
             "tls": tls_enabled,
             "ssl": ssl_enabled,
         }
