@@ -141,6 +141,21 @@ class JabinProduct(models.Model):
         'product_id',
         string='Product Images'
     )
+    size_ids = fields.One2many(
+        'jabin.product.size',
+        'product_id',
+        string='Carcass Sizes'
+    )
+    has_sizes = fields.Boolean(
+        string='Has Multiple Sizes',
+        compute='_compute_has_sizes',
+        store=True
+    )
+
+    @api.depends('size_ids', 'size_ids.active')
+    def _compute_has_sizes(self):
+        for record in self:
+            record.has_sizes = bool(record.size_ids.filtered(lambda s: s.active))
 
     # Constraints
     @api.constrains('sku')

@@ -62,20 +62,26 @@ class CheckoutService:
         delivery_fee_config = float(env['ir.config_parameter'].sudo().get_param('jabin.delivery.fee', '31.95'))
         delivery_fee = delivery_fee_config if delivery_type == "address" else 0.0
 
-        order = env["jabin.order"].sudo().create({
+        order_vals = {
             "customer_id": customer_id,
             "state": initial_state,
             "payment_method_id": payment_method_id,
             "internal_notes": notes or cart.notes or "",
             "delivery_type": delivery_type,
             "delivery_fee": delivery_fee,
-        })
+        }
+        if delivery_type == "pickup" and branch:
+            order_vals["branch_id"] = branch.id
+
+        order = env["jabin.order"].sudo().with_context(skip_order_created_notification=True).create(order_vals)
 
         for line in cart.line_ids:
+            line_name = f"{line.product_id.name} ({line.size_id.name})" if (hasattr(line, 'size_id') and line.size_id) else line.product_id.name
             line_vals = {
                 "order_id": order.id,
                 "product_id": line.product_id.id,
-                "name": line.product_id.name,
+                "name": line_name,
+                "size_id": line.size_id.id if (hasattr(line, 'size_id') and line.size_id) else False,
                 "price_unit": line.price_unit,
                 "quantity": line.quantity,
                 "discount": line.discount_percent,
@@ -121,5 +127,13 @@ class CheckoutService:
             "checked_out_order_id": order.id,
             "delivery_address_id": address_obj.id if address_obj else False,
         })
+
+        # Trigger completed order notifications (customer + admin) with full order lines and final totals
+        try:
+            order._compute_totals()
+            env["jabin.notification.service"].sudo().send_order_created(env, order)
+        except Exception as notif_err:
+            import logging
+            logging.getLogger(__name__).warning("Failed to trigger order created notification: %s", notif_err)
 
         return order

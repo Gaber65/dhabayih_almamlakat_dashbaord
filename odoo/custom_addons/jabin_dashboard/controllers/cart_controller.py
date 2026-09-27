@@ -122,6 +122,7 @@ class CartController(BaseApiController):
             packaging_ids = vals.get("packaging_ids")
             excluded_part_ids = vals.get("excluded_part_ids")
             notes = vals.get("notes")
+            size_id = vals.get("size_id")
 
             cart = CartService.add_product(
                 request.env,
@@ -132,6 +133,7 @@ class CartController(BaseApiController):
                 packaging_ids=packaging_ids,
                 excluded_part_ids=excluded_part_ids,
                 notes=notes,
+                size_id=size_id,
             )
 
             ctx.set_body(
@@ -162,10 +164,18 @@ class CartController(BaseApiController):
             if not customer_id:
                 raise ValidationError(_("Customer authentication session not found."))
 
+            size_id = kwargs.get("size_id") or request.params.get("size_id")
+            if size_id:
+                try:
+                    size_id = int(size_id)
+                except ValueError:
+                    size_id = None
+
             cart = CartService.remove_product(
                 request.env,
                 customer_id,
                 product_id,
+                size_id=size_id,
             )
 
             ctx.set_body(
@@ -202,6 +212,7 @@ class CartController(BaseApiController):
             packaging_ids = vals.get("packaging_ids")
             excluded_part_ids = vals.get("excluded_part_ids")
             notes = vals.get("notes")
+            size_id = vals.get("size_id")
 
             if quantity is None:
                 raise ValidationError(_("Quantity is required."))
@@ -215,6 +226,7 @@ class CartController(BaseApiController):
                 packaging_ids=packaging_ids,
                 excluded_part_ids=excluded_part_ids,
                 notes=notes,
+                size_id=size_id,
             )
 
             ctx.set_body(
@@ -229,7 +241,7 @@ class CartController(BaseApiController):
         "/api/v1/cart/increase/<int:product_id>",
         type="http",
         auth="public",
-        methods=["PATCH"],
+        methods=["PATCH", "POST"],
         csrf=False,
         cors="*",
     )
@@ -244,10 +256,19 @@ class CartController(BaseApiController):
             if not customer_id:
                 raise ValidationError(_("Customer authentication session not found."))
 
+            vals = _parse_request_data() if request.httprequest.data else {}
+            size_id = vals.get("size_id") or kwargs.get("size_id") or request.params.get("size_id")
+            if size_id:
+                try:
+                    size_id = int(size_id)
+                except ValueError:
+                    size_id = None
+
             cart = CartService.increase_quantity(
                 request.env,
                 customer_id,
                 product_id,
+                size_id=size_id,
             )
 
             ctx.set_body(
@@ -262,7 +283,7 @@ class CartController(BaseApiController):
         "/api/v1/cart/decrease/<int:product_id>",
         type="http",
         auth="public",
-        methods=["PATCH"],
+        methods=["PATCH", "POST"],
         csrf=False,
         cors="*",
     )
@@ -277,16 +298,64 @@ class CartController(BaseApiController):
             if not customer_id:
                 raise ValidationError(_("Customer authentication session not found."))
 
+            vals = _parse_request_data() if request.httprequest.data else {}
+            size_id = vals.get("size_id") or kwargs.get("size_id") or request.params.get("size_id")
+            if size_id:
+                try:
+                    size_id = int(size_id)
+                except ValueError:
+                    size_id = None
+
             cart = CartService.decrease_quantity(
                 request.env,
                 customer_id,
                 product_id,
+                size_id=size_id,
             )
 
             ctx.set_body(
                 ResponseBuilder.success(
                     data=cart.get_summary(),
                     message=_("Quantity decreased successfully"),
+                )
+            )
+        return ctx.response
+
+    @http.route(
+        "/api/v1/cart/delivery",
+        type="http",
+        auth="public",
+        methods=["POST", "PUT"],
+        csrf=False,
+        cors="*",
+    )
+    def update_cart_delivery(self, **kwargs):
+        """Update active cart delivery type and branch."""
+        denied = require_token()
+        if denied:
+            return denied
+
+        with self.handle() as ctx:
+            customer_id = _get_auth_user_id()
+            if not customer_id:
+                raise ValidationError(_("Customer authentication session not found."))
+
+            vals = _parse_request_data()
+            cart = CartService.get_or_create_active_cart(request.env, customer_id)
+            delivery_type = vals.get("delivery_type")
+            branch_id = vals.get("branch_id")
+            updates = {}
+            if delivery_type in ("delivery", "pickup"):
+                updates["delivery_type"] = delivery_type
+            if branch_id is not None:
+                updates["branch_id"] = branch_id or False
+            if updates:
+                cart.write(updates)
+
+            ctx.set_body(
+                ResponseBuilder.success(
+                    data=cart.get_summary(),
+                    message=_("Cart delivery options updated successfully"),
                 )
             )
         return ctx.response

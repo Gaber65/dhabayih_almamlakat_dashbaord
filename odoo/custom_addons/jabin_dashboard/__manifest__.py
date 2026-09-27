@@ -45,6 +45,7 @@
 
         'views/device_views.xml',
         'views/notification_views.xml',
+        'views/branch_views.xml',
 
         'views/actions.xml',  # Load after all views are defined
         'views/menus.xml',  # Load after all actions are defined

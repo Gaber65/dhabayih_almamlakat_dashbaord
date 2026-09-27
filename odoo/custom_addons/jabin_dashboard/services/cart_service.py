@@ -34,46 +34,55 @@ class CartService:
 
 
     @staticmethod
-    def add_product(env, customer_id, product_id, quantity=1.0, cutting_option_id=None, packaging_ids=None, excluded_part_ids=None, notes=None):
-        """Add a product to the customer's active cart with customization options."""
+    def add_product(env, customer_id, product_id, quantity=1.0, cutting_option_id=None, packaging_ids=None, excluded_part_ids=None, notes=None, size_id=None):
+        """Add a product to the customer's active cart with customization options and size."""
         CartValidator.validate_add_product({'product_id': product_id, 'quantity': quantity})
         CartValidator.validate_options(env, product_id, cutting_option_id, packaging_ids, excluded_part_ids)
         cart = CartService.get_or_create_active_cart(env, customer_id)
-        existing_line = cart.line_ids.filtered(lambda l: l.product_id.id == product_id)
+        existing_line = cart.line_ids.filtered(lambda l: l.product_id.id == product_id and (l.size_id.id == size_id if size_id else not l.size_id))
         current_qty = existing_line.quantity if existing_line else 0.0
         CartValidator.validate_stock(env, product_id, float(quantity), current_qty)
-        cart.add_product(product_id, quantity, cutting_option_id, packaging_ids, excluded_part_ids, notes)
+        cart.add_product(product_id, quantity, cutting_option_id, packaging_ids, excluded_part_ids, notes, size_id=size_id)
         return cart
 
     @staticmethod
-    def remove_product(env, customer_id, product_id):
+    def remove_product(env, customer_id, product_id, size_id=None):
         """Remove a product from the customer's active cart."""
         cart = CartService.get_or_create_active_cart(env, customer_id)
-        cart.remove_product(product_id)
+        cart.remove_product(product_id, size_id=size_id)
         return cart
 
     @staticmethod
-    def update_quantity(env, customer_id, product_id, quantity, cutting_option_id=None, packaging_ids=None, excluded_part_ids=None, notes=None):
+    def update_quantity(env, customer_id, product_id, quantity, cutting_option_id=None, packaging_ids=None, excluded_part_ids=None, notes=None, size_id=None):
         """Update a product's quantity and customization options in the customer's active cart."""
         CartValidator.validate_update_quantity({'product_id': product_id, 'quantity': quantity})
         CartValidator.validate_options(env, product_id, cutting_option_id, packaging_ids, excluded_part_ids)
         CartValidator.validate_stock(env, product_id, float(quantity), 0.0)
         cart = CartService.get_or_create_active_cart(env, customer_id)
-        cart.update_quantity(product_id, quantity, cutting_option_id, packaging_ids, excluded_part_ids, notes)
+        cart.update_quantity(product_id, quantity, cutting_option_id, packaging_ids, excluded_part_ids, notes, size_id=size_id)
         return cart
 
     @staticmethod
-    def increase_quantity(env, customer_id, product_id):
+    def increase_quantity(env, customer_id, product_id, size_id=None):
         """Increase product quantity in active cart by 1."""
         cart = CartService.get_or_create_active_cart(env, customer_id)
-        cart.increase_quantity(product_id)
+        line = cart.line_ids.filtered(lambda l: l.product_id.id == product_id and (l.size_id.id == size_id if size_id else not l.size_id))
+        if line:
+            cart.update_quantity(product_id, line.quantity + 1.0, size_id=size_id)
+        else:
+            cart.add_product(product_id, 1.0, size_id=size_id)
         return cart
 
     @staticmethod
-    def decrease_quantity(env, customer_id, product_id):
+    def decrease_quantity(env, customer_id, product_id, size_id=None):
         """Decrease product quantity in active cart by 1."""
         cart = CartService.get_or_create_active_cart(env, customer_id)
-        cart.decrease_quantity(product_id)
+        line = cart.line_ids.filtered(lambda l: l.product_id.id == product_id and (l.size_id.id == size_id if size_id else not l.size_id))
+        if line:
+            if line.quantity > 1:
+                cart.update_quantity(product_id, line.quantity - 1.0, size_id=size_id)
+            else:
+                cart.remove_product(product_id, size_id=size_id)
         return cart
 
     @staticmethod

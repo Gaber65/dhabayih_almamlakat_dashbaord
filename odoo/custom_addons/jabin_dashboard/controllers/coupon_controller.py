@@ -81,12 +81,18 @@ def _parse_request_data() -> Dict[str, Any]:
         vals["name"] = vals["code"]
     if "is_active" in vals:
         vals["active"] = bool(vals.pop("is_active"))
-    if "min_order_value" in vals and "minimum_order_amount" not in vals:
-        vals["minimum_order_amount"] = vals.pop("min_order_value")
-    if "max_uses" in vals and "usage_limit" not in vals:
-        vals["usage_limit"] = vals.pop("max_uses")
-    if "expiry_date" in vals and "end_date" not in vals:
-        vals["end_date"] = vals.pop("expiry_date")
+    if "min_order_value" in vals:
+        val = vals.pop("min_order_value")
+        if not vals.get("minimum_order_amount"):
+            vals["minimum_order_amount"] = val
+    if "max_uses" in vals:
+        val = vals.pop("max_uses")
+        if not vals.get("usage_limit"):
+            vals["usage_limit"] = val
+    if "expiry_date" in vals:
+        val = vals.pop("expiry_date")
+        if not vals.get("end_date"):
+            vals["end_date"] = val
 
     return vals
 

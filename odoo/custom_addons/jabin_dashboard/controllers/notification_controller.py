@@ -73,7 +73,7 @@ class NotificationController(BaseApiController):
             limit = int(kwargs.get("limit", 20))
             offset = int(kwargs.get("offset", 0))
 
-            domain = [('user_id', '=', user_id)]
+            domain = ['|', ('user_id', '=', user_id), ('user_id', '=', False)]
             status_filter = kwargs.get("status")
             if status_filter:
                 domain.append(('status', '=', status_filter))
@@ -104,7 +104,7 @@ class NotificationController(BaseApiController):
                 })
 
             unread_count = request.env['jabin.notification'].sudo().search_count([
-                ('user_id', '=', user_id),
+                '|', ('user_id', '=', user_id), ('user_id', '=', False),
                 ('status', '!=', 'read')
             ])
 
@@ -132,7 +132,7 @@ class NotificationController(BaseApiController):
         user_id = _get_auth_user_id() or request.env.user.id
         with self.handle() as ctx:
             unread_count = request.env['jabin.notification'].sudo().search_count([
-                ('user_id', '=', user_id),
+                '|', ('user_id', '=', user_id), ('user_id', '=', False),
                 ('status', '!=', 'read')
             ])
             ctx.set_body(ResponseBuilder.success(data={"unread_count": unread_count}, message=_("Unread count retrieved.")))

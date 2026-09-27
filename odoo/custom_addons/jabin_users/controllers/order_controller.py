@@ -36,6 +36,22 @@ def _parse_json_body():
         raise ValidationError(_("Invalid JSON payload."))
 
 
+def _is_admin_request() -> bool:
+    try:
+        raw_header = request.httprequest.headers.get("Authorization", "")
+        if raw_header:
+            parts = raw_header.split(None, 1)
+            if len(parts) == 2 and parts[0].lower() == 'bearer':
+                token = parts[1].strip()
+                from odoo.addons.jabin_security.utils.jwt_utils import JWTUtils
+                claims = JWTUtils.decode_token(token)
+                if claims and claims.get("type") in ("admin", "staff"):
+                    return True
+    except Exception:
+        pass
+    return request.env.user.has_group('base.group_user')
+
+
 class OrderController(BaseApiController):
     """Customer Orders and Checkout REST API Controller."""
 
@@ -169,25 +185,6 @@ class OrderController(BaseApiController):
             }, message=_("Checkout summary retrieved.")))
         return ctx.response
 
-def _is_admin_request() -> bool:
-    try:
-        raw_header = request.httprequest.headers.get("Authorization", "")
-        if raw_header:
-            parts = raw_header.split(None, 1)
-            if len(parts) == 2 and parts[0].lower() == 'bearer':
-                token = parts[1].strip()
-                from odoo.addons.jabin_security.utils.jwt_utils import JWTUtils
-                claims = JWTUtils.decode_token(token)
-                if claims and claims.get("type") in ("admin", "staff"):
-                    return True
-    except Exception:
-        pass
-    return request.env.user.has_group('base.group_user')
-
-
-class OrderController(BaseApiController):
-    """Customer Orders and Checkout REST API Controller."""
-
     @http.route(
         "/api/v1/orders",
         type="http",
@@ -297,7 +294,7 @@ class OrderController(BaseApiController):
                 try:
                     lines.append({
                         "id": l.id,
-                        "product_id": getattr(l, "product_id", None) and l.product_id.id,
+                        "product_id": l.product_id.id if hasattr(l, "product_id") and l.product_id else None,
                         "name": l.name or '',
                         "price_unit": getattr(l, "price_unit", 0.0) or 0.0,
                         "quantity": getattr(l, "quantity", 1.0) or 1.0,
@@ -564,7 +561,7 @@ class OrderController(BaseApiController):
             for l in order.order_line_ids:
                 lines.append({
                     "id": l.id,
-                    "product_id": getattr(l, "product_id", None) and l.product_id.id,
+                    "product_id": l.product_id.id if hasattr(l, "product_id") and l.product_id else None,
                     "name": l.name,
                     "price_unit": l.price_unit,
                     "quantity": l.quantity,
@@ -580,10 +577,10 @@ class OrderController(BaseApiController):
             for t in order.timeline_ids:
                 timeline.append({
                     "id": t.id,
-                    "status_from": t.status_from,
-                    "status_to": t.status_to,
-                    "description": t.description,
-                    "timestamp": t.timestamp,
+                    "status_from": t.status_from or '',
+                    "status_to": t.status_to or '',
+                    "description": t.description or '',
+                    "timestamp": str(t.timestamp) if t.timestamp else '',
                 })
 
             ctx.set_body(ResponseBuilder.success(data={

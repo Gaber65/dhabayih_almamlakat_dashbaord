@@ -15,3 +15,4 @@ from . import favorite_controller
 from . import search_controller
 from . import home_controller
 from . import offer_controller
+from . import product_size_controller

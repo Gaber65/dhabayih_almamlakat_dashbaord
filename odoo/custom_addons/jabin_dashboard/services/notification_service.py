@@ -138,7 +138,8 @@ class NotificationService(models.AbstractModel):
             full_data['deep_link'] = deep_link
         if order_id:
             full_data['order_id'] = str(order_id)
-        full_data['type'] = notification_type
+        if 'type' not in full_data:
+            full_data['type'] = notification_type
 
         # Create history record
         notif = env['jabin.notification'].sudo().create({
@@ -204,37 +205,75 @@ class NotificationService(models.AbstractModel):
         required_permission: Optional[str] = None,
         notification_type: str = 'admin',
         deep_link: Optional[str] = None,
-        data: Optional[Dict[str, Any]] = None
+        data: Optional[Dict[str, Any]] = None,
+        order_id: Optional[int] = None
     ):
-        """Send push notification to Admin mobile application users."""
-        admin_users = env['res.users'].sudo().search([
-            ('user_type', '=', 'admin'),
-            ('status', '=', 'active')
-        ])
+        """Send push notification to Admin mobile application users and FCM topic."""
+        full_data = dict(data or {})
+        if order_id:
+            full_data['order_id'] = str(order_id)
+        if 'type' not in full_data:
+            full_data['type'] = 'new_order'
+        full_data['click_action'] = 'FLUTTER_NOTIFICATION_CLICK'
 
-        if required_permission and 'jabin.permission' in env:
-            filtered_admins = []
-            for admin in admin_users:
-                perms = admin.get_permission_codes() if hasattr(admin, 'get_permission_codes') else set()
-                if required_permission in perms or admin.has_group('base.group_system'):
-                    filtered_admins.append(admin)
-            admin_users = env['res.users'].sudo().browse([a.id for a in filtered_admins])
-
-        if not admin_users:
-            _logger.info("No matching admin users found for push notification.")
-            return True
-
-        for admin in admin_users:
-            self.send_to_user(
+        # 1. FCM topic push notification to 'admin_orders' (received by Flutter admin listener)
+        try:
+            env['jabin.firebase.service'].send_topic(
                 env=env,
-                user_id=admin.id,
+                topic='admin_orders',
                 title=title,
                 body=body,
-                notification_type=notification_type,
-                deep_link=deep_link,
-                data=data,
-                priority='high'
+                data=full_data
             )
+        except Exception as exc:
+            _logger.warning("FCM topic notification to admin_orders failed: %s", exc)
+
+        # 2. Find admin / staff users
+        admin_users = env['res.users'].sudo().search([
+            '|', '|',
+            ('user_type', 'in', ['admin', 'staff']),
+            ('groups_id.name', 'ilike', 'Administrator'),
+            ('id', '=', 2)
+        ])
+
+        system_group = env.ref('base.group_system', raise_if_not_found=False)
+        if system_group:
+            admin_users |= system_group.users
+
+        created_any = False
+        for admin in admin_users:
+            try:
+                self.send_to_user(
+                    env=env,
+                    user_id=admin.id,
+                    title=title,
+                    body=body,
+                    notification_type=notification_type,
+                    deep_link=deep_link,
+                    data=full_data,
+                    order_id=order_id,
+                    priority='high'
+                )
+                created_any = True
+            except Exception as e:
+                _logger.warning("Failed sending admin notification to user %s: %s", admin.id, e)
+
+        # 3. Fallback: Save store notification with user_id=False so AdminNotificationsSheet always sees it
+        if not created_any:
+            try:
+                env['jabin.notification'].sudo().create({
+                    'user_id': False,
+                    'title': title,
+                    'body': body,
+                    'notification_type': notification_type,
+                    'priority': 'high',
+                    'deep_link': deep_link,
+                    'data_json': json.dumps(full_data),
+                    'status': 'sent',
+                    'order_id': order_id,
+                })
+            except Exception as e:
+                _logger.warning("Failed creating fallback admin notification: %s", e)
 
         return True
 
@@ -255,23 +294,41 @@ class NotificationService(models.AbstractModel):
         if deep_link:
             full_data['deep_link'] = deep_link
 
+        # Record broadcast in notification history
+        try:
+            env['jabin.notification'].sudo().create({
+                'title': title,
+                'body': body,
+                'notification_type': notification_type or 'system',
+                'deep_link': deep_link or '',
+                'status': 'sent',
+                'user_id': False,
+                'image_url': image_url or '',
+            })
+        except Exception as e:
+            _logger.warning("Failed to record broadcast in history: %s", e)
+
+        topic_name = 'all'
         if topic_or_all and topic_or_all.startswith('topic:'):
             topic_name = topic_or_all.split(':', 1)[1]
-            return env['jabin.firebase.service'].send_topic(
-                env=env,
-                topic=topic_name,
-                title=title,
-                body=body,
-                data=full_data,
-                image_url=image_url
-            )
+        elif topic_or_all and topic_or_all != 'all':
+            topic_name = topic_or_all
 
-        # Broadcast to all active customer devices
+        # 1. Send to FCM topic
+        topic_result = env['jabin.firebase.service'].send_topic(
+            env=env,
+            topic=topic_name,
+            title=title,
+            body=body,
+            data=full_data,
+            image_url=image_url
+        )
+
+        # 2. Also multicast to all registered active devices
         devices = env['jabin.device'].sudo().search([('is_active', '=', True)])
-        tokens = devices.mapped('fcm_token')
-
+        tokens = [d.fcm_token for d in devices if d.fcm_token]
         if tokens:
-            return env['jabin.firebase.service'].send_multicast(
+            env['jabin.firebase.service'].send_multicast(
                 env=env,
                 tokens=tokens,
                 title=title,
@@ -280,41 +337,68 @@ class NotificationService(models.AbstractModel):
                 image_url=image_url
             )
 
-        return {'success_count': 0, 'failure_count': 0}
+        return topic_result or True
 
     # --- Business Event Notifications ---
     @api.model
     def send_order_created(self, env, order):
         """Notification triggered when a new order is created."""
-        title = _("Order Created")
-        body = _("Your order #%s has been created successfully.") % order.name
+        title = _("طلب جديد قيد المراجعة")
+        body = _("تم إنشاء طلبك رقم #%s بنجاح وجارٍ مراجعته والتجهيز.") % order.name
         deep_link = f"jabin://orders/{order.id}"
-        data = {'order_id': order.id, 'status': order.state}
+        customer_data = {
+            'order_id': str(order.id),
+            'status': order.state,
+            'type': 'order_status',
+            'order_name': order.name,
+            'total': str(order.total)
+        }
 
         # Customer notification
-        self.send_to_user(
-            env=env,
-            user_id=order.customer_id.id,
-            title=title,
-            body=body,
-            notification_type='order',
-            deep_link=deep_link,
-            data=data,
-            order_id=order.id
-        )
+        if order.customer_id:
+            try:
+                self.send_to_user(
+                    env=env,
+                    user_id=order.customer_id.id,
+                    title=title,
+                    body=body,
+                    notification_type='order',
+                    deep_link=deep_link,
+                    data=customer_data,
+                    order_id=order.id
+                )
+            except Exception as e:
+                _logger.warning("Failed to send customer order notification: %s", e)
 
         # Admin alert
-        admin_title = _("New Order Created")
-        admin_body = _("New order #%s placed by %s for %s SAR.") % (order.name, order.customer_id.name, order.total)
-        self.send_to_admins(
-            env=env,
-            title=admin_title,
-            body=admin_body,
-            required_permission='orders_manage',
-            notification_type='admin',
-            deep_link=deep_link,
-            data=data
+        customer_name = order.customer_id.name if order.customer_id else _("عميل")
+        admin_title = _("طلب جديد وارد! 🥩")
+        admin_body = _("طلب جديد #%s من العميل %s بقيمة %s ر.س") % (
+            order.name,
+            customer_name,
+            f"{order.total:.2f}"
         )
+        admin_data = {
+            'order_id': str(order.id),
+            'status': order.state,
+            'type': 'new_order',
+            'order_name': order.name,
+            'customer_name': customer_name,
+            'total': str(order.total)
+        }
+        try:
+            self.send_to_admins(
+                env=env,
+                title=admin_title,
+                body=admin_body,
+                required_permission='orders_manage',
+                notification_type='admin',
+                deep_link=deep_link,
+                data=admin_data,
+                order_id=order.id
+            )
+        except Exception as e:
+            _logger.warning("Failed to send admin order notification: %s", e)
 
     @api.model
     def send_order_status_changed(self, env, order, new_state: str):

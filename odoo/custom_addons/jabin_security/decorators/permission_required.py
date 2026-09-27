@@ -20,6 +20,26 @@ def permission_required(permission: Optional[str]=None, *, any_of: Optional[List
                 return func(self, *args, **kwargs)
             ctx = SecurityContext.get()
             if not ctx.is_authenticated:
+                try:
+                    from odoo.addons.jabin_security.utils.jwt_utils import JWTUtils, JWTError
+                    from odoo.addons.jabin_security.decorators.auth_required import _extract_bearer_token
+                    raw_header = request.httprequest.headers.get('Authorization', '')
+                    token = _extract_bearer_token(raw_header)
+                    if token:
+                        claims = JWTUtils.decode_token(token)
+                        if JWTUtils.get_token_kind(claims) == 'access':
+                            user_id = JWTUtils.get_user_id(claims)
+                            if user_id:
+                                user = request.env['res.users'].sudo().browse(user_id)
+                                if user.exists():
+                                    authz_svc = request.env['jabin.authorization.service'].sudo()
+                                    token_id = JWTUtils.get_token_id(claims)
+                                    ctx = authz_svc.build_context(user_id, token_id=token_id)
+                                    SecurityContext.set(ctx)
+                except Exception:
+                    pass
+
+            if not ctx.is_authenticated:
                 envelope = ResponseBuilder.unauthorized(message='Authentication required before permission check.')
                 return self._build_response(envelope, status=401)
             if ctx.is_admin:

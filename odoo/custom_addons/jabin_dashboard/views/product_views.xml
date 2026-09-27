@@ -134,6 +134,20 @@
                                 <field name="excluded_part_ids" widget="many2many_tags"/>
                             </group>
                         </page>
+                        <page string="Carcass Sizes (الأحجام)" name="sizes">
+                            <field name="size_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name" string="Size Name (اسم الحجم)"/>
+                                    <field name="sub_title" string="Subtitle / Notes (ملاحظة مثلاً: يجزئ عقيقة)"/>
+                                    <field name="price" string="Price (السعر)"/>
+                                    <field name="calories" string="Calories (السعرات)"/>
+                                    <field name="loyalty_points" string="Loyalty Points" readonly="1"/>
+                                    <field name="is_default" string="Default (افتراضي)"/>
+                                    <field name="active" string="Active"/>
+                                </tree>
+                            </field>
+                        </page>
                     </notebook>
                 </sheet>
             </form>

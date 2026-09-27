@@ -54,6 +54,8 @@
               action="action_jabin_packaging" sequence="20"/>
     <menuitem id="menu_jabin_excluded_part" name="Excluded Parts" parent="menu_jabin_configuration"
               action="action_jabin_excluded_part" sequence="30"/>
+    <menuitem id="menu_jabin_branch" name="Store Branches (الفروع)" parent="menu_jabin_configuration"
+              action="action_jabin_branch" sequence="32"/>
     <menuitem id="menu_jabin_banner" name="Banners" parent="menu_jabin_configuration" action="action_jabin_banner"
               sequence="35"/>
     <menuitem id="menu_jabin_dashboard_settings" name="Dashboard Settings" parent="menu_jabin_configuration"

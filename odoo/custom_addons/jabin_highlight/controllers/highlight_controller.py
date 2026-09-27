@@ -110,12 +110,66 @@ class HighlightController(BaseApiController):
             name = request.httprequest.form.get("name")
             file_storage = request.httprequest.files.get("media")
 
-            highlight_data = self._service().create_highlight(
-                user_id=user_id,
-                media_type=media_type,
-                name=name,
-                file_storage=file_storage,
-            )
+            if file_storage:
+                highlight_data = self._service().create_highlight(
+                    user_id=user_id,
+                    media_type=media_type,
+                    name=name,
+                    file_storage=file_storage,
+                )
+            else:
+                # Handle JSON payload or form fields (base64 image or media_url)
+                import base64 as b64
+                from datetime import timedelta
+                from odoo import fields
+
+                json_data = {}
+                try:
+                    if request.httprequest.is_json:
+                        json_data = request.httprequest.get_json() or {}
+                except Exception:
+                    pass
+
+                media_type = (media_type or json_data.get("media_type") or "image").strip().lower()
+                name = name or json_data.get("name") or json_data.get("title") or f"Highlight_{user_id}"
+                b64_image = json_data.get("base64_image") or json_data.get("image") or json_data.get("media")
+                media_url = json_data.get("media_url") or request.httprequest.form.get("media_url")
+
+                vals = {
+                    "user_id": user_id,
+                    "media_type": media_type,
+                    "name": name,
+                    "expires_at": fields.Datetime.now() + timedelta(hours=24),
+                    "active": True,
+                }
+
+                if b64_image and isinstance(b64_image, str):
+                    clean_b64 = b64_image
+                    if "," in clean_b64 and "base64" in clean_b64:
+                        clean_b64 = clean_b64.split(",", 1)[1].strip()
+                    if media_type == "video":
+                        vals["video"] = clean_b64
+                        vals["media_mimetype"] = "video/mp4"
+                    else:
+                        vals["image"] = clean_b64
+                        vals["media_mimetype"] = "image/jpeg"
+                elif media_url and isinstance(media_url, str):
+                    import urllib.request
+                    try:
+                        with urllib.request.urlopen(media_url, timeout=10) as resp:
+                            raw = resp.read()
+                            encoded = b64.b64encode(raw).decode("ascii")
+                            if media_type == "video":
+                                vals["video"] = encoded
+                                vals["media_mimetype"] = "video/mp4"
+                            else:
+                                vals["image"] = encoded
+                                vals["media_mimetype"] = "image/jpeg"
+                    except Exception as e:
+                        _logger.warning("Failed to fetch media_url %s: %s", media_url, e)
+
+                record = request.env["jabin.highlight"].sudo().create(vals)
+                highlight_data = record.to_dict()
 
             ctx.set_body(
                 ResponseBuilder.success(

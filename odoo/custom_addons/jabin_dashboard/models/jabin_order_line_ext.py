@@ -26,3 +26,9 @@ class JabinOrderLine(models.Model):
         "part_id",
         string="Excluded Parts"
     )
+    size_id = fields.Many2one(
+        "jabin.product.size",
+        string="Size",
+        ondelete="restrict"
+    )
+

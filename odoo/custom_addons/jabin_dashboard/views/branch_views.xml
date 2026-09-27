@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Branch Tree View -->
+    <record id="view_jabin_branch_tree" model="ir.ui.view">
+        <field name="name">jabin.branch.tree</field>
+        <field name="model">jabin.branch</field>
+        <field name="arch" type="xml">
+            <tree string="Store Branches" decoration-muted="active==False">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="city"/>
+                <field name="address"/>
+                <field name="phone"/>
+                <field name="opening_hours"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Branch Form View -->
+    <record id="view_jabin_branch_form" model="ir.ui.view">
+        <field name="name">jabin.branch.form</field>
+        <field name="model">jabin.branch</field>
+        <field name="arch" type="xml">
+            <form string="Store Branch">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" string="Branch Name (اسم الفرع)"/>
+                        <h1>
+                            <field name="name" placeholder="مثال: فرع الرياض - العليا"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group string="Basic Information">
+                            <field name="code" placeholder="e.g. RUH-01"/>
+                            <field name="city" placeholder="e.g. الرياض"/>
+                            <field name="address" placeholder="e.g. طريق الملك فهد"/>
+                            <field name="active"/>
+                        </group>
+                        <group string="Contact &amp; Operations">
+                            <field name="phone" placeholder="e.g. +966501234567"/>
+                            <field name="opening_hours" placeholder="e.g. 08:00 AM - 11:00 PM"/>
+                            <field name="latitude"/>
+                            <field name="longitude"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Branch Search View -->
+    <record id="view_jabin_branch_search" model="ir.ui.view">
+        <field name="name">jabin.branch.search</field>
+        <field name="model">jabin.branch</field>
+        <field name="arch" type="xml">
+            <search string="Search Branches">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="city"/>
+                <field name="phone"/>
+                <filter string="Active" name="active" domain="[('active', '=', True)]"/>
+                <filter string="Archived" name="archived" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="City" name="group_by_city" context="{'group_by': 'city'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Branch Action -->
+    <record id="action_jabin_branch" model="ir.actions.act_window">
+        <field name="name">Store Branches (الفروع)</field>
+        <field name="res_model">jabin.branch</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_jabin_branch_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add a new store branch for order pickup!
+            </p>
+        </field>
+    </record>
+</odoo>

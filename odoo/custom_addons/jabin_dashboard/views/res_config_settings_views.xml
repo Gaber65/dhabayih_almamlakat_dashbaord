@@ -19,6 +19,20 @@
                             <field name="loyalty_min_redemption"/>
                         </setting>
                     </block>
+                    <block title="WhatsApp Support Settings (إعدادات الواتساب)" name="jabin_whatsapp_block">
+                        <setting id="whatsapp_enabled_setting" string="Enable WhatsApp" help="Show/hide WhatsApp button across mobile and web apps.">
+                            <field name="whatsapp_enabled"/>
+                        </setting>
+                        <setting id="whatsapp_number_setting" string="WhatsApp Number" help="Customer support WhatsApp phone number with country code (e.g. +966500000000).">
+                            <field name="whatsapp_number"/>
+                        </setting>
+                        <setting id="whatsapp_message_setting" string="Default Message" help="Pre-filled message when starting chat.">
+                            <field name="whatsapp_default_message"/>
+                        </setting>
+                        <setting id="support_phone_setting" string="Unified Phone (الهاتف الموحد)" help="Unified telephone number for customer service and orders.">
+                            <field name="support_phone"/>
+                        </setting>
+                    </block>
                 </app>
             </xpath>
         </field>

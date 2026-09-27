@@ -6,7 +6,7 @@ import jwt
 ALGORITHM: str = 'HS256'
 ISSUER: str = 'jabin'
 DEFAULT_ACCESS_TTL: int = 24 * 3600
-DEFAULT_REFRESH_TTL: int = 7 * 24 * 3600
+DEFAULT_REFRESH_TTL: int = 30 * 24 * 3600  # 30 days
 _DEV_SECRET: str = 'jabin-dev-secret-change-in-production-please'
 CLAIM_SUBJECT = 'sub'
 CLAIM_USER_TYPE = 'type'

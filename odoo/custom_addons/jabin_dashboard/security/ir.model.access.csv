@@ -19,6 +19,8 @@ access_jabin_device_user,jabin.device.user,model_jabin_device,base.group_user,1,
 access_jabin_notification_user,jabin.notification.user,model_jabin_notification,base.group_user,1,1,1,1
 access_jabin_send_notification_wizard_user,jabin.send.notification.wizard.user,model_jabin_send_notification_wizard,base.group_user,1,1,1,1
 access_jabin_branch_all,jabin.branch.all,model_jabin_branch,,1,1,1,1
+access_jabin_product_size_all,jabin.product.size.all,model_jabin_product_size,,1,1,1,1
+
 
 access_jabin_favorite_all,jabin.favorite.all,model_jabin_favorite,,1,1,1,1
 access_jabin_dashboard_service,access_jabin_dashboard_service,model_jabin_dashboard_service,base.group_user,1,0,0,0

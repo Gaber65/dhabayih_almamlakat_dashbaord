@@ -75,10 +75,52 @@ def _parse_request_data() -> Dict[str, Any]:
         vals.pop("image_path", None)
         vals.pop("image_url", None)
 
+    # Convert Many2Many lists to Odoo ORM command format [(6, 0, [ids])]
+    for m2m_field in ("cutting_option_ids", "packaging_ids", "excluded_part_ids"):
+        if m2m_field in vals:
+            val = vals[m2m_field]
+            if isinstance(val, list):
+                clean_ids = []
+                for item in val:
+                    if isinstance(item, int):
+                        clean_ids.append(item)
+                    elif isinstance(item, str) and item.isdigit():
+                        clean_ids.append(int(item))
+                    elif isinstance(item, dict) and "id" in item:
+                        clean_ids.append(int(item["id"]))
+                vals[m2m_field] = [(6, 0, clean_ids)]
+
+    # Handle base64 image in JSON
+    if "main_image" in vals and isinstance(vals["main_image"], str):
+        img_str = vals["main_image"].strip()
+        if img_str.startswith("http://") or img_str.startswith("https://"):
+            vals.pop("main_image", None)
+        elif "," in img_str and "base64" in img_str:
+            vals["main_image"] = img_str.split(",", 1)[1].strip()
+        else:
+            vals["main_image"] = img_str
+
+    if "image" in vals and not vals.get("main_image"):
+        img_str = str(vals.pop("image")).strip()
+        if not (img_str.startswith("http://") or img_str.startswith("https://")):
+            if "," in img_str and "base64" in img_str:
+                vals["main_image"] = img_str.split(",", 1)[1].strip()
+            else:
+                vals["main_image"] = img_str
+
+    # Strip computed / non-model fields that would cause write errors
+    for f in (
+        "is_available", "is_on_offer", "offer_price", "profit",
+        "offer_profit", "profit_percentage", "loyalty_points",
+        "has_sizes", "sizes", "cutting_options", "packaging_options",
+        "excluded_parts", "images"
+    ):
+        vals.pop(f, None)
+
     # Map Flutter fields
     name = vals.pop("name_ar", None) or vals.pop("title", None) or vals.get("name") or vals.pop("name_en", None)
     if name:
-        vals["name"] = name
+        vals["name"] = " ".join(str(name).strip().split())
     vals.pop("name_ar", None)
     vals.pop("name_en", None)
     vals.pop("title", None)
@@ -87,8 +129,33 @@ def _parse_request_data() -> Dict[str, Any]:
         vals["selling_price"] = vals.pop("price")
     vals.pop("price", None)
 
-    if not vals.get("sku"):
+    if "selling_price" in vals and vals["selling_price"] is not None:
+        try:
+            vals["selling_price"] = float(vals["selling_price"])
+        except ValueError:
+            pass
+
+    if "purchase_price" in vals and vals["purchase_price"] is not None:
+        try:
+            vals["purchase_price"] = float(vals["purchase_price"])
+        except ValueError:
+            pass
+    elif "selling_price" in vals:
+        vals["purchase_price"] = round(float(vals.get("selling_price", 0.0)) * 0.7, 2)
+
+    if vals.get("sku"):
+        vals["sku"] = str(vals["sku"]).strip().upper().replace(" ", "-")
+    else:
         vals["sku"] = f"PROD-{int(time.time() * 1000)}"
+
+    if "category_id" in vals:
+        if not vals["category_id"] or vals["category_id"] == 0:
+            vals.pop("category_id", None)
+        else:
+            try:
+                vals["category_id"] = int(vals["category_id"])
+            except ValueError:
+                vals.pop("category_id", None)
 
     return vals
 
@@ -165,16 +232,16 @@ def _serialize_product(product) -> Dict[str, Any]:
         "category_id": product.category_id.id,
         "category_name": product.category_id.name,
         "name": product.name,
-        "description": product.description,
-        "sku": product.sku,
-        "barcode": product.barcode,
+        "description": product.description or "",
+        "sku": product.sku or "",
+        "barcode": product.barcode or "",
         "purchase_price": product.purchase_price,
         "selling_price": product.selling_price,
-        "discount_type": product.discount_type,
+        "discount_type": product.discount_type or "percentage",
         "discount_value": product.discount_value,
         "offer_price": product.offer_price,
-        "offer_start_date": product.offer_start_date,
-        "offer_end_date": product.offer_end_date,
+        "offer_start_date": str(product.offer_start_date) if product.offer_start_date else None,
+        "offer_end_date": str(product.offer_end_date) if product.offer_end_date else None,
         "is_on_offer": product.is_on_offer,
         "profit": product.profit,
         "offer_profit": product.offer_profit,
@@ -190,6 +257,22 @@ def _serialize_product(product) -> Dict[str, Any]:
         "is_available": product.is_available,
         "is_featured": product.is_featured,
         "is_best_seller": product.is_best_seller,
+        "is_offer": product.is_on_offer,
+        "has_sizes": getattr(product, "has_sizes", False),
+        "sizes": [
+            {
+                "id": s.id,
+                "name": s.name,
+                "sub_title": s.sub_title or "",
+                "price": s.price,
+                "calories": s.calories,
+                "loyalty_points": s.loyalty_points,
+                "points_price": s.points_price,
+                "is_default": s.is_default,
+                "sequence": s.sequence,
+            }
+            for s in (product.size_ids.filtered(lambda x: x.active) if hasattr(product, "size_ids") else [])
+        ],
         "cutting_options": [
             {"id": opt.id, "name": opt.name}
             for opt in product.cutting_option_ids
@@ -258,11 +341,37 @@ class ProductController(BaseApiController):
                             for idx, img_b64 in enumerate(extra_images)
                         ]
 
+                # Ensure category_id is set
+                if not vals.get("category_id"):
+                    first_cat = request.env['jabin.category'].sudo().search([('active', '=', True)], limit=1)
+                    if first_cat:
+                        vals["category_id"] = first_cat.id
+
+                raw_sizes = vals.get("sizes")
+
                 # Create product via service
                 product = ProductService.create(
                     request.env,
                     vals,
                 )
+
+                # Save custom carcass sizes if provided
+                if raw_sizes and isinstance(raw_sizes, list):
+                    for idx, s in enumerate(raw_sizes):
+                        if isinstance(s, dict) and s.get("name") and s.get("price") is not None:
+                            try:
+                                request.env["jabin.product.size"].sudo().create({
+                                    "product_id": product.id,
+                                    "name": str(s.get("name")).strip(),
+                                    "sub_title": str(s.get("sub_title") or "").strip(),
+                                    "price": float(s.get("price", 0.0)),
+                                    "calories": int(s.get("calories") or 243),
+                                    "sequence": int(s.get("sequence") or ((idx + 1) * 10)),
+                                    "is_default": bool(s.get("is_default", idx == 0)),
+                                    "active": bool(s.get("active", True) if "active" in s else s.get("is_active", True)),
+                                })
+                            except Exception as size_err:
+                                _logger.warning("Failed to save size on create: %s", size_err)
 
                 img_url = BaseApiController.build_image_url(
                     "jabin.product", product.id, "main_image", bool(product.main_image)
@@ -313,7 +422,7 @@ class ProductController(BaseApiController):
     # GET /api/catalog/product/<id>
     # ------------------------------------------------------------------
     @http.route(
-        "/api/catalog/product/<int:product_id>",
+        ["/api/v1/products/<int:product_id>", "/api/catalog/product/<int:product_id>"],
         type="http",
         auth="public",
         methods=["GET"],
@@ -458,27 +567,7 @@ class ProductController(BaseApiController):
 
                 # Build response data
                 response_data = {
-                    "data": [
-                        {
-                            "id": p.id,
-                            "name": p.name,
-                            "sku": p.sku,
-                            "category_name": p.category_id.name,
-                            "selling_price": p.selling_price,
-                            "offer_price": p.offer_price,
-                            "is_on_offer": p.is_on_offer,
-                            "stock_quantity": p.stock_quantity,
-                            "is_available": p.is_available,
-                            "is_featured": p.is_featured,
-                            "main_image": _get_product_main_image_url(p),
-                            "main_image_url": _get_product_main_image_url(p),
-                            "image_url": _get_product_main_image_url(p),
-                            "cutting_options": [{"id": opt.id, "name": opt.name} for opt in p.cutting_option_ids],
-                            "packaging_options": [{"id": pkg.id, "name": pkg.name} for pkg in p.packaging_ids],
-                            "excluded_parts": [{"id": part.id, "name": part.name} for part in p.excluded_part_ids],
-                        }
-                        for p in records
-                    ],
+                    "data": [_serialize_product(p) for p in records],
                     "pagination": {
                         "total": total,
                         "limit": limit,
@@ -563,12 +652,40 @@ class ProductController(BaseApiController):
                             for idx, img_b64 in enumerate(extra_images)
                         ]
 
+                raw_sizes = vals.get("sizes")
+
                 # Update product via service
                 product = ProductService.update(
                     request.env,
                     product_id,
                     vals,
                 )
+
+                # Save or update custom carcass sizes if provided
+                if raw_sizes is not None and isinstance(raw_sizes, list):
+                    for idx, s in enumerate(raw_sizes):
+                        if not isinstance(s, dict) or not s.get("name"):
+                            continue
+                        size_id = s.get("id")
+                        size_vals = {
+                            "name": str(s.get("name")).strip(),
+                            "sub_title": str(s.get("sub_title") or "").strip(),
+                            "price": float(s.get("price", 0.0)),
+                            "calories": int(s.get("calories") or 243),
+                            "sequence": int(s.get("sequence") or ((idx + 1) * 10)),
+                            "is_default": bool(s.get("is_default", False)),
+                            "active": bool(s.get("active", True) if "active" in s else s.get("is_active", True)),
+                        }
+                        try:
+                            if size_id:
+                                existing = request.env["jabin.product.size"].sudo().browse(int(size_id))
+                                if existing.exists() and existing.product_id.id == product.id:
+                                    existing.write(size_vals)
+                                    continue
+                            size_vals["product_id"] = product.id
+                            request.env["jabin.product.size"].sudo().create(size_vals)
+                        except Exception as size_err:
+                            _logger.warning("Failed to save size on update: %s", size_err)
 
                 # Build success response
                 ctx.set_body(

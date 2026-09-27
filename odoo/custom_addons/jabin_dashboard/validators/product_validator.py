@@ -15,7 +15,7 @@ class ProductValidator:
     MIN_NAME_LENGTH = 2
     MAX_NAME_LENGTH = 200
     MAX_DESCRIPTION_LENGTH = 2000
-    SKU_PATTERN = r'^[A-Z0-9\-_]+$'
+    SKU_PATTERN = r'^[A-Za-z0-9\-_]+$'
     ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/jpg", "image/png", "image/webp"}
 
     @staticmethod

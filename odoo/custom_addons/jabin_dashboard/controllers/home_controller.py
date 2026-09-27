@@ -1,8 +1,11 @@
-# home_controller.py
+import json
+import re
+import urllib.parse
 from odoo import http, fields, _
 from odoo.http import request
 from odoo.addons.jabin_api.controllers import BaseApiController
 from odoo.addons.jabin_core import ResponseBuilder
+from odoo.addons.jabin_security.utils.token_auth import require_token
 
 from ..services.product_service import ProductService
 from ..services.category_service import CategoryService
@@ -177,10 +180,27 @@ class HomeController(BaseApiController):
             )
             recommended_data = [_serialize_product(p) for p in recommended]
 
+            # 8. WhatsApp & Public Settings
+            wa_number = env['ir.config_parameter'].sudo().get_param('jabin.whatsapp_number', '+966500000000')
+            wa_msg = env['ir.config_parameter'].sudo().get_param('jabin.whatsapp_default_message', 'مرحباً، أود الاستفسار عن ذبائح المملكة')
+            wa_enabled = env['ir.config_parameter'].sudo().get_param('jabin.whatsapp_enabled', 'True') in ('True', 'true', '1')
+            import re
+            import urllib.parse
+            clean_digits = re.sub(r'[^0-9]', '', wa_number)
+            wa_url = f"https://wa.me/{clean_digits}?text={urllib.parse.quote(wa_msg)}"
+            whatsapp_data = {
+                "enabled": wa_enabled,
+                "phone": wa_number,
+                "number": wa_number,
+                "default_message": wa_msg,
+                "chat_url": wa_url,
+            }
+
             response_data = {
                 "delivery_location": delivery_location,
                 "user_highlight": user_highlight,
                 "jabin_highlight": jabin_highlight,
+                "whatsapp": whatsapp_data,
                 "banners": banners_data,
                 "offers": offers_data,
                 "categories": categories_data,
@@ -197,3 +217,115 @@ class HomeController(BaseApiController):
             )
 
         return ctx.response
+
+    @http.route(
+        "/api/v1/settings/public",
+        type="http",
+        auth="public",
+        methods=["GET"],
+        csrf=False,
+        cors="*",
+    )
+    def get_public_settings(self, **kwargs):
+        """Get publicly available system settings (WhatsApp, Loyalty rates, delivery fee)."""
+        with self.handle() as ctx:
+            env = request.env
+            wa_number = env['ir.config_parameter'].sudo().get_param('jabin.whatsapp_number', '+966500000000')
+            wa_msg = env['ir.config_parameter'].sudo().get_param('jabin.whatsapp_default_message', 'مرحباً، أود الاستفسار عن ذبائح المملكة')
+            wa_enabled = env['ir.config_parameter'].sudo().get_param('jabin.whatsapp_enabled', 'True') in ('True', 'true', '1')
+            delivery_fee = float(env['ir.config_parameter'].sudo().get_param('jabin.delivery.fee', '31.95'))
+
+            import re
+            import urllib.parse
+            clean_digits = re.sub(r'[^0-9]', '', wa_number)
+            wa_url = f"https://wa.me/{clean_digits}?text={urllib.parse.quote(wa_msg)}"
+
+            data = {
+                "whatsapp": {
+                    "enabled": wa_enabled,
+                    "phone": wa_number,
+                    "number": wa_number,
+                    "default_message": wa_msg,
+                    "chat_url": wa_url,
+                },
+                "support_phone": env['ir.config_parameter'].sudo().get_param('jabin.support_phone', '920000000'),
+                "delivery_fee": delivery_fee,
+            }
+            ctx.set_body(ResponseBuilder.success(data=data, message=_("Settings retrieved successfully.")))
+        return ctx.response
+
+    @http.route(
+        ["/api/v1/admin/settings/contact", "/api/v1/settings/contact"],
+        type="http",
+        auth="public",
+        methods=["PUT", "POST"],
+        csrf=False,
+        cors="*",
+    )
+    def update_contact_settings(self, **kwargs):
+        """Update WhatsApp and customer support contact settings."""
+        denied = require_token()
+        if denied:
+            return denied
+
+        with self.handle() as ctx:
+            content_type = request.httprequest.content_type or ""
+            vals = {}
+            if "multipart/form-data" in content_type:
+                vals = dict(request.httprequest.form.items())
+            else:
+                raw = request.httprequest.data
+                if raw:
+                    try:
+                        vals = json.loads(raw)
+                    except json.JSONDecodeError:
+                        raise ValueError("Invalid JSON payload.")
+
+            env = request.env
+            config = env['ir.config_parameter'].sudo()
+
+            if "whatsapp_number" in vals:
+                config.set_param('jabin.whatsapp_number', str(vals['whatsapp_number']).strip())
+            elif "phone" in vals:
+                config.set_param('jabin.whatsapp_number', str(vals['phone']).strip())
+
+            if "whatsapp_default_message" in vals:
+                config.set_param('jabin.whatsapp_default_message', str(vals['whatsapp_default_message']).strip())
+            elif "default_message" in vals:
+                config.set_param('jabin.whatsapp_default_message', str(vals['default_message']).strip())
+
+            if "whatsapp_enabled" in vals:
+                enabled_val = vals["whatsapp_enabled"]
+                is_enabled = enabled_val if isinstance(enabled_val, bool) else str(enabled_val).lower() not in ("false", "0", "no")
+                config.set_param('jabin.whatsapp_enabled', str(is_enabled))
+            elif "enabled" in vals:
+                enabled_val = vals["enabled"]
+                is_enabled = enabled_val if isinstance(enabled_val, bool) else str(enabled_val).lower() not in ("false", "0", "no")
+                config.set_param('jabin.whatsapp_enabled', str(is_enabled))
+
+            if "support_phone" in vals:
+                config.set_param('jabin.support_phone', str(vals['support_phone']).strip())
+
+            wa_number = config.get_param('jabin.whatsapp_number', '+966500000000')
+            wa_msg = config.get_param('jabin.whatsapp_default_message', 'مرحباً، أود الاستفسار عن ذبائح المملكة')
+            wa_enabled = config.get_param('jabin.whatsapp_enabled', 'True') in ('True', 'true', '1')
+            support_phone = config.get_param('jabin.support_phone', '920000000')
+            delivery_fee = float(config.get_param('jabin.delivery.fee', '31.95'))
+
+            clean_digits = re.sub(r'[^0-9]', '', wa_number)
+            wa_url = f"https://wa.me/{clean_digits}?text={urllib.parse.quote(wa_msg)}"
+
+            data = {
+                "whatsapp": {
+                    "enabled": wa_enabled,
+                    "phone": wa_number,
+                    "number": wa_number,
+                    "default_message": wa_msg,
+                    "chat_url": wa_url,
+                },
+                "support_phone": support_phone,
+                "delivery_fee": delivery_fee,
+            }
+            ctx.set_body(ResponseBuilder.success(data=data, message=_("Contact settings updated successfully.")))
+        return ctx.response
+

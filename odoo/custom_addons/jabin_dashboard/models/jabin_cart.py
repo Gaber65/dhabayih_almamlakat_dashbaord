@@ -47,6 +47,15 @@ class JabinCart(models.Model):
         'res.users.address',
         string='Delivery Address'
     )
+    delivery_type = fields.Selection([
+        ('delivery', 'Home Delivery'),
+        ('pickup', 'Store Pickup')
+    ], string='Delivery Type', default='delivery')
+    branch_id = fields.Many2one(
+        'jabin.branch',
+        string='Pickup Branch',
+        ondelete='restrict'
+    )
     delivery_fee = fields.Monetary(
         string='Delivery Fee',
         default=0.0,
@@ -144,7 +153,7 @@ class JabinCart(models.Model):
                 _("Only active carts can be modified.")
             )
 
-    def add_product(self, product_id, quantity=1.0, cutting_option_id=None, packaging_ids=None, excluded_part_ids=None, notes=None):
+    def add_product(self, product_id, quantity=1.0, cutting_option_id=None, packaging_ids=None, excluded_part_ids=None, notes=None, size_id=None):
         """Add a product to the cart with optional customization options."""
         self.ensure_one()
         self._check_modifiable()
@@ -157,7 +166,9 @@ class JabinCart(models.Model):
         if not product.is_available:
             raise ValidationError(_("Product is not available."))
 
-        existing_line = self.line_ids.filtered(lambda l: l.product_id.id == product_id)
+        existing_line = self.line_ids.filtered(
+            lambda l: l.product_id.id == product_id and (l.size_id.id == size_id if size_id else not l.size_id)
+        )
         current_qty = existing_line.quantity if existing_line else 0.0
         total_qty = current_qty + quantity
         if product.stock_quantity and total_qty > product.stock_quantity:
@@ -181,6 +192,10 @@ class JabinCart(models.Model):
                 vals['notes'] = notes
             existing_line.write(vals)
         else:
+            # Determine base price: check carcass size first, otherwise product selling_price
+            size_obj = self.env['jabin.product.size'].sudo().browse(size_id) if size_id else None
+            base_price = size_obj.price if (size_obj and size_obj.exists()) else product.selling_price
+
             # Determine discount percent from offer_price
             discount = 0.0
             if product.is_on_offer and product.selling_price > 0 and product.offer_price < product.selling_price:
@@ -191,8 +206,9 @@ class JabinCart(models.Model):
             line_vals = {
                 'cart_id': self.id,
                 'product_id': product_id,
+                'size_id': size_id or False,
                 'quantity': quantity,
-                'price_unit': product.selling_price,
+                'price_unit': base_price,
                 'discount_percent': discount,
                 'tax_percent': 0.0,
                 'cutting_option_id': cutting_option_id or False,
@@ -208,19 +224,22 @@ class JabinCart(models.Model):
         self.write({'updated_date': fields.Datetime.now()})
         return self
 
-    def remove_product(self, product_id):
+    def remove_product(self, product_id, size_id=None):
         """Remove a product from the cart."""
         self.ensure_one()
         self._check_modifiable()
         
-        line = self.line_ids.filtered(lambda l: l.product_id.id == product_id)
+        if size_id:
+            line = self.line_ids.filtered(lambda l: l.product_id.id == product_id and l.size_id.id == size_id)
+        else:
+            line = self.line_ids.filtered(lambda l: l.product_id.id == product_id)
         if line:
             line.unlink()
             
         self.write({'updated_date': fields.Datetime.now()})
         return self
 
-    def update_quantity(self, product_id, quantity, cutting_option_id=None, packaging_ids=None, excluded_part_ids=None, notes=None):
+    def update_quantity(self, product_id, quantity, cutting_option_id=None, packaging_ids=None, excluded_part_ids=None, notes=None, size_id=None):
         """Update product quantity and customization options in the cart."""
         self.ensure_one()
         self._check_modifiable()
@@ -245,7 +264,9 @@ class JabinCart(models.Model):
                 }
             )
 
-        existing_line = self.line_ids.filtered(lambda l: l.product_id.id == product_id)
+        existing_line = self.line_ids.filtered(
+            lambda l: l.product_id.id == product_id and (l.size_id.id == size_id if size_id else not l.size_id)
+        )
         if existing_line:
             vals = {'quantity': quantity}
             if cutting_option_id:
@@ -258,6 +279,9 @@ class JabinCart(models.Model):
                 vals['notes'] = notes
             existing_line.write(vals)
         else:
+            size_obj = self.env['jabin.product.size'].sudo().browse(size_id) if size_id else None
+            base_price = size_obj.price if (size_obj and size_obj.exists()) else product.selling_price
+
             discount = 0.0
             if product.is_on_offer:
                 if product.discount_type == 'percentage':
@@ -268,8 +292,9 @@ class JabinCart(models.Model):
             line_vals = {
                 'cart_id': self.id,
                 'product_id': product_id,
+                'size_id': size_id or False,
                 'quantity': quantity,
-                'price_unit': product.selling_price,
+                'price_unit': base_price,
                 'discount_percent': discount,
                 'tax_percent': 0.0,
                 'cutting_option_id': cutting_option_id or False,
@@ -281,6 +306,9 @@ class JabinCart(models.Model):
                 line_vals['excluded_part_ids'] = [(6, 0, excluded_part_ids)]
 
             self.env['jabin.cart.line'].sudo().create(line_vals)
+
+        self.write({'updated_date': fields.Datetime.now()})
+        return self
 
         self.write({'updated_date': fields.Datetime.now()})
         return self
@@ -357,17 +385,25 @@ class JabinCart(models.Model):
             'payment_status': 'pending',
             'currency_id': self.currency_id.id,
             'cart_id': self.id,
+            'delivery_type': 'pickup' if self.delivery_type == 'pickup' else 'address',
+            'branch_id': self.branch_id.id if self.branch_id else False,
+            'delivery_fee': self.delivery_fee if self.delivery_type != 'pickup' else 0.0,
         }
         order = self.env['jabin.order'].sudo().create(order_vals)
         
         # Create order lines
         for line in self.line_ids:
+            line_name = f"{line.product_id.display_name} ({line.size_id.name})" if line.size_id else line.product_id.display_name
             self.env['jabin.order.line'].sudo().create({
                 'order_id': order.id,
-                'name': line.product_id.display_name,
+                'product_id': line.product_id.id,
+                'size_id': line.size_id.id if line.size_id else False,
+                'name': line_name,
                 'price_unit': line.price_unit,
                 'quantity': line.quantity,
-                'discount': line.discount_percent
+                'discount': line.discount_percent,
+                'cutting_option_id': line.cutting_option_id.id if line.cutting_option_id else False,
+                'packaging_id': line.packaging_ids.ids[0] if line.packaging_ids else False,
             })
             
         # Update cart status
@@ -395,6 +431,9 @@ class JabinCart(models.Model):
             'tax_amount': self.tax_amount,
             'delivery_fee': self.delivery_fee,
             'grand_total': self.grand_total,
+            'delivery_type': self.delivery_type,
+            'branch_id': self.branch_id.id if self.branch_id else None,
+            'branch_name': self.branch_id.name if self.branch_id else None,
             'currency_id': self.currency_id.id if self.currency_id else None,
             'currency_symbol': self.currency_id.symbol if self.currency_id else None,
             'lines': self.line_ids.get_summary_lines()
@@ -475,6 +514,11 @@ class JabinCartLine(models.Model):
         currency_field='currency_id'
     )
 
+    size_id = fields.Many2one(
+        'jabin.product.size',
+        string='Carcass Size',
+        ondelete='restrict'
+    )
     cutting_option_id = fields.Many2one(
         'jabin.cutting.option',
         string='Cutting Option',
@@ -535,6 +579,14 @@ class JabinCartLine(models.Model):
             'cutting_option': {'id': self.cutting_option_id.id, 'name': self.cutting_option_id.name} if self.cutting_option_id else None,
             'packaging_options': [{'id': p.id, 'name': p.name} for p in self.packaging_ids],
             'excluded_parts': [{'id': p.id, 'name': p.name} for p in self.excluded_part_ids],
+            'size': {
+                'id': self.size_id.id,
+                'name': self.size_id.name,
+                'sub_title': self.size_id.sub_title or '',
+                'price': self.size_id.price,
+                'calories': self.size_id.calories,
+                'loyalty_points': self.size_id.loyalty_points,
+            } if self.size_id else None,
             'notes': self.notes or None,
         }
 

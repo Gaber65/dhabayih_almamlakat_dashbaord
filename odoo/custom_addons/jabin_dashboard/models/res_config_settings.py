@@ -22,3 +22,29 @@ class ResConfigSettings(models.TransientModel):
         default=500,
         help='Minimum points required in wallet to perform redemption. Default is 500 Points.'
     )
+
+    whatsapp_number = fields.Char(
+        string='WhatsApp Support Number (رقم الواتساب)',
+        config_parameter='jabin.whatsapp_number',
+        default='+966500000000',
+        help='WhatsApp phone number for customer support'
+    )
+    whatsapp_default_message = fields.Char(
+        string='WhatsApp Default Message (الرسالة الافتراضية)',
+        config_parameter='jabin.whatsapp_default_message',
+        default='مرحباً، أود الاستفسار عن ذبائح المملكة',
+        help='Initial message pre-filled when opening WhatsApp chat'
+    )
+    whatsapp_enabled = fields.Boolean(
+        string='Enable WhatsApp Support (تفعيل الواتساب)',
+        config_parameter='jabin.whatsapp_enabled',
+        default=True,
+        help='Show or hide WhatsApp chat button across apps'
+    )
+    support_phone = fields.Char(
+        string='Customer Support Phone (رقم الهاتف الموحد / الاتصال)',
+        config_parameter='jabin.support_phone',
+        default='920000000',
+        help='Unified phone number for phone support'
+    )
+

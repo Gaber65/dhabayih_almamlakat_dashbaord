@@ -24,6 +24,12 @@ class JabinOrder(models.Model):
         store=True,
         readonly=True
     )
+    branch_id = fields.Many2one(
+        'jabin.branch',
+        string='Pickup Branch',
+        ondelete='restrict',
+        help='Store branch chosen by customer for order pickup'
+    )
     total_after_discount = fields.Monetary(
         string='Total After Discount',
         compute='_compute_totals',
@@ -64,12 +70,13 @@ class JabinOrder(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         records = super(JabinOrder, self).create(vals_list)
-        for record in records:
-            try:
-                self.env["jabin.notification.service"].sudo().send_order_created(self.env, record)
-            except Exception as e:
-                import logging
-                logging.getLogger(__name__).warning("Failed to send order created notification: %s", e)
+        if not self.env.context.get('skip_order_created_notification'):
+            for record in records:
+                try:
+                    self.env["jabin.notification.service"].sudo().send_order_created(self.env, record)
+                except Exception as e:
+                    import logging
+                    logging.getLogger(__name__).warning("Failed to send order created notification: %s", e)
         return records
 
     @api.depends(

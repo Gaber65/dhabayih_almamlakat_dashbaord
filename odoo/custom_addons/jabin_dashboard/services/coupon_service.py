@@ -33,7 +33,9 @@ class CouponService:
         """
         CouponValidator.validate_create(vals, env=env)
         formatted_vals = CouponService._format_m2m_vals(vals)
-        coupon = env["jabin.coupon"].sudo().create(formatted_vals)
+        valid_fields = set(env["jabin.coupon"]._fields.keys())
+        clean_vals = {k: v for k, v in formatted_vals.items() if k in valid_fields}
+        coupon = env["jabin.coupon"].sudo().create(clean_vals)
         return coupon
 
     @staticmethod
@@ -55,7 +57,9 @@ class CouponService:
 
         CouponValidator.validate_update(coupon, vals)
         formatted_vals = CouponService._format_m2m_vals(vals)
-        coupon.write(formatted_vals)
+        valid_fields = set(env["jabin.coupon"]._fields.keys())
+        clean_vals = {k: v for k, v in formatted_vals.items() if k in valid_fields}
+        coupon.write(clean_vals)
         return coupon
 
     @staticmethod
