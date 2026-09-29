@@ -58,7 +58,7 @@ class AuthController(BaseApiController):
 
     @http.route(
         "/api/v1/auth/register",
-        type="http",  # Using http for proper status codes
+        type="http",
         auth="public",
         methods=["POST"],
         csrf=False,
@@ -67,22 +67,27 @@ class AuthController(BaseApiController):
     def register(self):
         try:
             data = self._get_request_data()
-            email = data.get("email")
+            identifier = data.get("phone") or data.get("email") or data.get("identifier")
+            channel = data.get("channel")
 
-            if not email:
+            if not identifier:
                 return ResponseBuilder.http_bad_request(
-                    message="Email is required"
+                    message="Email or phone number is required"
                 )
 
             result = (
                 request.env["jabin.auth.registration.service"]
                 .sudo()
-                .initiate_registration(email)
+                .initiate_registration(identifier, channel=channel)
             )
 
             return ResponseBuilder.http_success(
-                data={"expires_in": result.get("expires_in")},
-                message="OTP sent to your email.",
+                data={
+                    "expires_in": result.get("expires_in"),
+                    "channel": result.get("channel"),
+                    "identifier": result.get("identifier"),
+                },
+                message=result.get("message", "Verification code sent."),
                 code=200
             )
 
@@ -107,18 +112,18 @@ class AuthController(BaseApiController):
     def register_verify(self):
         try:
             data = self._get_request_data()
-            email = data.get("email")
-            otp = data.get("otp")
+            identifier = data.get("phone") or data.get("email") or data.get("identifier")
+            otp = data.get("otp") or data.get("code")
 
-            if not email or not otp:
+            if not identifier or not otp:
                 return ResponseBuilder.http_bad_request(
-                    message="Email and OTP are required"
+                    message="Email/phone and OTP are required"
                 )
 
             tokens = (
                 request.env["jabin.auth.registration.service"]
                 .sudo()
-                .verify_registration(email, otp)
+                .verify_registration(identifier, otp)
             )
 
             return ResponseBuilder.http_success(
@@ -147,34 +152,40 @@ class AuthController(BaseApiController):
     def login(self):
         try:
             data = self._get_request_data()
-            email = data.get("email")
+            identifier = data.get("phone") or data.get("email") or data.get("identifier")
+            channel = data.get("channel")
 
-            if not email:
+            if not identifier:
                 return ResponseBuilder.http_bad_request(
-                    message="Email is required"
+                    message="Email or phone number is required"
                 )
 
             result = (
                 request.env["jabin.auth.login.service"]
                 .sudo()
-                .initiate_login(email)
+                .initiate_login(identifier, channel=channel)
             )
 
-            # Check if user needs verification
             if result.get('requires_verification'):
                 return ResponseBuilder.http_success(
                     data={
                         "expires_in": result.get("expires_in"),
                         "requires_verification": True,
-                        "action": "verify_account"
+                        "action": "verify_account",
+                        "channel": result.get("channel"),
+                        "identifier": result.get("identifier"),
                     },
-                    message=result.get('message', 'Account needs verification. A code has been sent to your email.'),
-                    code=202  # 202 Accepted - Not yet verified but we sent the code
+                    message=result.get('message', 'Account needs verification. A code has been sent.'),
+                    code=202
                 )
 
             return ResponseBuilder.http_success(
-                data={"expires_in": result.get("expires_in")},
-                message="Login OTP sent to your email.",
+                data={
+                    "expires_in": result.get("expires_in"),
+                    "channel": result.get("channel"),
+                    "identifier": result.get("identifier"),
+                },
+                message=result.get("message", "Login OTP sent."),
             )
 
         except ValidationError as exc:
@@ -197,22 +208,22 @@ class AuthController(BaseApiController):
         """
         try:
             data = self._get_request_data()
-            email = data.get("email")
+            identifier = data.get("phone") or data.get("email") or data.get("identifier")
 
-            if not email:
+            if not identifier:
                 return ResponseBuilder.http_bad_request(
-                    message="Email is required"
+                    message="Email or phone is required"
                 )
 
             result = (
                 request.env["jabin.auth.login.service"]
                 .sudo()
-                .resend_verification_for_pending(email)
+                .initiate_login(identifier)
             )
 
             return ResponseBuilder.http_success(
                 data={"expires_in": result.get("expires_in")},
-                message="Verification code resent to your email.",
+                message="Verification code resent successfully.",
             )
 
         except ValidationError as exc:
@@ -236,18 +247,18 @@ class AuthController(BaseApiController):
     def login_verify(self):
         try:
             data = self._get_request_data()
-            email = data.get("email")
-            otp = data.get("otp")
+            identifier = data.get("phone") or data.get("email") or data.get("identifier")
+            otp = data.get("otp") or data.get("code")
 
-            if not email or not otp:
+            if not identifier or not otp:
                 return ResponseBuilder.http_bad_request(
-                    message="Email and OTP are required"
+                    message="Email/phone and OTP are required"
                 )
 
             tokens = (
                 request.env["jabin.auth.login.service"]
                 .sudo()
-                .verify_login(email, otp)
+                .verify_login(identifier, otp)
             )
 
             return ResponseBuilder.http_success(
@@ -260,6 +271,117 @@ class AuthController(BaseApiController):
 
         except Exception as exc:
             return self._handle_server_error("Login verify", exc)
+
+    # ------------------------------------------------------------------
+    # Unified OTP Endpoints (Direct Dual-Channel API)
+    # ------------------------------------------------------------------
+
+    @http.route(
+        "/api/v1/auth/otp/send",
+        type="http",
+        auth="public",
+        methods=["POST"],
+        csrf=False,
+        cors="*",
+    )
+    def otp_send(self):
+        """Unified endpoint to send OTP via SMS (Authentica) or Email (Gmail)."""
+        try:
+            data = self._get_request_data()
+            identifier = data.get("phone") or data.get("email") or data.get("identifier")
+            purpose = data.get("purpose", "login")
+            channel = data.get("channel")
+
+            if not identifier:
+                return ResponseBuilder.http_bad_request(
+                    message="Phone or email identifier is required"
+                )
+
+            if purpose == "register":
+                result = request.env["jabin.auth.registration.service"].sudo().initiate_registration(identifier, channel=channel)
+            else:
+                result = request.env["jabin.auth.login.service"].sudo().initiate_login(identifier, channel=channel)
+
+            return ResponseBuilder.http_success(
+                data=result,
+                message=result.get("message", "OTP sent successfully."),
+            )
+
+        except ValidationError as exc:
+            return self._handle_validation_error(exc)
+        except Exception as exc:
+            return self._handle_server_error("Send OTP", exc)
+
+    @http.route(
+        "/api/v1/auth/otp/verify",
+        type="http",
+        auth="public",
+        methods=["POST"],
+        csrf=False,
+        cors="*",
+    )
+    def otp_verify(self):
+        """Unified endpoint to verify OTP and return authentication tokens."""
+        try:
+            data = self._get_request_data()
+            identifier = data.get("phone") or data.get("email") or data.get("identifier")
+            otp = data.get("otp") or data.get("code")
+            purpose = data.get("purpose", "login")
+
+            if not identifier or not otp:
+                return ResponseBuilder.http_bad_request(
+                    message="Identifier and OTP are required"
+                )
+
+            if purpose == "register":
+                tokens = request.env["jabin.auth.registration.service"].sudo().verify_registration(identifier, otp)
+            else:
+                tokens = request.env["jabin.auth.login.service"].sudo().verify_login(identifier, otp)
+
+            return ResponseBuilder.http_success(
+                data=tokens,
+                message="Verification successful.",
+            )
+
+        except ValidationError as exc:
+            return self._handle_validation_error(exc)
+        except Exception as exc:
+            return self._handle_server_error("Verify OTP", exc)
+
+    @http.route(
+        "/api/v1/auth/otp/resend",
+        type="http",
+        auth="public",
+        methods=["POST"],
+        csrf=False,
+        cors="*",
+    )
+    def otp_resend(self):
+        """Unified endpoint to resend OTP."""
+        try:
+            data = self._get_request_data()
+            identifier = data.get("phone") or data.get("email") or data.get("identifier")
+            purpose = data.get("purpose", "login")
+            channel = data.get("channel")
+
+            if not identifier:
+                return ResponseBuilder.http_bad_request(
+                    message="Identifier is required"
+                )
+
+            success, message = request.env["jabin.otp.service"].sudo().resend_otp(identifier, purpose, channel=channel)
+            if not success:
+                return ResponseBuilder.http_bad_request(message=message)
+
+            return ResponseBuilder.http_success(
+                data={"expires_in": 300},
+                message=message,
+            )
+
+        except ValidationError as exc:
+            return self._handle_validation_error(exc)
+        except Exception as exc:
+            return self._handle_server_error("Resend OTP", exc)
 
     # ------------------------------------------------------------------
     # Internal Admin Registration

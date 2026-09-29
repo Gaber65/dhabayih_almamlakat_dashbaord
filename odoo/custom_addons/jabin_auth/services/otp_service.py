@@ -53,26 +53,36 @@ class OtpService(models.AbstractModel):
     @api.model
     def create_otp(
             self,
-            email: str,
+            identifier: str,
             purpose: str,
+            channel: Optional[str] = None,
             user_id: Optional[int] = None,
             invalidate_existing: bool = True
     ) -> Tuple[str, str]:
-        """Create a new OTP for the given email and purpose."""
-        if not email:
-            raise ValidationError('Email is required.')
+        """Create a new OTP for the given email or phone and purpose."""
+        if not identifier:
+            raise ValidationError('Identifier (email or phone) is required.')
         if not purpose:
             raise ValidationError('Purpose is required.')
 
-        # Normalize email
-        email = email.strip().lower()
+        identifier = str(identifier).strip()
+        email_val = None
+        phone_val = None
 
-        # Invalidate existing OTPs for this email and purpose
+        # Determine channel and normalize identifier
+        if channel == 'sms' or (not channel and '@' not in identifier):
+            channel = 'sms'
+            authentica_service = self.env['jabin.authentica.service'].sudo()
+            phone_val = authentica_service.normalize_saudi_phone(identifier)
+            normalized_identifier = phone_val
+        else:
+            channel = 'email'
+            email_val = identifier.lower()
+            normalized_identifier = email_val
+
+        # Invalidate existing OTPs for this identifier and purpose
         if invalidate_existing:
-            # Delete existing OTPs to avoid unique constraint violations
-            self.invalidate_existing_otps(email, purpose)
-
-            # Force a database commit to ensure deletion is complete
+            self.invalidate_existing_otps(normalized_identifier, purpose)
             self.env.cr.commit()
 
         # Generate OTP
@@ -85,7 +95,9 @@ class OtpService(models.AbstractModel):
         # Create OTP record - MUST use sudo() for anonymous access
         OTP = self.env['jabin.otp'].sudo()
         otp_data = {
-            'email': email,
+            'email': email_val,
+            'phone': phone_val,
+            'channel': channel,
             'user_id': user_id,
             'purpose': purpose,
             'code_hash': code_hash,
@@ -98,22 +110,21 @@ class OtpService(models.AbstractModel):
 
         try:
             OTP.create(otp_data)
-        except IntegrityError as exc:
-            # If we still get a duplicate, try one more time with a fresh deletion
+        except IntegrityError:
             self.env.cr.rollback()
             _get_logger().warning(
                 'Duplicate OTP detected, forcing cleanup and retry: %s',
-                email
+                normalized_identifier
             )
-            # Force delete any existing OTPs
             OTP.search([
-                ('email', '=', email),
+                '|',
+                ('email', '=', email_val),
+                ('phone', '=', phone_val),
                 ('purpose', '=', purpose),
                 ('verified', '=', False)
             ]).unlink()
             self.env.cr.commit()
 
-            # Try creating again
             try:
                 OTP.create(otp_data)
             except Exception as retry_exc:
@@ -127,24 +138,60 @@ class OtpService(models.AbstractModel):
         return plain_code, code_hash
 
     @api.model
-    def create_and_send_otp(
+    def create_and_send_phone_otp(
+            self,
+            phone: str,
+            purpose: str,
+            user_id: Optional[int] = None
+    ) -> str:
+        """Create an OTP and send it via Authentica SA SMS gateway."""
+        authentica_service = self.env['jabin.authentica.service'].sudo()
+        normalized_phone = authentica_service.normalize_saudi_phone(phone)
+        plain_code, code_hash = self.create_otp(
+            identifier=normalized_phone,
+            purpose=purpose,
+            channel='sms',
+            user_id=user_id
+        )
+
+        try:
+            authentica_service.send_otp(phone=normalized_phone, otp=plain_code)
+            _get_logger().audit(
+                'OTP SMS sent via Authentica: phone=%s purpose=%s',
+                normalized_phone,
+                purpose,
+                extra={'phone': normalized_phone, 'purpose': purpose}
+            )
+        except Exception as exc:
+            _get_logger().error('Failed to send OTP SMS: %s', exc)
+            raise
+
+        return plain_code
+
+    @api.model
+    def create_and_send_email_otp(
             self,
             email: str,
             purpose: str,
             user_id: Optional[int] = None
     ) -> str:
-        """Create an OTP and send it via email."""
-        plain_code, code_hash = self.create_otp(email, purpose, user_id)
+        """Create an OTP and send it via Gmail / SMTP email."""
+        email_val = email.strip().lower()
+        plain_code, code_hash = self.create_otp(
+            identifier=email_val,
+            purpose=purpose,
+            channel='email',
+            user_id=user_id
+        )
 
-        # Send email - MUST use sudo() for anonymous access
         try:
             email_service = self.env['jabin.email.service'].sudo()
-            email_service.send_verification_code(email, plain_code, purpose)
+            email_service.send_verification_code(email_val, plain_code, purpose)
             _get_logger().audit(
                 'OTP email sent: email=%s purpose=%s',
-                email,
+                email_val,
                 purpose,
-                extra={'email': email, 'purpose': purpose}
+                extra={'email': email_val, 'purpose': purpose}
             )
         except Exception as exc:
             _get_logger().error('Failed to send OTP email: %s', exc)
@@ -152,92 +199,113 @@ class OtpService(models.AbstractModel):
 
         return plain_code
 
+    @api.model
+    def create_and_send_otp(
+            self,
+            identifier: str,
+            purpose: str,
+            user_id: Optional[int] = None,
+            channel: Optional[str] = None
+    ) -> str:
+        """Create and send OTP through the appropriate channel (SMS or Email)."""
+        identifier = str(identifier).strip()
+        if channel == 'sms' or (not channel and '@' not in identifier):
+            return self.create_and_send_phone_otp(phone=identifier, purpose=purpose, user_id=user_id)
+        else:
+            return self.create_and_send_email_otp(email=identifier, purpose=purpose, user_id=user_id)
+
     # -- OTP Verification -------------------------------------------------- #
     @api.model
     def verify_otp(
             self,
-            email: str,
+            identifier: str,
             code: str,
             purpose: str
     ) -> bool:
-        """Verify an OTP code."""
-        if not email or not code or not purpose:
+        """Verify an OTP code for either phone or email."""
+        if not identifier or not code or not purpose:
             _get_logger().warning('Verification failed: missing parameters')
             return False
 
-        email = email.strip().lower()
+        identifier = str(identifier).strip()
+        if '@' not in identifier:
+            try:
+                identifier = self.env['jabin.authentica.service'].normalize_saudi_phone(identifier)
+            except Exception:
+                pass
+        else:
+            identifier = identifier.lower()
 
         # Find active OTP - MUST use sudo() for anonymous access
         OTP = self.env['jabin.otp'].sudo()
-        otp = OTP.find_active_otp(email, purpose)
+        otp = OTP.find_active_otp(identifier, purpose)
 
         if not otp:
             _get_logger().audit(
-                'OTP verification failed: no active OTP found for email=%s purpose=%s',
-                email,
+                'OTP verification failed: no active OTP found for identifier=%s purpose=%s',
+                identifier,
                 purpose,
-                extra={'email': email, 'purpose': purpose, 'reason': 'no_active_otp'}
+                extra={'identifier': identifier, 'purpose': purpose, 'reason': 'no_active_otp'}
             )
             return False
 
         # Check expiration
         if otp.is_expired():
             _get_logger().audit(
-                'OTP verification failed: expired for email=%s',
-                email,
-                extra={'email': email, 'purpose': purpose, 'reason': 'expired'}
+                'OTP verification failed: expired for identifier=%s',
+                identifier,
+                extra={'identifier': identifier, 'purpose': purpose, 'reason': 'expired'}
             )
             return False
 
         # Check attempts
         if otp.attempts >= otp.max_attempts:
             _get_logger().audit(
-                'OTP verification failed: max attempts reached for email=%s',
-                email,
-                extra={'email': email, 'purpose': purpose, 'reason': 'max_attempts'}
+                'OTP verification failed: max attempts reached for identifier=%s',
+                identifier,
+                extra={'identifier': identifier, 'purpose': purpose, 'reason': 'max_attempts'}
             )
             return False
 
-        # Verify the code - use the model's static method
+        # Verify the code hash
         if not OTP._verify_hash(code, otp.code_hash):
             otp.increment_attempts()
             _get_logger().audit(
-                'OTP verification failed: invalid code for email=%s',
-                email,
-                extra={'email': email, 'purpose': purpose, 'reason': 'invalid_code'}
+                'OTP verification failed: invalid code for identifier=%s',
+                identifier,
+                extra={'identifier': identifier, 'purpose': purpose, 'reason': 'invalid_code'}
             )
             return False
 
         # Success - mark as verified
         otp.mark_verified()
         _get_logger().audit(
-            'OTP verified successfully: email=%s purpose=%s',
-            email,
+            'OTP verified successfully: identifier=%s purpose=%s channel=%s',
+            identifier,
             purpose,
-            extra={'email': email, 'purpose': purpose, 'success': True}
+            otp.channel,
+            extra={'identifier': identifier, 'purpose': purpose, 'channel': otp.channel, 'success': True}
         )
         return True
 
     # -- OTP Management ---------------------------------------------------- #
     @api.model
-    def invalidate_existing_otps(self, email: str, purpose: str) -> int:
-        """Invalidate all existing OTPs for an email and purpose."""
+    def invalidate_existing_otps(self, identifier: str, purpose: str) -> int:
+        """Invalidate all existing OTPs for an identifier (phone or email) and purpose."""
         OTP = self.env['jabin.otp'].sudo()
-        return OTP.invalidate_all_for_email(email, purpose)
+        return OTP.invalidate_all_for_identifier(identifier, purpose)
 
     @api.model
-    def can_resend_otp(self, email: str, purpose: str) -> Tuple[bool, str]:
+    def can_resend_otp(self, identifier: str, purpose: str) -> Tuple[bool, str]:
         """Check if user can request an OTP resend."""
-        email = email.strip().lower()
+        identifier = str(identifier).strip()
         OTP = self.env['jabin.otp'].sudo()
 
-        # Check recent resends (within cooldown period)
-        recent_count = OTP.count_recent_resends(email, purpose, minutes=1)
+        recent_count = OTP.count_recent_resends(identifier, purpose, minutes=1)
         if recent_count >= self.MAX_RESEND_ATTEMPTS:
             return False, f"Maximum resend attempts ({self.MAX_RESEND_ATTEMPTS}) reached. Please wait before requesting again."
 
-        # Check if there's an active OTP that was sent too recently
-        active_otp = OTP.find_active_otp(email, purpose)
+        active_otp = OTP.find_active_otp(identifier, purpose)
         if active_otp and active_otp.resend_count >= self.MAX_RESEND_ATTEMPTS:
             return False, f"Maximum resend attempts ({self.MAX_RESEND_ATTEMPTS}) reached."
 
@@ -246,21 +314,20 @@ class OtpService(models.AbstractModel):
     @api.model
     def resend_otp(
             self,
-            email: str,
+            identifier: str,
             purpose: str,
-            user_id: Optional[int] = None
+            user_id: Optional[int] = None,
+            channel: Optional[str] = None
     ) -> Tuple[bool, str]:
-        """Resend OTP for an email and purpose."""
-        can_resend, reason = self.can_resend_otp(email, purpose)
+        """Resend OTP for an identifier and purpose."""
+        can_resend, reason = self.can_resend_otp(identifier, purpose)
         if not can_resend:
             return False, reason
 
-        # Invalidate existing OTPs
-        self.invalidate_existing_otps(email, purpose)
+        self.invalidate_existing_otps(identifier, purpose)
 
-        # Create and send new OTP
         try:
-            plain_code = self.create_and_send_otp(email, purpose, user_id)
+            self.create_and_send_otp(identifier, purpose, user_id=user_id, channel=channel)
             return True, "Verification code sent successfully"
         except Exception as exc:
             _get_logger().error('Failed to resend OTP: %s', exc)
@@ -268,29 +335,31 @@ class OtpService(models.AbstractModel):
 
     # -- Utility Methods --------------------------------------------------- #
     @api.model
-    def get_otp_status(self, email: str, purpose: str) -> dict:
-        """Get the status of OTP for an email and purpose."""
-        email = email.strip().lower()
+    def get_otp_status(self, identifier: str, purpose: str) -> dict:
+        """Get the status of OTP for an email or phone and purpose."""
+        identifier = str(identifier).strip()
         OTP = self.env['jabin.otp'].sudo()
 
-        active_otp = OTP.find_active_otp(email, purpose, include_expired=True)
+        active_otp = OTP.find_active_otp(identifier, purpose, include_expired=True)
 
         if not active_otp:
             return {
                 'exists': False,
-                'message': 'No OTP found for this email and purpose'
+                'message': 'No OTP found for this identifier and purpose'
             }
 
         return {
             'exists': True,
+            'channel': active_otp.channel,
             'expired': active_otp.is_expired(),
             'attempts': active_otp.attempts,
             'max_attempts': active_otp.max_attempts,
             'resend_count': active_otp.resend_count,
             'can_verify': active_otp.can_verify(),
-            'can_resend': self.can_resend_otp(email, purpose)[0],
+            'can_resend': self.can_resend_otp(identifier, purpose)[0],
             'expires_in': max(0, (
-                        active_otp.expires_at - fields.Datetime.now()).total_seconds()) if not active_otp.is_expired() else 0
+                active_otp.expires_at - fields.Datetime.now()
+            ).total_seconds()) if not active_otp.is_expired() else 0
         }
 
     @api.model
@@ -305,4 +374,4 @@ class OtpService(models.AbstractModel):
             _get_logger().audit('Cleaned up %d expired OTPs', count)
             return count
 
-        return 0
+        return 0

@@ -11,125 +11,153 @@ class RegistrationService(models.AbstractModel):
     _description = 'Registration Service'
 
     @api.model
-    def initiate_registration(self, email: str) -> dict:
+    def initiate_registration(self, identifier: str, channel: Optional[str] = None) -> dict:
         """
-        Step 1: Initiate registration by email.
+        Step 1: Initiate registration by email or phone.
         Creates a pending user or regenerates OTP for existing pending user.
 
         Args:
-            email: User's email address
+            identifier: User's email address or Saudi phone number
+            channel: 'sms' or 'email' (auto-detected if None)
 
         Returns:
-            dict: Contains expires_in seconds
-
-        Raises:
-            ValidationError: If email is invalid or user already active
+            dict: Contains expires_in seconds and channel info
         """
-        User = self.env['res.users']  # Changed from res.users
+        User = self.env['res.users']
         OTPService = self.env['jabin.otp.service']
+        AuthenticaService = self.env['jabin.authentica.service'].sudo()
 
-        if not email:
-            raise ValidationError(_("Email is required."))
+        if not identifier:
+            raise ValidationError(_("Email or phone number is required."))
 
-        if not EmailValidator.validate(email):
-            raise ValidationError(_("Invalid email format."))
+        identifier = str(identifier).strip()
+        is_phone = channel == 'sms' or (channel is None and '@' not in identifier)
 
-        email = email.strip().lower()
-        user = User.find_by_email(email)
+        if is_phone:
+            channel = 'sms'
+            normalized_identifier = AuthenticaService.normalize_saudi_phone(identifier)
+            user = User.find_by_phone(normalized_identifier)
+            login_val = normalized_identifier
+            email_val = False
+            phone_val = normalized_identifier
+            name_val = f"عميل {normalized_identifier[-4:]}"
+            msg = _("Verification code sent via SMS to your phone.")
+        else:
+            channel = 'email'
+            if not EmailValidator.validate(identifier):
+                raise ValidationError(_("Invalid email format."))
+            normalized_identifier = identifier.lower()
+            user = User.find_by_email(normalized_identifier)
+            login_val = normalized_identifier
+            email_val = normalized_identifier
+            phone_val = False
+            name_val = normalized_identifier.split('@')[0]
+            msg = _("Verification code sent to your email.")
 
         # Rule: If ACTIVE -> 409 Conflict
         if user and user.status == 'active':
-            _logger.audit('REGISTER_FAILED', f'Email already active: {email}')
-            raise ValidationError(_("Email already registered. Please login."))
+            _logger.audit('REGISTER_FAILED', f'Identifier already active: {normalized_identifier}')
+            raise ValidationError(_("Account already registered. Please login."))
 
         # Rule: If PENDING -> Regenerate OTP
         if user and user.status == 'pending':
-            _logger.audit('REGISTER_RESEND', f'Registration OTP resent to {email}')
+            _logger.audit('REGISTER_RESEND', f'Registration OTP resent to {normalized_identifier}')
+            OTPService.invalidate_existing_otps(normalized_identifier, 'register')
 
-            # Invalidate existing OTPs
-            OTPService.invalidate_existing_otps(email, 'register')
-
-            # Create and send new OTP
             try:
-                plain_code = OTPService.create_and_send_otp(email, 'register', user.id)
-                _logger.audit('OTP_SENT', f'Registration OTP sent to {email}')
-
+                OTPService.create_and_send_otp(
+                    identifier=normalized_identifier,
+                    purpose='register',
+                    user_id=user.id,
+                    channel=channel
+                )
                 return {
                     'expires_in': OTPService.OTP_EXPIRY_MINUTES * 60,
-                    'message': 'Verification code sent to your email',
+                    'channel': channel,
+                    'identifier': normalized_identifier,
+                    'message': msg,
                     'requires_verification': True
                 }
             except Exception as e:
-                _logger.error(f'Failed to send registration OTP to {email}: {e}')
+                _logger.error(f'Failed to send registration OTP to {normalized_identifier}: {e}')
                 raise ValidationError(_("Failed to send verification code. Please try again."))
 
         # Rule: If NOT EXISTS -> Create pending user
         try:
-            new_user = User.create({
-                'login': email,  # Login is the email
-                'email': email,  # Email field (will be copied to partner)
-                'name': email.split('@')[0],  # Default name from email
+            vals = {
+                'login': login_val,
+                'name': name_val,
                 'status': 'pending',
-                'user_type': 'customer',  # Default user type
+                'user_type': 'customer',
                 'profile_completed': False,
-            })
+            }
+            if email_val:
+                vals['email'] = email_val
+            if phone_val:
+                vals['phone'] = phone_val
 
-            _logger.audit('USER_CREATED', f'New pending user created for {email}')
+            new_user = User.create(vals)
+            _logger.audit('USER_CREATED', f'New pending user created for {normalized_identifier}')
 
-            # Create and send OTP
-            plain_code = OTPService.create_and_send_otp(email, 'register', new_user.id)
-            _logger.audit('OTP_SENT', f'Registration OTP sent to {email}')
+            OTPService.create_and_send_otp(
+                identifier=normalized_identifier,
+                purpose='register',
+                user_id=new_user.id,
+                channel=channel
+            )
 
             return {
                 'expires_in': OTPService.OTP_EXPIRY_MINUTES * 60,
-                'message': 'Verification code sent to your email',
+                'channel': channel,
+                'identifier': normalized_identifier,
+                'message': msg,
                 'requires_verification': True
             }
 
         except Exception as e:
-            _logger.error(f'Failed to create user for {email}: {e}')
+            _logger.error(f'Failed to create user for {normalized_identifier}: {e}')
             raise ValidationError(_("Failed to create account. Please try again."))
 
     @api.model
-    def verify_registration(self, email: str, otp_code: str) -> dict:
+    def verify_registration(self, identifier: str, otp_code: str) -> dict:
         """
         Step 2: Verify OTP and activate user, then generate tokens.
 
         Args:
-            email: User's email address
+            identifier: User's email address or phone number
             otp_code: OTP code to verify
-
-        Returns:
-            dict: Contains tokens and user data
-
-        Raises:
-            ValidationError: If OTP is invalid or user status is invalid
         """
-        User = self.env['res.users']  # Changed from res.users
+        User = self.env['res.users']
         OTPService = self.env['jabin.otp.service']
         TokenService = self.env['jabin.auth.token.service']
+        AuthenticaService = self.env['jabin.authentica.service'].sudo()
 
-        if not email or not otp_code:
-            raise ValidationError(_("Email and OTP code are required."))
+        if not identifier or not otp_code:
+            raise ValidationError(_("Identifier and OTP code are required."))
 
-        email = email.strip().lower()
-        user = User.find_by_email(email)
+        identifier = str(identifier).strip()
+        if '@' not in identifier:
+            normalized_identifier = AuthenticaService.normalize_saudi_phone(identifier)
+            user = User.find_by_phone(normalized_identifier)
+        else:
+            normalized_identifier = identifier.lower()
+            user = User.find_by_email(normalized_identifier)
 
         if not user:
-            _logger.audit('VERIFY_FAILED', f'User not found: {email}')
+            _logger.audit('VERIFY_FAILED', f'User not found: {normalized_identifier}')
             raise ValidationError(_("User not found."))
 
         if user.status == 'active':
-            _logger.audit('VERIFY_FAILED', f'User already active: {email}')
+            _logger.audit('VERIFY_FAILED', f'User already active: {normalized_identifier}')
             raise ValidationError(_("Account is already verified. Please login."))
 
         if user.status != 'pending':
-            _logger.audit('VERIFY_FAILED', f'Invalid account status: {email} ({user.status})')
+            _logger.audit('VERIFY_FAILED', f'Invalid account status: {normalized_identifier} ({user.status})')
             raise ValidationError(_("Account is not in pending state."))
 
         # Use OTP service to verify
-        if not OTPService.verify_otp(email, otp_code, purpose='register'):
-            _logger.audit('OTP_VERIFY_FAILED', f'Invalid registration OTP for {email}')
+        if not OTPService.verify_otp(normalized_identifier, otp_code, purpose='register'):
+            _logger.audit('OTP_VERIFY_FAILED', f'Invalid registration OTP for {normalized_identifier}')
             raise ValidationError(_("Invalid or expired OTP."))
 
         # Activate user
@@ -138,30 +166,25 @@ class RegistrationService(models.AbstractModel):
                 'status': 'active',
                 'verified_at': fields.Datetime.now()
             })
-
-            _logger.audit('USER_ACTIVATED', f'User {email} activated')
-
+            _logger.audit('USER_ACTIVATED', f'User {normalized_identifier} activated')
         except Exception as e:
-            _logger.error(f'Failed to activate user {email}: {e}')
+            _logger.error(f'Failed to activate user {normalized_identifier}: {e}')
             raise ValidationError(_("Failed to activate account. Please try again."))
 
-        # Generate tokens (Access: 24 hours, Refresh: 7 days)
         try:
             tokens = TokenService.generate_tokens(user)
-            _logger.audit('TOKENS_GENERATED', f'Tokens generated for {email}')
+            _logger.audit('TOKENS_GENERATED', f'Tokens generated for {normalized_identifier}')
 
-            # Add user data to tokens
             tokens['user'] = {
                 'id': user.id,
-                'email': user.login,  # Use login as email
+                'email': user.email or user.login,
+                'phone': user.phone or (user.partner_id.phone if user.partner_id else None),
                 'status': user.status,
                 'profile_completed': user.profile_completed
             }
-
             return tokens
-
         except Exception as e:
-            _logger.error(f'Failed to generate tokens for {email}: {e}')
+            _logger.error(f'Failed to generate tokens for {normalized_identifier}: {e}')
             raise ValidationError(_("Failed to generate authentication tokens. Please try again."))
 
     @api.model

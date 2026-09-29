@@ -46,14 +46,36 @@ class JabinOTP(models.Model):
     _name = 'jabin.otp'
     _description = 'Dhabayih Lmamlaka OTP'
     _order = 'created_at desc'
-    _rec_name = 'email'
+    _rec_name = 'display_name'
 
     # -- Fields ----------------------------------------------------------- #
     email = fields.Char(
         string='Email',
-        required=True,
+        required=False,
         index=True,
         help='Email address for which the OTP was generated.'
+    )
+    phone = fields.Char(
+        string='Phone Number',
+        index=True,
+        help='Saudi mobile phone number (+9665XXXXXXXX) for which the OTP was generated.'
+    )
+    channel = fields.Selection(
+        selection=[
+            ('sms', 'SMS'),
+            ('email', 'Email'),
+            ('whatsapp', 'WhatsApp'),
+        ],
+        string='Channel',
+        default='email',
+        required=True,
+        index=True,
+        help='Delivery channel used to send this OTP.'
+    )
+    display_name = fields.Char(
+        string='Display Name',
+        compute='_compute_display_name',
+        store=False
     )
     user_id = fields.Many2one(
         comodel_name='res.users',  # Changed from res.users
@@ -129,27 +151,54 @@ class JabinOTP(models.Model):
     )
 
     # -- Constraints ------------------------------------------------------- #
-    @api.constrains('email', 'purpose', 'verified')
+    @api.constrains('email', 'phone', 'purpose', 'verified', 'channel')
     def _check_unique_active_otp(self):
         for rec in self:
             if not rec.verified:
-                duplicate = self.search([
-                    ('id', '!=', rec.id),
-                    ('email', '=', rec.email),
-                    ('purpose', '=', rec.purpose),
-                    ('verified', '=', False),
-                ], limit=1)
-                if duplicate:
-                    raise ValidationError(_('Only one active (unverified) OTP per email and purpose is allowed.'))
+                if rec.channel in ('sms', 'whatsapp') or rec.phone:
+                    if not rec.phone:
+                        raise ValidationError(_('Phone number is required for SMS OTP.'))
+                    duplicate = self.search([
+                        ('id', '!=', rec.id),
+                        ('phone', '=', rec.phone),
+                        ('purpose', '=', rec.purpose),
+                        ('verified', '=', False),
+                    ], limit=1)
+                    if duplicate:
+                        raise ValidationError(_('Only one active (unverified) OTP per phone and purpose is allowed.'))
+                else:
+                    if not rec.email:
+                        raise ValidationError(_('Email is required for Email OTP.'))
+                    duplicate = self.search([
+                        ('id', '!=', rec.id),
+                        ('email', '=', rec.email),
+                        ('purpose', '=', rec.purpose),
+                        ('verified', '=', False),
+                    ], limit=1)
+                    if duplicate:
+                        raise ValidationError(_('Only one active (unverified) OTP per email and purpose is allowed.'))
 
     def init(self):
         super().init()
+        # Drop legacy restrictive index if exists, replace with partial indexes
         self.env.cr.execute("""
+            DROP INDEX IF EXISTS jabin_otp_email_purpose_active_idx;
             CREATE UNIQUE INDEX IF NOT EXISTS jabin_otp_email_purpose_active_idx
             ON jabin_otp (email, purpose)
-            WHERE verified = false;
+            WHERE verified = false AND email IS NOT NULL;
         """)
+        self.env.cr.execute("""
+            CREATE UNIQUE INDEX IF NOT EXISTS jabin_otp_phone_purpose_active_idx
+            ON jabin_otp (phone, purpose)
+            WHERE verified = false AND phone IS NOT NULL;
+        """)
+
     # -- Helper Methods ---------------------------------------------------- #
+    @api.depends('phone', 'email')
+    def _compute_display_name(self):
+        for rec in self:
+            rec.display_name = rec.phone or rec.email or f"OTP #{rec.id}"
+
     @api.model
     def _get_purpose_selection(self):
         """Get the purpose selection list."""
@@ -198,16 +247,13 @@ class JabinOTP(models.Model):
     @api.model_create_multi
     def create(self, vals_list) -> 'JabinOTP':
         """Override create to set default values and hash the code."""
-        # Convert single dict to list if needed
         if isinstance(vals_list, dict):
             vals_list = [vals_list]
 
         for vals in vals_list:
             if 'code_hash' in vals and vals['code_hash']:
-                # Code is already hashed (from service)
                 pass
             elif 'code' in vals and vals['code']:
-                # Hash the plain code
                 vals['code_hash'] = self._hash_code(vals.pop('code'))
             else:
                 raise ValidationError('Either code or code_hash must be provided.')
@@ -217,11 +263,9 @@ class JabinOTP(models.Model):
                     fields.Datetime.now() + timedelta(minutes=5)
                 )
 
-            # Set last_sent_at on creation
             if 'last_sent_at' not in vals or not vals['last_sent_at']:
                 vals['last_sent_at'] = fields.Datetime.now()
 
-            # Extract request metadata
             try:
                 from odoo.http import request
                 httprequest = getattr(request, 'httprequest', None)
@@ -235,10 +279,11 @@ class JabinOTP(models.Model):
         records = super().create(vals_list)
         for record in records:
             _get_logger().audit(
-                'OTP created: email=%s purpose=%s',
-                record.email,
+                'OTP created: channel=%s identifier=%s purpose=%s',
+                record.channel,
+                record.phone or record.email,
                 record.purpose,
-                extra={'email': record.email, 'purpose': record.purpose}
+                extra={'channel': record.channel, 'phone': record.phone, 'email': record.email, 'purpose': record.purpose}
             )
         return records
 
@@ -248,10 +293,11 @@ class JabinOTP(models.Model):
             vals['verified_at'] = fields.Datetime.now()
             for record in self:
                 _get_logger().audit(
-                    'OTP verified: email=%s purpose=%s',
-                    record.email,
+                    'OTP verified: channel=%s identifier=%s purpose=%s',
+                    record.channel,
+                    record.phone or record.email,
                     record.purpose,
-                    extra={'email': record.email, 'purpose': record.purpose}
+                    extra={'channel': record.channel, 'phone': record.phone, 'email': record.email, 'purpose': record.purpose}
                 )
 
         if 'resend_count' in vals and vals['resend_count'] > self.resend_count:
@@ -263,15 +309,18 @@ class JabinOTP(models.Model):
     @api.model
     def find_active_otp(
             self,
-            email: str,
+            identifier: str,
             purpose: str,
             include_expired: bool = False
     ) -> 'JabinOTP':
-        """Find the active (unverified, not expired) OTP for an email and purpose."""
+        """Find the active (unverified, not expired) OTP for an email or phone and purpose."""
+        identifier = str(identifier).strip()
         domain = [
-            ('email', '=', email),
             ('purpose', '=', purpose),
             ('verified', '=', False),
+            '|',
+            ('email', '=', identifier.lower()),
+            ('phone', '=', identifier)
         ]
         if not include_expired:
             domain.append(('expires_at', '>', fields.Datetime.now()))
@@ -283,43 +332,47 @@ class JabinOTP(models.Model):
         return self.search([('code_hash', '=', code_hash)], limit=1)
 
     @api.model
-    def count_recent_resends(self, email: str, purpose: str, minutes: int = 1) -> int:
-        """Count OTP resends for an email and purpose in the last N minutes."""
+    def count_recent_resends(self, identifier: str, purpose: str, minutes: int = 1) -> int:
+        """Count OTP resends for an identifier (email or phone) and purpose in the last N minutes."""
         cutoff = fields.Datetime.now() - timedelta(minutes=minutes)
+        identifier = str(identifier).strip()
         return self.search_count([
-            ('email', '=', email),
             ('purpose', '=', purpose),
             ('last_sent_at', '>=', cutoff),
+            '|',
+            ('email', '=', identifier.lower()),
+            ('phone', '=', identifier)
         ])
 
     @api.model
     def invalidate_all_for_email(self, email: str, purpose: Optional[str] = None) -> int:
-        """
-        Invalidate all OTPs for an email (optionally filtered by purpose).
-        This deletes the OTP records instead of just marking them expired
-        to avoid unique constraint violations.
-        """
-        domain = [('email', '=', email), ('verified', '=', False)]
+        """Backwards compatible alias for invalidate_all_for_identifier."""
+        return self.invalidate_all_for_identifier(email, purpose)
+
+    @api.model
+    def invalidate_all_for_identifier(self, identifier: str, purpose: Optional[str] = None) -> int:
+        """Invalidate all unverified OTPs for an email or phone."""
+        identifier = str(identifier).strip()
+        domain = [
+            ('verified', '=', False),
+            '|',
+            ('email', '=', identifier.lower()),
+            ('phone', '=', identifier)
+        ]
         if purpose:
             domain.append(('purpose', '=', purpose))
 
-        # Find all active OTPs
         records = self.search(domain)
         count = len(records)
-
         if records:
-            # Delete the records instead of updating them
-            # This ensures no unique constraint violations
             records.unlink()
-
             _get_logger().audit(
-                'Deleted %d OTPs for email=%s purpose=%s',
+                'Deleted %d OTPs for identifier=%s purpose=%s',
                 count,
-                email,
+                identifier,
                 purpose or 'all',
-                extra={'email': email, 'count': count, 'purpose': purpose}
+                extra={'identifier': identifier, 'count': count, 'purpose': purpose}
             )
-
         return count
 
     # -- Utility Methods --------------------------------------------------- #
@@ -349,6 +402,8 @@ class JabinOTP(models.Model):
         return {
             'id': self.id,
             'email': self.email,
+            'phone': self.phone,
+            'channel': self.channel,
             'purpose': self.purpose,
             'expires_at': self.expires_at,
             'attempts': self.attempts,
@@ -356,4 +411,4 @@ class JabinOTP(models.Model):
             'resend_count': self.resend_count,
             'verified': self.verified,
             'created_at': self.created_at,
-        }
+        }

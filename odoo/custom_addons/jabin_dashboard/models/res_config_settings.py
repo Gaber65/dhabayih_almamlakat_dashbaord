@@ -89,3 +89,96 @@ class ResConfigSettings(models.TransientModel):
         default='شكراً لتسوقكم من ذبائح المملكة | خدمة العملاء: 0568741660',
         help='عبارة شكر أو ملاحظات تظهر في أسفل الفاتورة'
     )
+
+    # -------------------------------------------------------------------------
+    # Authentica SA SMS & Dual-Channel OTP Settings
+    # -------------------------------------------------------------------------
+    authentica_api_key = fields.Char(
+        string='Authentica API Key (مفتاح الربط)',
+        config_parameter='authentica.api_key',
+        default='',
+        help='X-Authorization API key provided by Authentica SA portal (portal.authentica.sa)'
+    )
+    authentica_template_id = fields.Char(
+        string='Authentica Template ID (معرّف القالب)',
+        config_parameter='authentica.template_id',
+        default='',
+        help='Approved OTP template ID registered in Authentica'
+    )
+    authentica_sender_id = fields.Char(
+        string='Authentica Sender ID (اسم المرسل)',
+        config_parameter='authentica.sender_id',
+        default='Dhabayih',
+        help='Registered CITC/CST sender name for SMS'
+    )
+    authentica_method = fields.Selection(
+        [
+            ('sms', 'رسالة نصية فقط (SMS Only)'),
+            ('whatsapp', 'واتساب فقط (WhatsApp Only)'),
+            ('sms-or-whatsapp', 'رسالة نصية أو واتساب (SMS or WhatsApp)'),
+        ],
+        string='طريقة إرسال الرمز (Send Method)',
+        config_parameter='authentica.method',
+        default='sms',
+        help='Delivery channel used by Authentica SA gateway'
+    )
+    authentica_enable_sms = fields.Boolean(
+        string='تفعيل التحقق عبر الجوال (Enable SMS OTP)',
+        config_parameter='authentica.enable_sms',
+        default=True,
+        help='Enable customer registration and login via mobile phone SMS OTP'
+    )
+    gmail_enable_email = fields.Boolean(
+        string='تفعيل التحقق عبر البريد الإلكتروني (Enable Email OTP)',
+        config_parameter='jabin_auth.enable_email',
+        default=True,
+        help='Enable customer registration and login via Gmail / Email OTP'
+    )
+    authentica_mock_mode = fields.Boolean(
+        string='الوضع التجريبي (Sandbox / Mock Mode)',
+        config_parameter='authentica.mock_mode',
+        default=False,
+        help='When enabled, OTP codes will be logged without consuming live Authentica SMS credits'
+    )
+
+    def action_check_authentica_balance(self):
+        """Action button to query and display live Authentica balance."""
+        self.ensure_one()
+        authentica_service = self.env.get('jabin.authentica.service')
+        if not authentica_service:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'خدمة Authentica غير متوفرة',
+                    'message': 'موديل jabin.authentica.service غير مثبت في النظام.',
+                    'type': 'danger',
+                    'sticky': False,
+                }
+            }
+
+        res = authentica_service.sudo().get_balance()
+        if res.get('success'):
+            balance = res.get('balance', 0)
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'رصيد Authentica المتبقي',
+                    'message': f'رصيد الرسائل المتاح حالياً بحسابك في Authentica هو: {balance} رسالة/عملية.',
+                    'type': 'success',
+                    'sticky': True,
+                }
+            }
+        else:
+            error_msg = res.get('message', 'تعذر جلب الرصيد من البوابة')
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'خطأ في الاتصال ببوابة Authentica',
+                    'message': f'فشل الاستعلام: {error_msg}',
+                    'type': 'warning',
+                    'sticky': True,
+                }
+            }

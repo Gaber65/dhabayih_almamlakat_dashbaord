@@ -164,8 +164,38 @@ class ResUsers(models.Model):
 
     @api.model
     def find_by_phone(self, phone: str) -> Optional['ResUsers']:
-        """Find a user by phone number."""
-        return self.search([('partner_id.phone', '=', phone)], limit=1)
+        """Find a user by phone number across all common Saudi formats and fields."""
+        if not phone:
+            return self.browse()
+
+        phone_str = str(phone).strip()
+        # Build list of possible phone formats
+        candidates = {phone_str}
+        digits = ''.join(c for c in phone_str if c.isdigit())
+        if digits.startswith('9665') and len(digits) == 12:
+            candidates.add(f"+{digits}")
+            candidates.add(digits)
+            candidates.add(f"0{digits[3:]}")
+            candidates.add(digits[3:])
+        elif digits.startswith('05') and len(digits) == 10:
+            candidates.add(f"+966{digits[1:]}")
+            candidates.add(f"966{digits[1:]}")
+            candidates.add(digits)
+            candidates.add(digits[1:])
+        elif digits.startswith('5') and len(digits) == 9:
+            candidates.add(f"+966{digits}")
+            candidates.add(f"966{digits}")
+            candidates.add(f"0{digits}")
+            candidates.add(digits)
+
+        domain = [
+            '|', '|', '|',
+            ('login', 'in', list(candidates)),
+            ('phone', 'in', list(candidates)),
+            ('partner_id.phone', 'in', list(candidates)),
+            ('partner_id.mobile', 'in', list(candidates)),
+        ]
+        return self.search(domain, limit=1)
 
     @api.model
     def find_by_login(self, email: str) -> Optional['ResUsers']:

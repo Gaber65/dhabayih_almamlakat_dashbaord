@@ -53,6 +53,32 @@
                             <field name="invoice_footer_note"/>
                         </setting>
                     </block>
+                    <block title="إعدادات التحقق وبوابة الرسائل (Authentica SMS &amp; Dual Verification)" name="jabin_authentica_block">
+                        <setting id="authentica_enable_sms_setting" string="تفعيل التحقق عبر الجوال (SMS)" help="تفعيل تسجيل الدخول وإنشاء الحساب عبر كود التحقق لرقم الجوال السعودي.">
+                            <field name="authentica_enable_sms"/>
+                        </setting>
+                        <setting id="gmail_enable_email_setting" string="تفعيل التحقق عبر الإيميل (Gmail)" help="تفعيل تسجيل الدخول وإنشاء الحساب عبر البريد الإلكتروني.">
+                            <field name="gmail_enable_email"/>
+                        </setting>
+                        <setting id="authentica_api_key_setting" string="Authentica API Key" help="مفتاح الـ X-Authorization المستخرج من لوحة تحكم Authentica (portal.authentica.sa).">
+                            <field name="authentica_api_key" password="True"/>
+                        </setting>
+                        <setting id="authentica_template_id_setting" string="معرف القالب (Template ID)" help="معرف قالب رسالة الـ OTP المعتمد في حسابكم لدى Authentica.">
+                            <field name="authentica_template_id"/>
+                        </setting>
+                        <setting id="authentica_method_setting" string="طريقة الإرسال" help="اختر ما إذا كان الإرسال رسائل SMS نصية أو عبر WhatsApp أو الجمع بينهما.">
+                            <field name="authentica_method"/>
+                        </setting>
+                        <setting id="authentica_sender_id_setting" string="اسم المرسل (Sender ID)" help="اسم المتجر المسجل لدى هيئة الاتصالات والفضاء والتقنية.">
+                            <field name="authentica_sender_id"/>
+                        </setting>
+                        <setting id="authentica_mock_mode_setting" string="وضع التجربة (Mock Sandbox)" help="تفعيل الوضع التجريبي لاختبار التطبيق دون استهلاك رصيد الرسائل الفعلي.">
+                            <field name="authentica_mock_mode"/>
+                        </setting>
+                        <setting id="authentica_balance_setting" string="رصيد الرسائل الحالي" help="فحص الرصيد الفعلي المتبقي في بوابة Authentica فوراً.">
+                            <button name="action_check_authentica_balance" type="object" string="🔍 فحص الرصيد المباشر من Authentica" class="btn btn-secondary"/>
+                        </setting>
+                    </block>
                 </app>
             </xpath>
         </field>
