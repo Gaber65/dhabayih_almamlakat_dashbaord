@@ -25,6 +25,7 @@
         'data/loyalty_data.xml',
         'data/firebase_data.xml',
         'data/initial_dhabayih_data.xml',
+        'data/company_data.xml',
         'views/jabin_users_views.xml',  # Users views and actions FIRST
 
         'views/dashboard_views.xml',      
@@ -38,6 +39,7 @@
         'views/coupon_views.xml',
 
         'views/order_views.xml',   # Orders, Payments, Activity views + their actions
+        'views/report_order_invoice.xml',  # Simplified Tax Invoice QWeb Report & Action
         'views/loyalty_transaction_views.xml',
         'views/loyalty_adjust_wizard_views.xml',
         'views/send_notification_wizard_views.xml',

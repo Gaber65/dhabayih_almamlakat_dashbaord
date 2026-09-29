@@ -92,9 +92,13 @@ class OrderController(BaseApiController):
                 redeem_points=redeem_points
             )
 
+            moyasar_pk = request.env['ir.config_parameter'].sudo().get_param('moyasar.publishable_key', 'pk_test_jmsPpaHEyAKUgFwNnLzhnzsCzbSPg11Lu7hN3Ex4')
             myfatoorah_token = None
             if order.payment_method_id and order.payment_method_id.code != "cod":
                 myfatoorah_token = request.env['ir.config_parameter'].sudo().get_param('jabin.myfatoorah.api_token', 'myfatoorah_test_token')
+
+            order_total_val = float(getattr(order, "total", getattr(order, "total_amount", 0.0)))
+            amount_minor = int(round(order_total_val * 100))
 
             ctx.set_body(ResponseBuilder.success(data={
                 "order_id": order.id,
@@ -107,6 +111,9 @@ class OrderController(BaseApiController):
                 "loyalty_discount_amount": getattr(order, "loyalty_discount_amount", 0.0),
                 "delivery_fee": getattr(order, "delivery_fee", 0.0),
                 "total": order.total,
+                "publishable_key": moyasar_pk,
+                "amount_minor_units": amount_minor,
+                "currency": "SAR",
                 "myfatoorah_token": myfatoorah_token,
             }, message=_("Checkout completed successfully."), code=201))
         return ctx.response
@@ -209,13 +216,13 @@ class OrderController(BaseApiController):
             state_filter = kwargs.get("state")
             if state_filter == "active":
                 domain.append(("state", "in", ["draft", "pending_payment", "confirmed", "preparing", "ready_pickup", "out_delivery"]))
-            elif state_filter == "previous":
+            elif state_filter in ("previous", "completed"):
                 domain.append(("state", "=", "delivered"))
-            elif state_filter == "cancelled":
+            elif state_filter in ("cancelled", "refunded"):
                 domain.append(("state", "in", ["cancelled", "refunded"]))
             elif state_filter == "pending":
                 domain.append(("state", "in", ["draft", "pending_payment"]))
-            elif state_filter == "out_delivery":
+            elif state_filter in ("out_delivery", "out_for_delivery"):
                 domain.append(("state", "in", ["out_delivery", "out_for_delivery"]))
             elif state_filter and state_filter != "all":
                 domain.append(("state", "=", state_filter))
@@ -374,6 +381,197 @@ class OrderController(BaseApiController):
                 "lines": lines,
                 "timeline": timeline,
             }, message=_("Order details retrieved.")))
+        return ctx.response
+
+    @http.route(
+        "/api/v1/orders/<int:order_id>/invoice/pdf",
+        type="http",
+        auth="public",
+        methods=["GET"],
+        csrf=False,
+        cors="*",
+    )
+    def download_invoice_pdf(self, order_id: int, **kwargs):
+        """Generate and stream the official simplified tax invoice PDF."""
+        user_id = None
+        is_admin = False
+
+        token_param = kwargs.get("token")
+        if token_param and token_param.strip():
+            from odoo.addons.jabin_security.utils.jwt_utils import JWTUtils
+            try:
+                claims = JWTUtils.decode_token(token_param.strip())
+                user_id = JWTUtils.get_user_id(claims)
+                u_type = claims.get("type") or claims.get("user_type")
+                is_admin = u_type in ("admin", "staff")
+            except Exception:
+                return ResponseBuilder.http_error(_("Invalid or expired token."), code=401)
+        else:
+            auth_header = request.httprequest.headers.get("Authorization", "")
+            if auth_header:
+                denied = require_token()
+                if denied:
+                    return ResponseBuilder.http_error(_("Authentication required."), code=401)
+                user_id = _get_auth_user_id()
+                is_admin = _is_admin_request()
+            elif request.env.user and request.env.user.id != request.env.ref('base.public_user').id:
+                user_id = request.env.user.id
+                is_admin = request.env.user.has_group('base.group_user')
+            else:
+                return ResponseBuilder.http_error(_("Authorization token required."), code=401)
+
+        order = request.env["jabin.order"].sudo().browse(order_id)
+        if not order.exists():
+            return ResponseBuilder.http_error(_("Order not found."), code=404)
+
+        if not is_admin and order.customer_id.id != user_id:
+            return ResponseBuilder.http_error(_("Unauthorized access to this order invoice."), code=403)
+
+        try:
+            format_param = kwargs.get('format')
+            report = request.env.ref('jabin_dashboard.action_report_jabin_order_invoice').sudo()
+            if format_param == 'a4':
+                a4_pf = request.env.ref('base.paperformat_euro', raise_if_not_found=False)
+                if a4_pf:
+                    report = report.with_context(paperformat_id=a4_pf.id)
+            elif format_param == 'thermal':
+                thermal_pf = request.env.ref('jabin_dashboard.paperformat_thermal_80', raise_if_not_found=False)
+                if thermal_pf:
+                    report = report.with_context(paperformat_id=thermal_pf.id)
+
+            pdf_content, report_format = report._render_qweb_pdf(
+                'jabin_dashboard.action_report_jabin_order_invoice',
+                [order.id]
+            )
+            filename = f"Invoice_{order.name.replace('/', '_')}.pdf"
+            headers = [
+                ('Content-Type', 'application/pdf'),
+                ('Content-Disposition', f'inline; filename="{filename}"'),
+                ('Content-Length', str(len(pdf_content))),
+            ]
+            return request.make_response(pdf_content, headers=headers)
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).error("Failed to render invoice PDF: %s", e)
+            return ResponseBuilder.http_error(str(e) or _("Failed to generate invoice PDF."), code=500)
+
+    @http.route(
+        "/api/v1/orders/<int:order_id>/invoice",
+        type="http",
+        auth="public",
+        methods=["GET"],
+        csrf=False,
+        cors="*",
+    )
+    def get_order_invoice_data(self, order_id: int, **kwargs):
+        """Get structured tax invoice data for mobile and web apps."""
+        denied = require_token()
+        if denied:
+            return denied
+
+        user_id = _get_auth_user_id()
+        is_admin = _is_admin_request()
+        with self.handle() as ctx:
+            order = request.env["jabin.order"].sudo().browse(order_id)
+            if not order.exists():
+                raise ValidationError(_("Order not found."))
+
+            if not is_admin and order.customer_id.id != user_id:
+                raise ValidationError(_("Unauthorized to view this invoice."))
+
+            cust = order.customer_id
+            cust_name = cust.name or (cust.partner_id.name if getattr(cust, 'partner_id', None) else '') or ""
+            cust_phone = cust.phone or getattr(cust, 'mobile', '') or (cust.partner_id.phone if getattr(cust, 'partner_id', None) else '') or ""
+
+            shipping_address_str = ""
+            if hasattr(order, 'delivery_address_id') and order.delivery_address_id:
+                a = order.delivery_address_id
+                parts = [getattr(a, 'city', '') or '', getattr(a, 'street', '') or '']
+                shipping_address_str = " - ".join([p for p in parts if p])
+            elif hasattr(order, 'branch_id') and order.branch_id:
+                shipping_address_str = order.branch_id.name
+
+            lines_data = []
+            for line in order.order_line_ids:
+                cut_name = line.cutting_option_id.name if hasattr(line, 'cutting_option_id') and line.cutting_option_id else None
+                pack_name = line.packaging_id.name if hasattr(line, 'packaging_id') and line.packaging_id else None
+                ex_parts = [p.name for p in line.excluded_part_ids] if hasattr(line, 'excluded_part_ids') and line.excluded_part_ids else []
+                size_name = line.size_id.name if hasattr(line, 'size_id') and line.size_id else None
+
+                lines_data.append({
+                    "id": line.id,
+                    "name": line.name,
+                    "size": size_name,
+                    "quantity": line.quantity,
+                    "price_unit": line.price_unit,
+                    "price_subtotal": line.price_subtotal,
+                    "discount": line.discount,
+                    "discount_amount": line.discount_amount,
+                    "cutting_option": cut_name,
+                    "packaging": pack_name,
+                    "excluded_parts": ex_parts,
+                })
+
+            zatca_qr = ""
+            try:
+                zatca_qr = order.get_zatca_qr_data()
+            except Exception:
+                pass
+
+            company_vat = request.env.company.vat or "310198765400003"
+            company_raw = request.env.company.name or ""
+            company_name = "ذبائح المملكة" if (not company_raw or "YourCompany" in company_raw or "My Company" in company_raw) else company_raw
+            support_phone = request.env['ir.config_parameter'].sudo().get_param('jabin.support_phone', '920000000')
+
+            subtotal_val = float(getattr(order, "subtotal", 0.0) or 0.0)
+            tax_val = float(getattr(order, "tax_amount", 0.0) or 0.0)
+            if tax_val == 0.0 and subtotal_val > 0.0:
+                tax_val = round(subtotal_val * 0.15, 2)
+
+            invoice_payload = {
+                "order_id": order.id,
+                "order_number": order.name,
+                "date": str(order.date) if order.date else "",
+                "state": order.state,
+                "payment_status": order.payment_status,
+                "payment_method": order.payment_method_id.name if order.payment_method_id else "دفع إلكتروني",
+                "seller": {
+                    "name": company_name,
+                    "name_en": "Dhabayih Lmamlaka",
+                    "vat_number": company_vat,
+                    "cr_number": "1010892341",
+                    "phone": support_phone,
+                    "address": "المملكة العربية السعودية",
+                },
+                "customer": {
+                    "id": cust.id if cust else None,
+                    "name": cust_name or "عميل محترم",
+                    "phone": cust_phone,
+                    "delivery_type": getattr(order, "delivery_type", "address"),
+                    "shipping_address": shipping_address_str,
+                },
+                "lines": lines_data,
+                "summary": {
+                    "subtotal": subtotal_val,
+                    "discount_amount": getattr(order, "discount_amount", 0.0) or 0.0,
+                    "loyalty_discount_amount": getattr(order, "loyalty_discount_amount", 0.0) or 0.0,
+                    "tax_amount": tax_val,
+                    "delivery_fee": getattr(order, "delivery_fee", 0.0) or 0.0,
+                    "total": getattr(order, "total", 0.0) or 0.0,
+                    "currency": "SAR",
+                },
+                "settings": {
+                    "paper_format": request.env['ir.config_parameter'].sudo().get_param('jabin_invoice.paper_format', 'thermal_80'),
+                    "receipt_width": int(request.env['ir.config_parameter'].sudo().get_param('jabin_invoice.receipt_width', 80)),
+                    "show_logo": request.env['ir.config_parameter'].sudo().get_param('jabin_invoice.show_logo', 'True') != 'False',
+                    "show_qr": request.env['ir.config_parameter'].sudo().get_param('jabin_invoice.show_qr', 'True') != 'False',
+                    "header_note": request.env['ir.config_parameter'].sudo().get_param('jabin_invoice.header_note', 'ذبائح ولحوم بلدية طازجة وفق الشريعة الإسلامية'),
+                    "footer_note": request.env['ir.config_parameter'].sudo().get_param('jabin_invoice.footer_note', 'شكراً لتسوقكم من ذبائح المملكة | خدمة العملاء: 0568741660'),
+                },
+                "zatca_qr": zatca_qr,
+                "pdf_url": f"/api/v1/orders/{order.id}/invoice/pdf",
+            }
+            ctx.set_body(ResponseBuilder.success(data=invoice_payload, message=_("Invoice retrieved successfully.")))
         return ctx.response
 
     @http.route(

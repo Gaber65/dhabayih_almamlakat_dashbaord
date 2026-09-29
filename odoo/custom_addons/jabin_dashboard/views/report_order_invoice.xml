@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- 80mm Thermal Receipt Paper Format -->
+    <record id="paperformat_thermal_80" model="report.paperformat">
+        <field name="name">إيصال حراري 80 مم (Thermal Receipt 80mm)</field>
+        <field name="default" eval="False"/>
+        <field name="format">custom</field>
+        <field name="page_width">80</field>
+        <field name="page_height">250</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">3</field>
+        <field name="margin_bottom">3</field>
+        <field name="margin_left">3</field>
+        <field name="margin_right">3</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="dpi">96</field>
+    </record>
+
+    <!-- Report Action -->
+    <record id="action_report_jabin_order_invoice" model="ir.actions.report">
+        <field name="name">فاتورة ضريبية مبسطة / Tax Invoice</field>
+        <field name="model">jabin.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">jabin_dashboard.report_order_invoice_template</field>
+        <field name="report_file">jabin_dashboard.report_order_invoice_template</field>
+        <field name="print_report_name">'Invoice_%s' % (object.name.replace('/', '_'))</field>
+        <field name="binding_model_id" ref="jabin_users.model_jabin_order"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="jabin_dashboard.paperformat_thermal_80"/>
+    </record>
+
+    <!-- Report Root Template -->
+    <template id="report_order_invoice_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="jabin_dashboard.report_order_invoice_document"/>
+            </t>
+        </t>
+    </template>
+
+    <!-- Individual Invoice Document -->
+    <template id="report_order_invoice_document">
+        <t t-set="is_thermal" t-value="o.env['ir.config_parameter'].sudo().get_param('jabin_invoice.paper_format', 'thermal_80') == 'thermal_80'"/>
+        <t t-set="show_logo" t-value="o.env['ir.config_parameter'].sudo().get_param('jabin_invoice.show_logo', 'True') != 'False'"/>
+        <t t-set="show_qr" t-value="o.env['ir.config_parameter'].sudo().get_param('jabin_invoice.show_qr', 'True') != 'False'"/>
+        <t t-set="header_note" t-value="o.env['ir.config_parameter'].sudo().get_param('jabin_invoice.header_note', 'ذبائح ولحوم بلدية طازجة وفق الشريعة الإسلامية')"/>
+        <t t-set="footer_note" t-value="o.env['ir.config_parameter'].sudo().get_param('jabin_invoice.footer_note', 'شكراً لتسوقكم من ذبائح المملكة | خدمة العملاء: 0568741660')"/>
+
+        <!-- ================= 1. THERMAL RECEIPT 80MM LAYOUT ================= -->
+        <t t-if="is_thermal">
+            <div class="article" style="direction: rtl; text-align: center; font-family: 'Cairo', 'Tajawal', sans-serif; font-size: 11px; color: #000000; width: 72mm; margin: 0 auto; padding: 2mm 0; background: #ffffff;">
+                
+                <!-- Shop Logo & Name -->
+                <div t-if="show_logo and o.env.company.logo" style="margin-bottom: 4px;">
+                    <img t-att-src="image_data_uri(o.env.company.logo)" style="max-height: 48px; max-width: 65mm; object-fit: contain; display: block; margin: 0 auto;"/>
+                </div>
+                <div style="font-size: 16px; font-weight: 900; margin: 2px 0;" t-esc="o.env.company.name or 'ذبائح المملكة'"/>
+                <div style="font-size: 10px; color: #475569;" t-esc="header_note"/>
+                
+                <div style="border-top: 1px dashed #475569; margin: 6px 0;"/>
+
+                <div style="font-size: 12px; font-weight: 800;">فاتورة ضريبية مبسطة</div>
+                <div style="font-size: 9px; color: #64748b;">SIMPLIFIED TAX INVOICE</div>
+                
+                <div style="text-align: right; font-size: 10px; margin-top: 6px; line-height: 18px;">
+                    <div><strong>رقم الفاتورة:</strong> <span style="font-family: monospace; font-weight: bold;" t-esc="o.name"/></div>
+                    <div><strong>التاريخ:</strong> <span t-esc="o.date.strftime('%Y-%m-%d %H:%M') if o.date else ''"/></div>
+                    <div><strong>الرقم الضريبي:</strong> <span style="font-family: monospace; font-weight: bold;" t-esc="o.env.company.vat or '310198765400003'"/></div>
+                    <div><strong>السجل التجاري:</strong> <span t-esc="o.env.company.company_registry or '1010892341'"/></div>
+                    <div><strong>العميل:</strong> <span t-esc="o.customer_id.name or 'عميل محترم'"/></div>
+                    <div><strong>الجوال:</strong> <span style="font-family: monospace;" t-esc="o.customer_id.phone or o.customer_id.mobile or (o.customer_id.partner_id and o.customer_id.partner_id.phone) or (o.customer_id.partner_id and o.customer_id.partner_id.mobile) or '-'"/></div>
+                    <div><strong>طريقة الدفع:</strong> <span t-esc="o.payment_method_id.name if o.payment_method_id else 'دفع إلكتروني'"/></div>
+                    <div>
+                        <strong>حالة السداد:</strong>
+                        <span t-if="o.payment_status == 'paid'" style="font-weight: bold;">مدفوع (Paid)</span>
+                        <span t-else="" t-esc="o.payment_status"/>
+                    </div>
+                </div>
+
+                <div style="border-top: 1px dashed #475569; margin: 6px 0;"/>
+
+                <!-- Items Table -->
+                <table style="width: 100%; border-collapse: collapse; font-size: 10px; text-align: right;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid #000000;">
+                            <th style="padding: 4px 2px; text-align: right; width: 45%;">الصنف</th>
+                            <th style="padding: 4px 2px; text-align: center; width: 15%;">الكمية</th>
+                            <th style="padding: 4px 2px; text-align: center; width: 20%;">السعر</th>
+                            <th style="padding: 4px 2px; text-align: left; width: 20%;">الإجمالي</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="o.order_line_ids" t-as="line">
+                            <tr style="border-bottom: 1px dotted #cbd5e1;">
+                                <td style="padding: 4px 2px; text-align: right;">
+                                    <div style="font-weight: bold;" t-esc="line.name"/>
+                                    <div t-if="line.size_id" style="font-size: 9px; color: #475569;">
+                                        <span>حجم: </span><span t-esc="line.size_id.name"/>
+                                    </div>
+                                    <div t-if="line.cutting_option_id" style="font-size: 9px; color: #475569;">
+                                        <span t-esc="line.cutting_option_id.name"/>
+                                    </div>
+                                </td>
+                                <td style="padding: 4px 2px; text-align: center;" t-esc="int(line.quantity)"/>
+                                <td style="padding: 4px 2px; text-align: center; font-family: monospace;" t-esc="'%.2f' % line.price_unit"/>
+                                <td style="padding: 4px 2px; text-align: left; font-family: monospace; font-weight: bold;" t-esc="'%.2f' % line.price_subtotal"/>
+                            </tr>
+                        </t>
+                    </tbody>
+                </table>
+
+                <div style="border-top: 1px dashed #475569; margin: 6px 0;"/>
+
+                <!-- Totals -->
+                <table style="width: 100%; font-size: 10px; text-align: right; line-height: 18px;">
+                    <tr>
+                        <td>المجموع قبل الضريبة:</td>
+                        <td style="text-align: left; font-family: monospace; font-weight: bold;" t-esc="'%.2f ر.س' % o.subtotal"/>
+                    </tr>
+                    <tr t-if="o.discount_amount and o.discount_amount > 0">
+                        <td>الخصم:</td>
+                        <td style="text-align: left; font-family: monospace;" t-esc="'- %.2f ر.س' % o.discount_amount"/>
+                    </tr>
+                    <tr t-if="o.loyalty_discount_amount and o.loyalty_discount_amount > 0">
+                        <td>خصم نقاط الولاء:</td>
+                        <td style="text-align: left; font-family: monospace;" t-esc="'- %.2f ر.س' % o.loyalty_discount_amount"/>
+                    </tr>
+                    <tr>
+                        <td>ضريبة القيمة المضافة (15%):</td>
+                        <td style="text-align: left; font-family: monospace; font-weight: bold;" t-esc="'%.2f ر.س' % o.tax_amount"/>
+                    </tr>
+                    <tr>
+                        <td>رسوم التوصيل:</td>
+                        <td style="text-align: left; font-family: monospace;">
+                            <span t-if="o.delivery_fee and o.delivery_fee > 0" t-esc="'%.2f ر.س' % o.delivery_fee"/>
+                            <span t-else="">مجاني</span>
+                        </td>
+                    </tr>
+                    <tr style="border-top: 1px solid #000000; font-size: 13px; font-weight: 900;">
+                        <td style="padding-top: 4px;">الإجمالي الكلي:</td>
+                        <td style="padding-top: 4px; text-align: left; font-family: monospace;" t-esc="'%.2f ر.س' % o.total"/>
+                    </tr>
+                </table>
+
+                <div style="border-top: 1px dashed #475569; margin: 8px 0;"/>
+
+                <!-- ZATCA QR Code -->
+                <div t-if="show_qr" style="margin: 6px auto; text-align: center;">
+                    <img t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s&amp;width=120&amp;height=120' % o.get_zatca_qr_data()" style="width: 110px; height: 110px; display: block; margin: 0 auto;"/>
+                    <div style="font-size: 8px; color: #64748b; margin-top: 2px;">فاتورة إلكترونية معتمدة - ZATCA QR</div>
+                </div>
+
+                <!-- Footer Note -->
+                <div style="font-size: 9px; color: #475569; margin-top: 6px; line-height: 14px;" t-esc="footer_note"/>
+                <div style="font-size: 8px; color: #94a3b8; margin-top: 4px;">ذبائح بلدية طازجة 100% - مسالخ أمانة الرياض</div>
+            </div>
+        </t>
+
+        <!-- ================= 2. LUXURY A4 FULL SHEET LAYOUT ================= -->
+        <t t-else="">
+            <div class="article" style="direction: rtl; text-align: right; font-family: 'Cairo', 'Tajawal', sans-serif; font-size: 13px; color: #1e293b; padding: 20px 30px; background-color: #ffffff;">
+                
+                <!-- Header Section -->
+                <table style="width: 100%; border-bottom: 2px solid #0f766e; padding-bottom: 16px; margin-bottom: 20px;">
+                    <tr>
+                        <td style="width: 55%; vertical-align: top;">
+                            <table style="border-collapse: collapse; margin-bottom: 6px;">
+                                <tr>
+                                    <td t-if="show_logo and o.env.company.logo" style="vertical-align: middle; padding-left: 12px;">
+                                        <img t-att-src="image_data_uri(o.env.company.logo)" style="max-height: 55px; max-width: 130px; object-fit: contain;"/>
+                                    </td>
+                                    <td style="vertical-align: middle;">
+                                        <h1 style="margin: 0; font-size: 22px; font-weight: 800; color: #0f766e;" t-esc="o.env.company.name or 'ذبائح المملكة'"/>
+                                        <div style="font-size: 12px; font-weight: bold; color: #475569; margin-top: 2px;">Dhabayih Lmamlaka - ذبائح ولحوم طازجة</div>
+                                    </td>
+                                </tr>
+                            </table>
+                            <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
+                                <span>الرقم الضريبي: </span>
+                                <span style="font-weight: bold; font-family: monospace; color: #0f172a;" t-esc="o.env.company.vat or '310198765400003'"/>
+                            </div>
+                            <div style="font-size: 12px; color: #64748b; margin-top: 2px;">
+                                <span>السجل التجاري: </span>
+                                <span style="font-weight: bold; color: #0f172a;" t-esc="o.env.company.company_registry or '1010892341'"/>
+                            </div>
+                            <div style="font-size: 12px; color: #64748b; margin-top: 2px;">
+                                <span t-esc="o.env.company.street or 'المملكة العربية السعودية'"/> - <span t-esc="o.env.company.city or 'الرياض'"/>
+                            </div>
+                            <div style="font-size: 11px; color: #0f766e; margin-top: 3px;" t-esc="header_note"/>
+                        </td>
+                        <td style="width: 45%; vertical-align: top; text-align: left;">
+                            <div style="display: inline-block; text-align: center; border: 1px solid #cbd5e1; border-radius: 12px; padding: 10px; background-color: #f8fafc;">
+                                <div style="font-size: 14px; font-weight: 800; color: #0f766e; margin-bottom: 4px;">فاتورة ضريبية مبسطة</div>
+                                <div style="font-size: 10px; color: #64748b; margin-bottom: 8px;">SIMPLIFIED TAX INVOICE</div>
+                                <!-- ZATCA QR Code -->
+                                <img t-if="show_qr" t-att-src="'/report/barcode/?barcode_type=QR&amp;value=%s&amp;width=110&amp;height=110' % o.get_zatca_qr_data()" style="width: 100px; height: 100px; display: block; margin: 0 auto;"/>
+                                <div style="font-size: 10px; color: #94a3b8; margin-top: 4px;">ZATCA Standard QR</div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Meta Grid -->
+                <table style="width: 100%; border-collapse: separate; border-spacing: 12px 0; margin-bottom: 24px;">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px;">
+                            <div style="font-size: 13px; font-weight: 800; color: #0f766e; border-bottom: 1px solid #cbd5e1; padding-bottom: 6px; margin-bottom: 8px;">
+                                📋 بيانات الفاتورة والطلب
+                            </div>
+                            <table style="width: 100%; font-size: 12px; line-height: 22px;">
+                                <tr>
+                                    <td style="color: #64748b; width: 40%;">رقم الطلب / الفاتورة:</td>
+                                    <td style="font-weight: 800; font-family: monospace; color: #0f172a;" t-esc="o.name"/>
+                                </tr>
+                                <tr>
+                                    <td style="color: #64748b;">تاريخ ووقت الإصدار:</td>
+                                    <td style="font-weight: bold; color: #0f172a;" t-esc="o.date.strftime('%Y-%m-%d %H:%M') if o.date else ''"/>
+                                </tr>
+                                <tr>
+                                    <td style="color: #64748b;">طريقة الدفع:</td>
+                                    <td style="font-weight: bold; color: #0f172a;">
+                                        <span t-if="o.payment_method_id" t-esc="o.payment_method_id.name"/>
+                                        <span t-else="">دفع إلكتروني</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="color: #64748b;">حالة السداد:</td>
+                                    <td>
+                                        <span t-if="o.payment_status == 'paid'" style="color: #16a34a; font-weight: bold;">مدفوع (Paid)</span>
+                                        <span t-elif="o.payment_status == 'pending'" style="color: #ca8a04; font-weight: bold;">بانتظار السداد (Pending)</span>
+                                        <span t-else="" style="font-weight: bold;" t-esc="o.payment_status"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+
+                        <td style="width: 50%; vertical-align: top; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px;">
+                            <div style="font-size: 13px; font-weight: 800; color: #0f766e; border-bottom: 1px solid #cbd5e1; padding-bottom: 6px; margin-bottom: 8px;">
+                                👤 بيانات العميل والاستلام
+                            </div>
+                            <table style="width: 100%; font-size: 12px; line-height: 22px;">
+                                <tr>
+                                    <td style="color: #64748b; width: 35%;">اسم العميل:</td>
+                                    <td style="font-weight: bold; color: #0f172a;" t-esc="o.customer_id.name or 'عميل محترم'"/>
+                                </tr>
+                                <tr>
+                                    <td style="color: #64748b;">رقم الجوال:</td>
+                                    <td style="font-weight: bold; font-family: monospace; color: #0f172a;" t-esc="o.customer_id.phone or o.customer_id.mobile or (o.customer_id.partner_id and o.customer_id.partner_id.phone) or (o.customer_id.partner_id and o.customer_id.partner_id.mobile) or '-'"/>
+                                </tr>
+                                <tr>
+                                    <td style="color: #64748b;">طريقة الاستلام:</td>
+                                    <td style="font-weight: bold; color: #0f172a;">
+                                        <span t-if="o.delivery_type == 'address'">توصيل مبرد للعنوان</span>
+                                        <span t-else="">استلام من الفرع</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="color: #64748b;">العنوان / الفرع:</td>
+                                    <td style="color: #0f172a;">
+                                        <t t-if="o.delivery_type == 'address'">
+                                            <span t-if="o.customer_id and o.customer_id.partner_id and (o.customer_id.partner_id.city or o.customer_id.partner_id.street)" t-esc="'%s - %s' % (o.customer_id.partner_id.city or '', o.customer_id.partner_id.street or '')"/>
+                                            <span t-else="">عنوان العميل المسجل</span>
+                                        </t>
+                                        <t t-else="">
+                                            <span t-if="o.branch_id" t-esc="o.branch_id.name"/>
+                                            <span t-else="">فرع المتجر</span>
+                                        </t>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Order Lines Table -->
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; border-radius: 8px; overflow: hidden;">
+                    <thead>
+                        <tr style="background-color: #0f766e; color: #ffffff; font-size: 12px; text-align: center;">
+                            <th style="padding: 10px 8px; width: 5%;">#</th>
+                            <th style="padding: 10px 8px; width: 35%; text-align: right;">المنتج / الصنف والتفاصيل</th>
+                            <th style="padding: 10px 8px; width: 25%; text-align: right;">خيارات التجهيز والتقطيع</th>
+                            <th style="padding: 10px 8px; width: 10%;">الكمية</th>
+                            <th style="padding: 10px 8px; width: 12%;">السعر (ر.س)</th>
+                            <th style="padding: 10px 8px; width: 13%;">الإجمالي (ر.س)</th>
+                        </tr>
+                    </thead>
+                    <tbody style="font-size: 12px;">
+                        <t t-set="idx" t-value="1"/>
+                        <t t-foreach="o.order_line_ids" t-as="line">
+                            <tr style="border-bottom: 1px solid #e2e8f0; background-color: #ffffff;">
+                                <td style="padding: 10px 8px; text-align: center; color: #64748b;" t-esc="idx"/>
+                                <td style="padding: 10px 8px; text-align: right;">
+                                    <div style="font-weight: bold; color: #0f172a;" t-esc="line.name"/>
+                                    <div t-if="line.size_id" style="font-size: 11px; color: #0f766e;">
+                                        <span>الحجم: </span><span t-esc="line.size_id.name"/>
+                                    </div>
+                                </td>
+                                <td style="padding: 10px 8px; text-align: right; font-size: 11px; color: #475569;">
+                                    <div t-if="line.cutting_option_id">
+                                        <span>✂️ التقطيع: </span><span style="font-weight: bold;" t-esc="line.cutting_option_id.name"/>
+                                    </div>
+                                    <div t-if="line.packaging_id">
+                                        <span>📦 التغليف: </span><span style="font-weight: bold;" t-esc="line.packaging_id.name"/>
+                                    </div>
+                                    <div t-if="line.excluded_part_ids">
+                                        <span>🚫 بدون: </span>
+                                        <span t-esc="', '.join(line.excluded_part_ids.mapped('name'))"/>
+                                    </div>
+                                </td>
+                                <td style="padding: 10px 8px; text-align: center; font-weight: bold; color: #0f172a;" t-esc="int(line.quantity)"/>
+                                <td style="padding: 10px 8px; text-align: center; font-family: monospace; color: #0f172a;" t-esc="'%.2f' % line.price_unit"/>
+                                <td style="padding: 10px 8px; text-align: center; font-weight: bold; font-family: monospace; color: #0f766e;" t-esc="'%.2f' % line.price_subtotal"/>
+                            </tr>
+                            <t t-set="idx" t-value="idx + 1"/>
+                        </t>
+                    </tbody>
+                </table>
+
+                <!-- Notes & Summary Split Section -->
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
+                    <tr>
+                        <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                            <div t-if="o.internal_notes" style="background-color: #fffbeb; border: 1px solid #fef08a; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+                                <div style="font-weight: bold; color: #b45309; font-size: 12px; margin-bottom: 4px;">📝 ملاحظات الطلب:</div>
+                                <div style="font-size: 11px; color: #78350f;" t-esc="o.internal_notes"/>
+                            </div>
+
+                            <div style="border: 1px dashed #cbd5e1; border-radius: 8px; padding: 12px; background-color: #f8fafc; font-size: 11px; color: #64748b; line-height: 18px;">
+                                <div style="font-weight: bold; color: #0f766e; margin-bottom: 4px;">🌟 إقرار وشروط الخدمة:</div>
+                                <div>• جميع الذبائح بلدية ومذبوحة وفق الشريعة الإسلامية وتحت إشراف بيطري كامل.</div>
+                                <div>• يتم التوصيل بسيارات مبردة بدرجة حرارة معتمدة لضمان أقصى درجات الطزاجة.</div>
+                                <div>• الأسعار الموضحة تشمل ضريبة القيمة المضافة بنسبة 15%.</div>
+                            </div>
+                        </td>
+
+                        <td style="width: 50%; vertical-align: top;">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 12px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+                                <tr style="border-bottom: 1px solid #e2e8f0;">
+                                    <td style="padding: 8px 12px; color: #475569;">المجموع قبل الخصم والضريبة:</td>
+                                    <td style="padding: 8px 12px; text-align: left; font-family: monospace; font-weight: bold;" t-esc="'%.2f ر.س' % o.subtotal"/>
+                                </tr>
+                                <tr t-if="o.discount_amount and o.discount_amount > 0" style="border-bottom: 1px solid #e2e8f0; color: #dc2626;">
+                                    <td style="padding: 8px 12px;">خصم الكوبون / العرض:</td>
+                                    <td style="padding: 8px 12px; text-align: left; font-family: monospace; font-weight: bold;" t-esc="'- %.2f ر.س' % o.discount_amount"/>
+                                </tr>
+                                <tr t-if="o.loyalty_discount_amount and o.loyalty_discount_amount > 0" style="border-bottom: 1px solid #e2e8f0; color: #dc2626;">
+                                    <td style="padding: 8px 12px;">خصم نقاط الولاء:</td>
+                                    <td style="padding: 8px 12px; text-align: left; font-family: monospace; font-weight: bold;" t-esc="'- %.2f ر.س' % o.loyalty_discount_amount"/>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e2e8f0;">
+                                    <td style="padding: 8px 12px; color: #475569;">ضريبة القيمة المضافة (15%):</td>
+                                    <td style="padding: 8px 12px; text-align: left; font-family: monospace; font-weight: bold;" t-esc="'%.2f ر.س' % o.tax_amount"/>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e2e8f0;">
+                                    <td style="padding: 8px 12px; color: #475569;">رسوم التوصيل المبرد:</td>
+                                    <td style="padding: 8px 12px; text-align: left; font-family: monospace; font-weight: bold;">
+                                        <span t-if="o.delivery_fee and o.delivery_fee > 0" t-esc="'%.2f ر.س' % o.delivery_fee"/>
+                                        <span t-else="" style="color: #16a34a;">مجاني</span>
+                                    </td>
+                                </tr>
+                                <tr style="background-color: #0f766e; color: #ffffff; font-size: 14px; font-weight: 800;">
+                                    <td style="padding: 12px;">الإجمالي الكلي المستحق:</td>
+                                    <td style="padding: 12px; text-align: left; font-family: monospace;" t-esc="'%.2f ر.س' % o.total"/>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Footer Section -->
+                <div style="text-align: center; border-top: 1px solid #e2e8f0; padding-top: 14px; margin-top: 20px; color: #64748b; font-size: 11px;">
+                    <div style="font-weight: bold; color: #0f766e; margin-bottom: 4px;">شكراً لثقتكم واختياركم ذبائح المملكة!</div>
+                    <div t-esc="footer_note"/>
+                    <div style="color: #94a3b8; font-size: 10px; margin-top: 4px;">تم إنشاء هذه الفاتورة الضريبية آلياً وفق أنظمة الفوترة الإلكترونية بالمملكة العربية السعودية</div>
+                </div>
+
+            </div>
+        </t>
+    </template>
+
+</odoo>

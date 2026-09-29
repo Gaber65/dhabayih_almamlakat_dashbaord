@@ -560,6 +560,22 @@ class JabinCartLine(models.Model):
                 )
 
     # --- Business Methods ---
+    @staticmethod
+    def _build_product_image_url(product):
+        """Build the image URL for a product, checking main_image first then gallery."""
+        try:
+            from odoo.http import request
+            base_url = request.httprequest.host_url.rstrip('/')
+        except Exception:
+            base_url = ''
+
+        if getattr(product, 'main_image', False):
+            return f"{base_url}/api/v1/image/jabin.product/{product.id}/main_image"
+        first_img = product.product_image_ids[:1] if hasattr(product, 'product_image_ids') else None
+        if first_img:
+            return f"{base_url}/api/v1/image/jabin.product.image/{first_img.id}/image"
+        return None
+
     def get_summary_line(self):
         """Get line summary as a dictionary."""
         self.ensure_one()
@@ -567,7 +583,7 @@ class JabinCartLine(models.Model):
             'id': self.id,
             'product_id': self.product_id.id,
             'product_name': self.product_id.display_name,
-            'product_image': self.product_id.image_1920 if hasattr(self.product_id, 'image_1920') else None,
+            'product_image_url': self._build_product_image_url(self.product_id),
             'quantity': self.quantity,
             'price_unit': self.price_unit,
             'discount_percent': self.discount_percent,

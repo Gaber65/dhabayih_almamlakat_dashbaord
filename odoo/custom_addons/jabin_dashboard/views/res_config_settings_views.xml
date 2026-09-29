@@ -7,7 +7,7 @@
         <field name="inherit_id" ref="base.res_config_settings_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//form" position="inside">
-                <app data-string="Dhabayih Lmamlaka Loyalty" string="Dhabayih Lmamlaka Loyalty" name="jabin_loyalty">
+                <app data-string="Dhabayih Lmamlaka" string="Dhabayih Lmamlaka" name="jabin_dashboard">
                     <block title="Loyalty Program Settings" name="jabin_loyalty_block">
                         <setting id="loyalty_earning_rate_setting" string="Earning Rate" help="Formula: Earned Points = Order Total (SAR) * Earning Rate (Default: 1 SAR = 1 Point).">
                             <field name="loyalty_earning_rate"/>
@@ -33,16 +33,36 @@
                             <field name="support_phone"/>
                         </setting>
                     </block>
+                    <block title="إعدادات طباعة الفاتورة والإيصال الحراري (Invoice &amp; Thermal Receipt)" name="jabin_invoice_block">
+                        <setting id="invoice_paper_format_setting" string="حجم ورق الفاتورة الافتراضي" help="اختر ما إذا كان التنسيق الافتراضي رول إيصالات حرارية 80مم أو ورقة A4.">
+                            <field name="invoice_paper_format"/>
+                        </setting>
+                        <setting id="invoice_receipt_width_setting" string="عرض الإيصال الحراري (مم)" help="عرض ورق الإيصال بالمليمتر (الافتراضي 80 مم للطابعات الحرارية).">
+                            <field name="invoice_receipt_width"/>
+                        </setting>
+                        <setting id="invoice_show_logo_setting" string="إظهار شعار المتجر" help="إظهار لوجو ذبائح المملكة في أعلى الإيصال والفاتورة.">
+                            <field name="invoice_show_logo"/>
+                        </setting>
+                        <setting id="invoice_show_qr_setting" string="إظهار باركود هيئة الزكاة (ZATCA QR)" help="إظهار رمز الاستجابة السريع للفوترة الإلكترونية.">
+                            <field name="invoice_show_qr"/>
+                        </setting>
+                        <setting id="invoice_header_note_setting" string="ملاحظة الترويسة" help="عبارة تظهر تحت اسم المتجر في الفاتورة.">
+                            <field name="invoice_header_note"/>
+                        </setting>
+                        <setting id="invoice_footer_note_setting" string="ملاحظة التذييل" help="عبارة شكر أو ملاحظات تظهر في أسفل الفاتورة.">
+                            <field name="invoice_footer_note"/>
+                        </setting>
+                    </block>
                 </app>
             </xpath>
         </field>
     </record>
 
     <record id="action_jabin_loyalty_settings" model="ir.actions.act_window">
-        <field name="name">Loyalty Settings</field>
+        <field name="name">Loyalty &amp; General Settings</field>
         <field name="res_model">res.config.settings</field>
         <field name="view_mode">form</field>
         <field name="target">inline</field>
-        <field name="context">{'module': 'jabin_loyalty'}</field>
+        <field name="context">{'module': 'jabin_dashboard'}</field>
     </record>
 </odoo>

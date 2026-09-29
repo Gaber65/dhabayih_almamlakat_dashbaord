@@ -13,6 +13,17 @@ class CheckoutService:
 
         cart = env["jabin.cart"].sudo().search([("customer_id", "=", customer_id), ("status", "=", "active")], limit=1)
         if not cart or not cart.line_ids:
+            # If active cart was already checked out for a pending order, re-use the recent pending order
+            recent_pending = env["jabin.order"].sudo().search([
+                ("customer_id", "=", customer_id),
+                ("state", "=", "pending_payment")
+            ], order="id desc", limit=1)
+            if recent_pending:
+                if payment_method_id and payment_method_id != recent_pending.payment_method_id.id:
+                    pm = env["jabin.payment.method"].sudo().browse(payment_method_id)
+                    if pm.exists() and pm.active:
+                        recent_pending.sudo().write({"payment_method_id": pm.id})
+                return recent_pending
             raise ValidationError(_("Active cart is empty."))
 
         if delivery_type not in ["address", "pickup"]:

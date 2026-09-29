@@ -49,7 +49,15 @@
             <field name="name">Apple Pay</field>
             <field name="code">apple_pay</field>
             <field name="payment_type">wallet</field>
-            <field name="provider">myfatoorah</field>
+            <field name="provider">moyasar</field>
+            <field name="is_installment" eval="False"/>
+        </record>
+
+        <record id="payment_method_moyasar" model="jabin.payment.method">
+            <field name="name">بوابة ميسر (مدى / بطاقات ائتمانية / Apple Pay)</field>
+            <field name="code">moyasar</field>
+            <field name="payment_type">card</field>
+            <field name="provider">moyasar</field>
             <field name="is_installment" eval="False"/>
         </record>
 
@@ -57,7 +65,7 @@
             <field name="name">بوابة ماي فاتورة (مدى / بطاقات إلكترونية)</field>
             <field name="code">myfatoorah</field>
             <field name="payment_type">card</field>
-            <field name="provider">myfatoorah</field>
+            <field name="provider">moyasar</field>
             <field name="is_installment" eval="False"/>
         </record>
 
@@ -68,6 +76,7 @@
             <field name="provider">tamara</field>
             <field name="is_installment" eval="True"/>
             <field name="max_installments">4</field>
+            <field name="active" eval="False"/>
         </record>
 
         <record id="payment_method_tabby" model="jabin.payment.method">
@@ -77,6 +86,21 @@
             <field name="provider">tabby</field>
             <field name="is_installment" eval="True"/>
             <field name="max_installments">4</field>
+            <field name="active" eval="False"/>
+        </record>
+
+        <!-- ==================== MOYASAR CONFIG PARAMETERS ==================== -->
+        <record id="param_moyasar_pk" model="ir.config_parameter">
+            <field name="key">moyasar.publishable_key</field>
+            <field name="value">pk_test_jmsPpaHEyAKUgFwNnLzhnzsCzbSPg11Lu7hN3Ex4</field>
+        </record>
+        <record id="param_moyasar_sk" model="ir.config_parameter">
+            <field name="key">moyasar.secret_key</field>
+            <field name="value">sk_test_pBw5i2exRNwmWxkGmfshPSA1tnW6a5C5KRkevCjy</field>
+        </record>
+        <record id="param_moyasar_env" model="ir.config_parameter">
+            <field name="key">moyasar.environment</field>
+            <field name="value">test</field>
         </record>
 
     </data>

@@ -215,3 +215,33 @@ class JabinOrder(models.Model):
                     order.coupon_id.sudo().write({'used_count': order.coupon_id.used_count + 1})
         return res
 
+    def action_print_invoice(self):
+        """Triggers the PDF simplified tax invoice report."""
+        self.ensure_one()
+        return self.env.ref('jabin_dashboard.action_report_jabin_order_invoice').report_action(self)
+
+    def get_zatca_qr_data(self):
+        """Generates standard ZATCA Phase-1/2 TLV Base64 string for QR Code."""
+        self.ensure_one()
+        import base64
+        seller_name = self.env.company.name or "ذبائح المملكة"
+        vat_number = self.env.company.vat or "310198765400003"
+        timestamp = self.date.strftime("%Y-%m-%dT%H:%M:%SZ") if self.date else fields.Datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+        total = f"{self.total:.2f}"
+        vat = f"{self.tax_amount:.2f}"
+
+        tags = [
+            (1, seller_name),
+            (2, vat_number),
+            (3, timestamp),
+            (4, total),
+            (5, vat),
+        ]
+        tlv_bytes = bytearray()
+        for tag, val in tags:
+            val_bytes = str(val).encode('utf-8')
+            tlv_bytes.append(tag)
+            tlv_bytes.append(len(val_bytes))
+            tlv_bytes.extend(val_bytes)
+        return base64.b64encode(tlv_bytes).decode('utf-8')
+

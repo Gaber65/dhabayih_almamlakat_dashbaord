@@ -296,15 +296,16 @@ class NotificationService(models.AbstractModel):
 
         # Record broadcast in notification history
         try:
-            env['jabin.notification'].sudo().create({
-                'title': title,
-                'body': body,
-                'notification_type': notification_type or 'system',
-                'deep_link': deep_link or '',
-                'status': 'sent',
-                'user_id': False,
-                'image_url': image_url or '',
-            })
+            with env.cr.savepoint():
+                env['jabin.notification'].sudo().create({
+                    'title': title,
+                    'body': body,
+                    'notification_type': notification_type or 'system',
+                    'deep_link': deep_link or '',
+                    'status': 'sent',
+                    'user_id': False,
+                    'image_url': image_url or '',
+                })
         except Exception as e:
             _logger.warning("Failed to record broadcast in history: %s", e)
 

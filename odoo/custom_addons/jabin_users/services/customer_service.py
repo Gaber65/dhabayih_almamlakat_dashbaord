@@ -9,12 +9,12 @@ class JabinCustomerService(models.AbstractModel):
     STATE_TRANSITIONS = {
         "draft": ["pending_payment", "confirmed", "cancelled"],
         "pending_payment": ["confirmed", "cancelled"],
-        "confirmed": ["preparing", "ready_pickup", "out_delivery", "delivered", "cancelled"],
-        "preparing": ["ready_pickup", "out_delivery", "delivered", "cancelled"],
-        "ready_pickup": ["out_delivery", "delivered", "cancelled"],
-        "out_delivery": ["delivered", "cancelled"],
+        "confirmed": ["preparing", "ready_pickup", "out_delivery", "delivered", "cancelled", "refunded"],
+        "preparing": ["ready_pickup", "out_delivery", "delivered", "cancelled", "refunded"],
+        "ready_pickup": ["out_delivery", "delivered", "cancelled", "refunded"],
+        "out_delivery": ["delivered", "cancelled", "refunded"],
         "delivered": ["refunded"],
-        "cancelled": [],
+        "cancelled": ["refunded"],
         "refunded": []
     }
 

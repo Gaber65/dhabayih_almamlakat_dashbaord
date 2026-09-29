@@ -101,7 +101,16 @@
                             class="btn-danger"
                             invisible="state in ('delivered', 'cancelled', 'refunded')"/>
                     <button name="action_refund" string="Request Refund" type="object"
-                            invisible="state != 'delivered'"/>
+                            invisible="state in ('draft', 'pending_payment', 'cancelled', 'refunded')"/>
+                    <button name="action_sync_moyasar_payment" string="Sync Moyasar" type="object"
+                            class="btn-secondary" icon="fa-refresh"
+                            invisible="payment_status not in ('paid', 'pending', 'authorized', 'refunded')"/>
+                    <button name="action_refund_moyasar" string="Refund via Moyasar" type="object"
+                            class="btn-outline-danger" icon="fa-undo"
+                            confirm="Are you sure you want to refund this order via Moyasar?"
+                            invisible="payment_status != 'paid'"/>
+                    <button name="action_print_invoice" string="طباعة الفاتورة" type="object"
+                            class="btn-secondary" icon="fa-print"/>
                     <field name="state" widget="statusbar"
                            statusbar_visible="draft,confirmed,preparing,ready_pickup,out_delivery,delivered"/>
                 </header>

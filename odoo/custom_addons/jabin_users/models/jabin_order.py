@@ -153,6 +153,42 @@ class JabinOrder(models.Model):
         self.ensure_one()
         self._get_service().trigger_status_transition(self.id, "refunded")
 
+    def action_sync_moyasar_payment(self):
+        """Syncs the order payment status from Moyasar gateway."""
+        self.ensure_one()
+        from ..services.moyasar_service import MoyasarService
+        res = MoyasarService.sync_order_status(self.env, self)
+        msg = res.get("message") or _("Payment synchronization completed.")
+        msg_type = "info" if res.get("success") else "warning"
+        return {
+            "type": "ir.actions.client",
+            "tag": "display_notification",
+            "params": {
+                "title": _("Moyasar Sync"),
+                "message": msg,
+                "type": msg_type,
+                "sticky": False,
+            }
+        }
+
+    def action_refund_moyasar(self):
+        """Triggers a refund for this order on Moyasar gateway."""
+        self.ensure_one()
+        from ..services.moyasar_service import MoyasarService
+        res = MoyasarService.refund_payment(self.env, self)
+        msg = res.get("message") or _("Refund request completed.")
+        msg_type = "success" if res.get("success") else "danger"
+        return {
+            "type": "ir.actions.client",
+            "tag": "display_notification",
+            "params": {
+                "title": _("Moyasar Refund"),
+                "message": msg,
+                "type": msg_type,
+                "sticky": False,
+            }
+        }
+
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:

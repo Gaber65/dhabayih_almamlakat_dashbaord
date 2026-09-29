@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Automatically initialize Dhabayih Lmamlaka company settings, branding, and details -->
+        <function model="res.company" name="init_dhabayih_company_defaults"/>
+    </data>
+</odoo>

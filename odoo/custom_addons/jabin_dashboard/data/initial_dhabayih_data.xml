@@ -194,11 +194,61 @@
             <field name="active">True</field>
         </record>
 
-        <!-- ======================================================== -->
-        <!--                   5. PRODUCTS (14 ITEMS)                 -->
-        <!-- ======================================================== -->
+        <!-- 1. خروف نعيمي بلدي -->
+        <record id="product_naimi" model="jabin.product">
+            <field name="name">خروف نعيمي بلدي</field>
+            <field name="sku">PRD-NAIMI-01</field>
+            <field name="category_id" ref="cat_sheep_goats"/>
+            <field name="description">خروف نعيمي بلدي طازج منتقى بعناية فائقة من أفضل مراعي المملكة، يمتاز بطراوة اللحم الفائقة وتوزيع الدهن المتناسق ونكهته الغنية الأصيلة المحببة في الموائد والولائم السعودية، مذبوح ومجهز تحت إشراف بيطري كامل وفق الشريعة الإسلامية.</field>
+            <field name="purchase_price">1650.0</field>
+            <field name="selling_price">1850.0</field>
+            <field name="weight">20.0</field>
+            <field name="preparation_time">45.0</field>
+            <field name="stock_quantity">35.0</field>
+            <field name="minimum_stock">5.0</field>
+            <field name="active">True</field>
+            <field name="is_featured">True</field>
+            <field name="is_best_seller">True</field>
+            <field name="main_image" type="base64" file="jabin_dashboard/static/src/img/products/naimi_baladi.jpg"/>
+            <field name="cutting_option_ids" eval="[(6, 0, [
+                ref('cut_fridge'), ref('cut_mufattah'), ref('cut_kabsa'), ref('cut_mandi'), ref('cut_quarters'), ref('cut_halves'), ref('cut_none')
+            ])]"/>
+            <field name="packaging_ids" eval="[(6, 0, [
+                ref('pkg_vacuum'), ref('pkg_foam_trays'), ref('pkg_portion_bags'), ref('pkg_thermal_box'), ref('pkg_banquet')
+            ])]"/>
+            <field name="excluded_part_ids" eval="[(6, 0, [
+                ref('excl_head'), ref('excl_trotters'), ref('excl_viscera'), ref('excl_fat_tail'), ref('excl_separate_fat'), ref('excl_isolate_offal')
+            ])]"/>
+        </record>
 
-        <!-- 1. خروف نجدي بلدي -->
+        <!-- 2. خروف حري بلدي -->
+        <record id="product_harri" model="jabin.product">
+            <field name="name">خروف حري بلدي</field>
+            <field name="sku">PRD-HARRI-01</field>
+            <field name="category_id" ref="cat_sheep_goats"/>
+            <field name="description">خروف حري بلدي طازج أصيل صغير السن، من أشهر سلالات الجزيرة العربية تميزاً باللحم الهبر الأبيض الخفيف وقليل الدهون وطيب المذاق، مناسب جداً للمندي والمظبي والمفطحات والعزائم والطبخ المنزلي الفاخر، مذبوح ومجهز بأعلى معايير الجودة.</field>
+            <field name="purchase_price">1550.0</field>
+            <field name="selling_price">1750.0</field>
+            <field name="weight">18.0</field>
+            <field name="preparation_time">45.0</field>
+            <field name="stock_quantity">35.0</field>
+            <field name="minimum_stock">5.0</field>
+            <field name="active">True</field>
+            <field name="is_featured">True</field>
+            <field name="is_best_seller">True</field>
+            <field name="main_image" type="base64" file="jabin_dashboard/static/src/img/products/harri_baladi.jpg"/>
+            <field name="cutting_option_ids" eval="[(6, 0, [
+                ref('cut_fridge'), ref('cut_mufattah'), ref('cut_kabsa'), ref('cut_mandi'), ref('cut_quarters'), ref('cut_halves'), ref('cut_none')
+            ])]"/>
+            <field name="packaging_ids" eval="[(6, 0, [
+                ref('pkg_vacuum'), ref('pkg_foam_trays'), ref('pkg_portion_bags'), ref('pkg_thermal_box'), ref('pkg_banquet')
+            ])]"/>
+            <field name="excluded_part_ids" eval="[(6, 0, [
+                ref('excl_head'), ref('excl_trotters'), ref('excl_viscera'), ref('excl_fat_tail'), ref('excl_separate_fat'), ref('excl_isolate_offal')
+            ])]"/>
+        </record>
+
+        <!-- 3. خروف نجدي بلدي -->
         <record id="product_najdi" model="jabin.product">
             <field name="name">خروف نجدي بلدي</field>
             <field name="sku">PRD-NAJDI-01</field>
@@ -652,6 +702,104 @@
             <field name="product_id" ref="product_najdi"/>
             <field name="name">نجدي جبر ناهي</field>
             <field name="price">2500.0</field>
+            <field name="calories">360</field>
+            <field name="sequence">60</field>
+        </record>
+
+        <!-- ======================================================== -->
+        <!--                   8. CARCASS SIZES (NAIMI)               -->
+        <!-- ======================================================== -->
+        <record id="size_naimi_harfi" model="jabin.product.size">
+            <field name="product_id" ref="product_naimi"/>
+            <field name="name">نعيمي هرفي صغير</field>
+            <field name="price">1700.0</field>
+            <field name="calories">245</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="size_naimi_harfi_wasat" model="jabin.product.size">
+            <field name="product_id" ref="product_naimi"/>
+            <field name="name">نعيمي هرفي وسط</field>
+            <field name="price">1850.0</field>
+            <field name="calories">265</field>
+            <field name="is_default">True</field>
+            <field name="sequence">20</field>
+        </record>
+        <record id="size_naimi_harfi_fakher" model="jabin.product.size">
+            <field name="product_id" ref="product_naimi"/>
+            <field name="name">نعيمي هرفي فاخر</field>
+            <field name="price">1980.0</field>
+            <field name="calories">285</field>
+            <field name="sequence">30</field>
+        </record>
+        <record id="size_naimi_jatha_wasat" model="jabin.product.size">
+            <field name="product_id" ref="product_naimi"/>
+            <field name="name">نعيمي جذع وسط ( يجزئ عقيقة وأضحية )</field>
+            <field name="sub_title">يجزئ عقيقة وأضحية</field>
+            <field name="price">2150.0</field>
+            <field name="calories">315</field>
+            <field name="sequence">40</field>
+        </record>
+        <record id="size_naimi_jatha_tayeb" model="jabin.product.size">
+            <field name="product_id" ref="product_naimi"/>
+            <field name="name">نعيمي جذع ناهي / جبر ( يجزئ عقيقة وأضحية )</field>
+            <field name="sub_title">يجزئ عقيقة وأضحية</field>
+            <field name="price">2350.0</field>
+            <field name="calories">340</field>
+            <field name="sequence">50</field>
+        </record>
+        <record id="size_naimi_kabeer" model="jabin.product.size">
+            <field name="product_id" ref="product_naimi"/>
+            <field name="name">نعيمي ثني كبير جبر</field>
+            <field name="price">2550.0</field>
+            <field name="calories">370</field>
+            <field name="sequence">60</field>
+        </record>
+
+        <!-- ======================================================== -->
+        <!--                   9. CARCASS SIZES (HARRI)               -->
+        <!-- ======================================================== -->
+        <record id="size_harri_labani" model="jabin.product.size">
+            <field name="product_id" ref="product_harri"/>
+            <field name="name">حري لباني صغير</field>
+            <field name="price">1580.0</field>
+            <field name="calories">235</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="size_harri_harfi_wasat" model="jabin.product.size">
+            <field name="product_id" ref="product_harri"/>
+            <field name="name">حري هرفي وسط</field>
+            <field name="price">1750.0</field>
+            <field name="calories">255</field>
+            <field name="is_default">True</field>
+            <field name="sequence">20</field>
+        </record>
+        <record id="size_harri_harfi_fakher" model="jabin.product.size">
+            <field name="product_id" ref="product_harri"/>
+            <field name="name">حري هرفي فاخر</field>
+            <field name="price">1890.0</field>
+            <field name="calories">275</field>
+            <field name="sequence">30</field>
+        </record>
+        <record id="size_harri_jatha_wasat" model="jabin.product.size">
+            <field name="product_id" ref="product_harri"/>
+            <field name="name">حري جذع وسط ( يجزئ عقيقة وأضحية )</field>
+            <field name="sub_title">يجزئ عقيقة وأضحية</field>
+            <field name="price">2080.0</field>
+            <field name="calories">300</field>
+            <field name="sequence">40</field>
+        </record>
+        <record id="size_harri_jatha_tayeb" model="jabin.product.size">
+            <field name="product_id" ref="product_harri"/>
+            <field name="name">حري جذع ناهي جبر ( يجزئ عقيقة وأضحية )</field>
+            <field name="sub_title">يجزئ عقيقة وأضحية</field>
+            <field name="price">2280.0</field>
+            <field name="calories">330</field>
+            <field name="sequence">50</field>
+        </record>
+        <record id="size_harri_kabeer" model="jabin.product.size">
+            <field name="product_id" ref="product_harri"/>
+            <field name="name">حري وبار كبير</field>
+            <field name="price">2450.0</field>
             <field name="calories">360</field>
             <field name="sequence">60</field>
         </record>

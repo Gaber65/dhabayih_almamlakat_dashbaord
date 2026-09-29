@@ -1,4 +1,4 @@
-# res_config_settings.py
+# -*- coding: utf-8 -*-
 from odoo import models, fields, api
 
 class ResConfigSettings(models.TransientModel):
@@ -48,3 +48,44 @@ class ResConfigSettings(models.TransientModel):
         help='Unified phone number for phone support'
     )
 
+    # Invoice & Thermal Printing Settings
+    invoice_paper_format = fields.Selection(
+        [
+            ('thermal_80', 'إيصال حراري 80مم (80mm Thermal Receipt)'),
+            ('a4', 'ورقة قياسية (Standard A4)'),
+        ],
+        string='حجم ورق الفاتورة الافتراضي',
+        config_parameter='jabin_invoice.paper_format',
+        default='thermal_80',
+        help='اختر التنسيق الافتراضي لطباعة الفواتير'
+    )
+    invoice_receipt_width = fields.Integer(
+        string='عرض الإيصال الحراري بالمليمتر (Receipt Width mm)',
+        config_parameter='jabin_invoice.receipt_width',
+        default=80,
+        help='العرض الافتراضي لورق الطابعة الحرارية (80 مم أو 72 مم)'
+    )
+    invoice_show_logo = fields.Boolean(
+        string='إظهار شعار المتجر في الإيصال (Show Logo)',
+        config_parameter='jabin_invoice.show_logo',
+        default=True,
+        help='إظهار لوجو ذبائح المملكة في الفاتورة والإيصال الحراري'
+    )
+    invoice_show_qr = fields.Boolean(
+        string='إظهار باركود هيئة الزكاة (ZATCA QR)',
+        config_parameter='jabin_invoice.show_qr',
+        default=True,
+        help='إظهار رمز الاستجابة السريع لهيئة الزكاة والضريبة والجمارك'
+    )
+    invoice_header_note = fields.Char(
+        string='ملاحظة الترويسة (Header Note)',
+        config_parameter='jabin_invoice.header_note',
+        default='ذبائح ولحوم بلدية طازجة وفق الشريعة الإسلامية',
+        help='عبارة تظهر تحت اسم المتجر في الفاتورة'
+    )
+    invoice_footer_note = fields.Char(
+        string='ملاحظة التذييل (Footer Note)',
+        config_parameter='jabin_invoice.footer_note',
+        default='شكراً لتسوقكم من ذبائح المملكة | خدمة العملاء: 0568741660',
+        help='عبارة شكر أو ملاحظات تظهر في أسفل الفاتورة'
+    )

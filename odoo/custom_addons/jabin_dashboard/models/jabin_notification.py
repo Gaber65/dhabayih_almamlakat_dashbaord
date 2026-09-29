@@ -18,7 +18,7 @@ class JabinNotification(models.Model):
     user_id = fields.Many2one(
         'res.users',
         string='Recipient User',
-        required=True,
+        required=False,
         index=True,
         ondelete='cascade'
     )

@@ -19,4 +19,4 @@ from . import jabin_device
 from . import jabin_notification
 from . import jabin_branch
 from . import favorite
-
+from . import res_company_ext

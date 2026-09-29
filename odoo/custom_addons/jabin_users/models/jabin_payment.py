@@ -17,6 +17,7 @@ class JabinPaymentMethod(models.Model):
     provider = fields.Selection([
         ("manual", "Cash on Delivery / Manual"),
         ("myfatoorah", "MyFatoorah Gateway"),
+        ("moyasar", "Moyasar Gateway"),
         ("tamara", "Tamara"),
         ("tabby", "Tabby"),
         ("stripe", "Stripe Gateway"),
