@@ -1,3 +1,4 @@
+from typing import Optional
 from odoo import api, models, _
 from odoo.exceptions import ValidationError
 from odoo.addons.jabin_core import JabinLogger
@@ -49,7 +50,7 @@ class LoginService(models.AbstractModel):
             # Auto resend verification OTP for pending user
             try:
                 OTPService.invalidate_existing_otps(normalized_identifier, 'register')
-                OTPService.create_and_send_otp(
+                plain_code = OTPService.create_and_send_otp(
                     identifier=normalized_identifier,
                     purpose='register',
                     user_id=user.id,
@@ -60,7 +61,8 @@ class LoginService(models.AbstractModel):
                     'requires_verification': True,
                     'channel': channel,
                     'identifier': normalized_identifier,
-                    'message': _("Account needs verification. A new code has been sent.")
+                    'message': _("Account needs verification. A new code has been sent."),
+                    'otp': plain_code,
                 }
             except Exception as exc:
                 _logger.error(f'Failed to auto-send verification OTP to {normalized_identifier}: {exc}')
@@ -84,7 +86,7 @@ class LoginService(models.AbstractModel):
         OTPService.invalidate_existing_otps(normalized_identifier, 'login')
 
         try:
-            OTPService.create_and_send_otp(
+            plain_code = OTPService.create_and_send_otp(
                 identifier=normalized_identifier,
                 purpose='login',
                 user_id=user.id,
@@ -97,7 +99,8 @@ class LoginService(models.AbstractModel):
                 'requires_verification': False,
                 'channel': channel,
                 'identifier': normalized_identifier,
-                'message': msg
+                'message': msg,
+                'otp': plain_code,
             }
 
         except Exception as e:

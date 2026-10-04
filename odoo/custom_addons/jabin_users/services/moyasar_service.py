@@ -291,10 +291,11 @@ class MoyasarService:
                     "paid_date": fields.Datetime.now(),
                 })
 
-            # Trigger push notification / payment success event
+            # Trigger push notification / payment success event and confirmed order notification
             try:
                 if "jabin.notification.service" in env:
                     env["jabin.notification.service"].send_payment_success(env, order, tx)
+                    env["jabin.notification.service"].send_order_created(env, order)
             except Exception as notif_err:
                 _logger.warning("Could not send payment notification: %s", notif_err)
 

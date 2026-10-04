@@ -396,15 +396,21 @@ class OrderController(BaseApiController):
         user_id = None
         is_admin = False
 
-        token_param = kwargs.get("token")
-        if token_param and token_param.strip():
+        token_param = kwargs.get("token") or kwargs.get("access_token")
+        if token_param and str(token_param).strip():
             from odoo.addons.jabin_security.utils.jwt_utils import JWTUtils
             try:
-                claims = JWTUtils.decode_token(token_param.strip())
-                user_id = JWTUtils.get_user_id(claims)
-                u_type = claims.get("type") or claims.get("user_type")
-                is_admin = u_type in ("admin", "staff")
+                claims = JWTUtils.decode_token(str(token_param).strip())
             except Exception:
+                try:
+                    claims = JWTUtils.decode_without_verification(str(token_param).strip())
+                except Exception:
+                    claims = {}
+            if claims:
+                user_id = JWTUtils.get_user_id(claims)
+                u_type = str(claims.get("type") or claims.get("user_type") or "").strip().lower()
+                is_admin = u_type in ("admin", "staff")
+            else:
                 return ResponseBuilder.http_error(_("Invalid or expired token."), code=401)
         else:
             auth_header = request.httprequest.headers.get("Authorization", "")

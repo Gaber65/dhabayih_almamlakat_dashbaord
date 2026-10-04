@@ -1,6 +1,6 @@
 /** @odoo-module **/
 
-import {Component, useState, onWillStart} from "@odoo/owl";
+import {Component, useState, onWillStart, onMounted, onWillUnmount} from "@odoo/owl";
 import {registry} from "@web/core/registry";
 import {useService} from "@web/core/utils/hooks";
 
@@ -47,15 +47,72 @@ export class JabinDashboard extends Component {
 
         this.orm = useService("orm");
         this.notification = useService("notification");
+        try {
+            this.busService = useService("bus_service");
+        } catch (_) {
+            this.busService = null;
+        }
 
         onWillStart(async () => {
-            await this.loadDashboardData();
+            await this.loadDashboardData(false);
+        });
+
+        onMounted(() => {
+            // 1. Listen for real-time live events from Odoo WebSocket Bus
+            if (this.busService) {
+                this.onBusNotification = ({ type, payload }) => {
+                    if (type === "simple_notification" || type === "jabin_order_event") {
+                        this.playNotificationSound();
+                        this.loadDashboardData(true);
+                    }
+                };
+                this.busService.addEventListener("notification", this.onBusNotification);
+            }
+
+            // 2. Periodic background poll (every 10s) to keep dashboard in sync and alert on new orders
+            this.refreshInterval = setInterval(() => {
+                this.loadDashboardData(true);
+            }, 10000);
+        });
+
+        onWillUnmount(() => {
+            if (this.refreshInterval) {
+                clearInterval(this.refreshInterval);
+            }
+            if (this.busService && this.onBusNotification) {
+                this.busService.removeEventListener("notification", this.onBusNotification);
+            }
         });
     }
 
-    async loadDashboardData() {
-        this.state.loading = true;
+    playNotificationSound() {
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) return;
+            const ctx = new AudioContext();
+            if (ctx.state === "suspended") {
+                ctx.resume();
+            }
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+            osc.frequency.setValueAtTime(880, ctx.currentTime + 0.12);
+            gain.gain.setValueAtTime(0.3, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.45);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.45);
+        } catch (_) {}
+    }
+
+    async loadDashboardData(silent = false) {
+        if (!silent) {
+            this.state.loading = true;
+        }
         this.state.error = null;
+        const previousOrderCount = this.state.total_orders;
 
         try {
             await Promise.all([
@@ -65,12 +122,26 @@ export class JabinDashboard extends Component {
                 this.loadChartData(),
                 this.loadInventoryData(),
             ]);
+
+            // If new orders are detected during live poll, trigger audio chime & alert
+            if (silent && previousOrderCount > 0 && this.state.total_orders > previousOrderCount) {
+                const diff = this.state.total_orders - previousOrderCount;
+                this.playNotificationSound();
+                this.notification.add(
+                    diff === 1 ? 'طلب جديد وارد! تم تحديث لوحة التحكم تلقائياً.' : `وصل ${diff} طلبات جديدة! تم التحديث.`,
+                    { type: 'warning', title: 'طلب جديد وارد! 🥩', sticky: true }
+                );
+            }
         } catch (error) {
             console.error('Dashboard Error:', error);
-            this.state.error = 'Unable to load dashboard data. Please refresh the page.';
-            this.notification.add('Error loading dashboard data', { type: 'danger' });
+            if (!silent) {
+                this.state.error = 'Unable to load dashboard data. Please refresh the page.';
+                this.notification.add('Error loading dashboard data', { type: 'danger' });
+            }
         } finally {
-            this.state.loading = false;
+            if (!silent) {
+                this.state.loading = false;
+            }
         }
     }
 

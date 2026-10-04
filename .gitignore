@@ -6,3 +6,4 @@ __pycache__/
 venv/
 .env
 *.sqlite3
+odoo/custom_addons/jabin_dashboard/data/firebase_credentials.json

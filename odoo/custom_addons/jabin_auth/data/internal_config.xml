@@ -1,12 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<odoo noupdate="1">
+<odoo>
+    <data noupdate="0">
+        <function model="ir.config_parameter" name="set_param">
+            <value>jabin.internal.admin.secret</value>
+            <value>2E3B8F6A92D441F5B6D0BDBD6E6DAD73</value>
+        </function>
 
-    <record id="jabin_internal_admin_secret"
-            model="ir.config_parameter">
+        <!-- Authentica SA SMS & OTP Gateway Credentials (Pinned on Init) -->
+        <function model="ir.config_parameter" name="set_param">
+            <value>authentica.api_key</value>
+            <value>$2y$10$pLY2W7p7pQAxqUkDv/Vnz.Svu/Jd4pDo9MsCOfZmGD55l5Cp5gY.q</value>
+        </function>
 
-        <field name="key">jabin.internal.admin.secret</field>
-        <field name="value">2E3B8F6A92D441F5B6D0BDBD6E6DAD73</field>
+        <function model="ir.config_parameter" name="set_param">
+            <value>authentica.token</value>
+            <value>34149|O3kilkRMb0VqVqwcO9lUkbkowapA9yqRUdUtk6az6e5cebd9</value>
+        </function>
 
-    </record>
+        <function model="ir.config_parameter" name="set_param">
+            <value>authentica.app_id</value>
+            <value>4946</value>
+        </function>
 
+        <function model="ir.config_parameter" name="set_param">
+            <value>authentica.enable_sms</value>
+            <value>True</value>
+        </function>
+
+        <function model="ir.config_parameter" name="set_param">
+            <value>authentica.method</value>
+            <value>sms</value>
+        </function>
+
+        <function model="ir.config_parameter" name="set_param">
+            <value>authentica.mock_mode</value>
+            <value>False</value>
+        </function>
+    </data>
 </odoo>

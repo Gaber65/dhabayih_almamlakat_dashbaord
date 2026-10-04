@@ -147,6 +147,15 @@ class FirebaseService(models.AbstractModel):
             return True
         except Exception as exc:
             _logger.error(f"FCM send failed for token {token[:10]}...: {str(exc)}")
+            # If credential authentication failed (e.g. revoked key), clear app cache so new credentials can be picked up
+            if 'invalid_grant' in str(exc).lower() or 'refresherror' in str(type(exc)).lower():
+                try:
+                    import firebase_admin
+                    if firebase_admin._apps:
+                        for app_name in list(firebase_admin._apps.keys()):
+                            firebase_admin.delete_app(firebase_admin._apps[app_name])
+                except Exception:
+                    pass
             if self._is_invalid_token_error(exc):
                 self._deactivate_token(env, token)
             return False
@@ -194,6 +203,14 @@ class FirebaseService(models.AbstractModel):
             }
         except Exception as exc:
             _logger.error(f"FCM multicast batch failed: {str(exc)}")
+            if 'invalid_grant' in str(exc).lower() or 'refresherror' in str(type(exc)).lower():
+                try:
+                    import firebase_admin
+                    if firebase_admin._apps:
+                        for app_name in list(firebase_admin._apps.keys()):
+                            firebase_admin.delete_app(firebase_admin._apps[app_name])
+                except Exception:
+                    pass
             return {'success_count': 0, 'failure_count': len(valid_tokens)}
 
     @api.model

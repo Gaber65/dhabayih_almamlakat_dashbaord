@@ -1,3 +1,4 @@
+from typing import Optional
 from odoo.addons.jabin_core import EmailValidator
 from odoo import api, models, _, fields
 from odoo.exceptions import ValidationError
@@ -65,7 +66,7 @@ class RegistrationService(models.AbstractModel):
             OTPService.invalidate_existing_otps(normalized_identifier, 'register')
 
             try:
-                OTPService.create_and_send_otp(
+                plain_code = OTPService.create_and_send_otp(
                     identifier=normalized_identifier,
                     purpose='register',
                     user_id=user.id,
@@ -76,8 +77,11 @@ class RegistrationService(models.AbstractModel):
                     'channel': channel,
                     'identifier': normalized_identifier,
                     'message': msg,
-                    'requires_verification': True
+                    'requires_verification': True,
+                    'otp': plain_code,
                 }
+            except ValidationError:
+                raise
             except Exception as e:
                 _logger.error(f'Failed to send registration OTP to {normalized_identifier}: {e}')
                 raise ValidationError(_("Failed to send verification code. Please try again."))
@@ -99,7 +103,7 @@ class RegistrationService(models.AbstractModel):
             new_user = User.create(vals)
             _logger.audit('USER_CREATED', f'New pending user created for {normalized_identifier}')
 
-            OTPService.create_and_send_otp(
+            plain_code = OTPService.create_and_send_otp(
                 identifier=normalized_identifier,
                 purpose='register',
                 user_id=new_user.id,
@@ -111,9 +115,12 @@ class RegistrationService(models.AbstractModel):
                 'channel': channel,
                 'identifier': normalized_identifier,
                 'message': msg,
-                'requires_verification': True
+                'requires_verification': True,
+                'otp': plain_code,
             }
 
+        except ValidationError:
+            raise
         except Exception as e:
             _logger.error(f'Failed to create user for {normalized_identifier}: {e}')
             raise ValidationError(_("Failed to create account. Please try again."))

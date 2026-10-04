@@ -1,0 +1,34 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+  fetch('http://127.0.0.1:8095/email_preview_ar.html')
+    .then(r => r.text())
+    .then(html => {
+      const iframe = document.createElement('iframe');
+      iframe.style.width = '390px';
+      iframe.style.height = '844px';
+      document.body.appendChild(iframe);
+      iframe.contentDocument.open();
+      iframe.contentDocument.write(html);
+      iframe.contentDocument.close();
+      setTimeout(() => {
+        const doc = iframe.contentDocument;
+        const all = doc.querySelectorAll('*');
+        const wide = [];
+        all.forEach(el => {
+          const w = el.getBoundingClientRect().width;
+          if (w > 390) {
+            wide.push(el.tagName + '.' + (el.className||'') + ' width=' + w + ' text=' + el.innerText.substring(0, 20).replace(/\n/g, ' '));
+          }
+        });
+        document.title = 'RESULT: ' + wide.join(' || ');
+      }, 500);
+    });
+});
+</script>
+</head>
+<body></body>
+</html>

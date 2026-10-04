@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Mobile Preview AR</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 24px;
+      background-color: #e2ded5;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    .phone-frame {
+      width: 390px;
+      background-color: #f7f5f0;
+      border-radius: 40px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.22), 0 0 0 10px #2a2825;
+      overflow: hidden;
+      border: 4px solid #1a1918;
+    }
+    .phone-notch {
+      height: 28px;
+      background-color: #1a1918;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .notch-pill {
+      width: 110px;
+      height: 16px;
+      background-color: #000000;
+      border-radius: 12px;
+    }
+    iframe {
+      width: 390px;
+      height: 820px;
+      border: none;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    <div class="phone-notch"><div class="notch-pill"></div></div>
+    <iframe src="email_preview_ar.html"></iframe>
+  </div>
+</body>
+</html>

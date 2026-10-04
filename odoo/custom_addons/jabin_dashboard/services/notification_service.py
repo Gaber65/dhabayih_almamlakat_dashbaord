@@ -206,7 +206,9 @@ class NotificationService(models.AbstractModel):
         notification_type: str = 'admin',
         deep_link: Optional[str] = None,
         data: Optional[Dict[str, Any]] = None,
-        order_id: Optional[int] = None
+        order_id: Optional[int] = None,
+        priority: str = 'high',
+        **kwargs
     ):
         """Send push notification to Admin mobile application users and FCM topic."""
         full_data = dict(data or {})
@@ -258,7 +260,34 @@ class NotificationService(models.AbstractModel):
             except Exception as e:
                 _logger.warning("Failed sending admin notification to user %s: %s", admin.id, e)
 
-        # 3. Fallback: Save store notification with user_id=False so AdminNotificationsSheet always sees it
+        # 3. Live WebSocket Toast notification in Odoo Web Client (bus.bus)
+        try:
+            bus_bus = env['bus.bus'].sudo()
+            toast_data = {
+                'type': 'warning',
+                'title': title,
+                'message': body,
+                'sticky': True,
+            }
+            # Send to broadcast so every open admin session receives the live toast
+            bus_bus._sendone('broadcast', 'simple_notification', toast_data)
+            bus_bus._sendone('broadcast', 'jabin_order_event', {
+                'order_id': order_id,
+                'title': title,
+                'message': body,
+            })
+            for admin in admin_users:
+                if admin.partner_id:
+                    bus_bus._sendone(admin.partner_id, 'simple_notification', toast_data)
+                    bus_bus._sendone(admin.partner_id, 'jabin_order_event', {
+                        'order_id': order_id,
+                        'title': title,
+                        'message': body,
+                    })
+        except Exception as bus_err:
+            _logger.warning("Failed to dispatch real-time bus notification to Odoo web: %s", bus_err)
+
+        # 4. Fallback: Save store notification with user_id=False so AdminNotificationsSheet always sees it
         if not created_any:
             try:
                 env['jabin.notification'].sudo().create({
@@ -515,10 +544,46 @@ class NotificationService(models.AbstractModel):
     @api.model
     def send_payment_success(self, env, order, tx=None):
         """Notification for payment success."""
-        title = _("Payment Successful")
-        body = _("Your payment of %s SAR for order #%s was completed.") % (order.total, order.name)
+        # 1. Customer notification
+        title = _("تم سداد الطلب بنجاح")
+        body = _("تم استلام دفعة بقيمة %s ر.س للطلب رقم #%s بنجاح.") % (f"{order.total:.2f}", order.name)
         deep_link = f"jabin://orders/{order.id}"
-        self.send_to_user(env, order.customer_id.id, title, body, notification_type='payment', deep_link=deep_link, order_id=order.id)
+        if order.customer_id:
+            try:
+                self.send_to_user(env, order.customer_id.id, title, body, notification_type='payment', deep_link=deep_link, order_id=order.id)
+            except Exception as e:
+                _logger.warning("Failed sending payment success to customer: %s", e)
+
+        # 2. Live Admin alert for Odoo Web Client (bus.bus) and Admin Mobile
+        customer_name = order.customer_id.name if order.customer_id else _("عميل")
+        payment_code = getattr(order.payment_method_id, 'code', 'online') if hasattr(order, 'payment_method_id') else 'online'
+        admin_title = _("تم سداد الطلب بنجاح! 💳")
+        admin_body = _("تم سداد الطلب #%s بقيمة %s ر.س بنجاح بواسطة %s (العميل: %s)") % (
+            order.name,
+            f"{order.total:.2f}",
+            payment_code.upper(),
+            customer_name
+        )
+        try:
+            self.send_to_admins(
+                env=env,
+                title=admin_title,
+                body=admin_body,
+                required_permission='orders_manage',
+                notification_type='admin',
+                deep_link=deep_link,
+                data={
+                    'order_id': str(order.id),
+                    'type': 'payment_success',
+                    'order_name': order.name,
+                    'customer_name': customer_name,
+                    'total': str(order.total)
+                },
+                order_id=order.id,
+                priority='high'
+            )
+        except Exception as e:
+            _logger.warning("Failed sending payment success notification to admins: %s", e)
 
     @api.model
     def send_payment_failed(self, env, order, tx=None):

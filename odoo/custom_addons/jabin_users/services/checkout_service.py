@@ -140,9 +140,16 @@ class CheckoutService:
         })
 
         # Trigger completed order notifications (customer + admin) with full order lines and final totals
+        # For online payments (e.g. Moyasar/Cards), order remains in pending_payment and notification is fired upon payment verification.
         try:
             order._compute_totals()
-            env["jabin.notification.service"].sudo().send_order_created(env, order)
+            is_online = bool(
+                order.payment_method_id
+                and order.payment_method_id.code != "cod"
+                and order.payment_method_id.provider not in ("manual", "bank_transfer", False)
+            )
+            if not is_online:
+                env["jabin.notification.service"].sudo().send_order_created(env, order)
         except Exception as notif_err:
             import logging
             logging.getLogger(__name__).warning("Failed to trigger order created notification: %s", notif_err)
