@@ -34,11 +34,11 @@ db_name = railway
 admin_passwd = Gaber@1907
 smtp_server = smtp.gmail.com
 smtp_port = 587
-smtp_user = gaberfares66@gmail.com
-smtp_password = rofg skzv jwrg bcjg
+smtp_user = zbayhalmmlkh@gmail.com
+smtp_password = ilno ommm ipxi eewv
 smtp_tls = True
 smtp_ssl = False
-email_from = gaberfares66@gmail.com
+email_from = zbayhalmmlkh@gmail.com
 EOF
 
 CMD ["python", "odoo-bin", "-c", "odoo.conf"]

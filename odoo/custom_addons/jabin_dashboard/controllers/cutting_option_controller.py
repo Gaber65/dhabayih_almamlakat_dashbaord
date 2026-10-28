@@ -228,7 +228,7 @@ class CuttingOptionController(BaseApiController):
         return ctx.response
 
     @http.route(
-        "/api/v1/catalog/cutting-options",
+        ["/api/v1/catalog/cutting-options", "/api/v1/cutting-options"],
         type="http",
         auth="public",
         methods=["GET"],

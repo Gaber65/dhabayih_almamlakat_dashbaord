@@ -25,6 +25,17 @@ class JabinProductSize(models.Model):
         translate=True,
         help='Additional note or qualification (e.g. يجزئ عقيقة)'
     )
+    portion_type = fields.Selection([
+        ('full', 'كامل'),
+        ('half', 'نصف'),
+        ('quarter', 'ربع'),
+    ], string='Portion Type', default='full', required=True, index=True)
+    weight_range = fields.Char(
+        string='Weight Range',
+        help='Estimated weight range (e.g. 11 - 12 كجم)'
+    )
+    min_weight = fields.Float(string='Min Weight (kg)')
+    max_weight = fields.Float(string='Max Weight (kg)')
     price = fields.Float(
         string='Price',
         required=True,

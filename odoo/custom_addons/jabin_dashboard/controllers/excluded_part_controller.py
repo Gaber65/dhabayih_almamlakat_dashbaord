@@ -305,7 +305,7 @@ class ExcludedPartController(BaseApiController):
         return ctx.response
 
     @http.route(
-        "/api/v1/catalog/excluded-parts",
+        ["/api/v1/catalog/excluded-parts", "/api/v1/excluded-parts"],
         type="http",
         auth="public",
         methods=["GET"],

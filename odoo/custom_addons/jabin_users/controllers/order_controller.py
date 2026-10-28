@@ -92,7 +92,7 @@ class OrderController(BaseApiController):
                 redeem_points=redeem_points
             )
 
-            moyasar_pk = request.env['ir.config_parameter'].sudo().get_param('moyasar.publishable_key', 'pk_test_jmsPpaHEyAKUgFwNnLzhnzsCzbSPg11Lu7hN3Ex4')
+            moyasar_pk = request.env['ir.config_parameter'].sudo().get_param('moyasar.publishable_key', 'pk_live_KRnTr1yvmuDRP4rxQnyx9NvdutbzbNCV32uNVX3L')
             myfatoorah_token = None
             if order.payment_method_id and order.payment_method_id.code != "cod":
                 myfatoorah_token = request.env['ir.config_parameter'].sudo().get_param('jabin.myfatoorah.api_token', 'myfatoorah_test_token')

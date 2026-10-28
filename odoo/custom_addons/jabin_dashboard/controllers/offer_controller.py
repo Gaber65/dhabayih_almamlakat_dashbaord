@@ -1,6 +1,7 @@
 import base64
 import json
 import logging
+from datetime import datetime, date
 from typing import Dict, Any, Optional
 from odoo import http, fields, _
 from odoo.http import request
@@ -11,6 +12,22 @@ from odoo.addons.jabin_security.decorators.permission_required import permission
 
 _logger = JabinLogger.get("offer.controller")
 _ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/jpg", "image/png", "image/webp"}
+
+
+def _normalize_date(date_val):
+    if not date_val or date_val is False:
+        return False
+    if isinstance(date_val, (date, datetime)):
+        return date_val.strftime("%Y-%m-%d")
+    s = str(date_val).strip()
+    if not s or s.lower() in ("false", "null", "none", "undefined", ""):
+        return False
+    for fmt in ("%Y-%m-%d", "%d/%m/%Y", "%m/%d/%Y", "%Y/%m/%d", "%d-%m-%Y", "%m-%d-%Y"):
+        try:
+            return datetime.strptime(s.split("T")[0], fmt).strftime("%Y-%m-%d")
+        except ValueError:
+            pass
+    return s.split("T")[0]
 
 
 def _read_image_upload(file_field_name: str = "banner_image") -> Optional[bytes]:
@@ -253,10 +270,14 @@ class OfferController(BaseApiController):
                 offer_vals["subtitle"] = str(vals.get("subtitle") or "").strip()
             if "description" in vals:
                 offer_vals["description"] = str(vals.get("description") or "").strip()
-            if "start_date" in vals and vals.get("start_date"):
-                offer_vals["start_date"] = str(vals["start_date"]).strip()
-            if "end_date" in vals and vals.get("end_date"):
-                offer_vals["end_date"] = str(vals["end_date"]).strip()
+            if "start_date" in vals:
+                d = _normalize_date(vals.get("start_date"))
+                if d:
+                    offer_vals["start_date"] = d
+            if "end_date" in vals:
+                d = _normalize_date(vals.get("end_date"))
+                if d:
+                    offer_vals["end_date"] = d
             if "badge_text" in vals and vals.get("badge_text"):
                 offer_vals["badge_text"] = str(vals["badge_text"]).strip()
             if "active" in vals:
@@ -317,9 +338,9 @@ class OfferController(BaseApiController):
                 except (ValueError, TypeError):
                     pass
             if "start_date" in vals:
-                update_vals["start_date"] = vals["start_date"] or False
+                update_vals["start_date"] = _normalize_date(vals.get("start_date"))
             if "end_date" in vals:
-                update_vals["end_date"] = vals["end_date"] or False
+                update_vals["end_date"] = _normalize_date(vals.get("end_date"))
             if "badge_text" in vals:
                 update_vals["badge_text"] = vals["badge_text"]
             if "active" in vals:

@@ -250,7 +250,7 @@ class CategoryController(BaseApiController):
         return ctx.response
 
     @http.route(
-        "/api/v1/catalog/categories",
+        ["/api/v1/catalog/categories", "/api/v1/categories"],
         type="http",
         auth="public",
         methods=["GET"],

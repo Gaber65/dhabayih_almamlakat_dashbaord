@@ -228,7 +228,7 @@ class PackagingController(BaseApiController):
         return ctx.response
 
     @http.route(
-        "/api/v1/catalog/packagings",
+        ["/api/v1/catalog/packagings", "/api/v1/packagings"],
         type="http",
         auth="public",
         methods=["GET"],

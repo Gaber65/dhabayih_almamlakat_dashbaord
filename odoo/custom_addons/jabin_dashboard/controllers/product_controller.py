@@ -1,8 +1,10 @@
-# product_controller.py
 import base64
 import json
+import logging
 import time
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional, List, Tuple
+
+_logger = logging.getLogger(__name__)
 
 from odoo import http, _
 from odoo.exceptions import ValidationError
@@ -39,7 +41,7 @@ def _parse_request_data() -> Dict[str, Any]:
         }
 
         # Handle boolean fields
-        for bool_field in ("active", "is_featured", "is_best_seller"):
+        for bool_field in ("active", "is_featured", "is_best_seller", "is_carcass"):
             if bool_field in vals:
                 vals[bool_field] = vals[bool_field].lower() not in ("false", "0", "no")
 
@@ -108,11 +110,15 @@ def _parse_request_data() -> Dict[str, Any]:
             else:
                 vals["main_image"] = img_str
 
+    # Preserve raw_sizes before stripping non-model fields
+    if "sizes" in vals:
+        vals["_raw_sizes"] = vals.pop("sizes")
+
     # Strip computed / non-model fields that would cause write errors
     for f in (
         "is_available", "is_on_offer", "offer_price", "profit",
         "offer_profit", "profit_percentage", "loyalty_points",
-        "has_sizes", "sizes", "cutting_options", "packaging_options",
+        "has_sizes", "cutting_options", "packaging_options",
         "excluded_parts", "images"
     ):
         vals.pop(f, None)
@@ -205,44 +211,109 @@ def _read_multiple_images(file_field_name: str = "images") -> List[str]:
 
 
 def _get_lang() -> str:
-    """Get language from Accept-Language header."""
-    lang = request.httprequest.headers.get("Accept-Language", "en_US")
-    lang_map = {
-        "ar": "ar_001",
-        "en": "en_US"
-    }
-    return lang_map.get(lang.split('_')[0], "en_US")
+    """Get language from query param or Accept-Language header."""
+    lang_param = (request.params.get("lang") if hasattr(request, "params") else None) or request.httprequest.args.get("lang")
+    if lang_param:
+        lp = lang_param.strip().lower()
+        if lp.startswith("ar"):
+            return "ar_001"
+        elif lp.startswith("en"):
+            return "en_US"
+
+    accept_lang = request.httprequest.headers.get("Accept-Language", "")
+    if accept_lang:
+        for part in accept_lang.split(","):
+            part_lang = part.split(";")[0].strip().lower()
+            if part_lang.startswith("ar"):
+                return "ar_001"
+            elif part_lang.startswith("en"):
+                return "en_US"
+
+    return "ar_001"
+
+
+def _extract_multilang(record, field_name: str) -> Tuple[str, str]:
+    """Extract (val_ar, val_en) safely from a translatable field."""
+    raw = None
+    try:
+        data = record.read([field_name])[0]
+        raw = data.get(field_name)
+    except Exception:
+        pass
+
+    val_ar = ""
+    val_en = ""
+    if isinstance(raw, dict):
+        val_ar = raw.get("ar_001") or raw.get("ar") or ""
+        val_en = raw.get("en_US") or raw.get("en") or ""
+
+    if not val_ar and val_en:
+        if any('\u0600' <= c <= '\u06FF' for c in val_en):
+            val_ar = val_en
+            val_en = ""
+    elif not val_en and val_ar:
+        if not any('\u0600' <= c <= '\u06FF' for c in val_ar):
+            val_en = val_ar
+            val_ar = ""
+
+    fallback = getattr(record, field_name, "") or ""
+    if not val_ar and fallback:
+        val_ar = fallback
+    if not val_en and fallback:
+        val_en = fallback
+
+    return str(val_ar or ""), str(val_en or "")
 
 
 def _get_product_main_image_url(product) -> Optional[str]:
-    """Get the primary image URL for a product, checking main_image first then gallery."""
+    """Get the primary image URL for a product with cache-busting version query."""
+    v = int(product.write_date.timestamp()) if getattr(product, "write_date", False) else 1
     if getattr(product, "main_image", False):
-        return BaseApiController.build_image_url("jabin.product", product.id, "main_image")
+        url = BaseApiController.build_image_url("jabin.product", product.id, "main_image")
+        return f"{url}?v={v}" if url else None
     first_img = product.product_image_ids[:1]
     if first_img:
-        return BaseApiController.build_image_url("jabin.product.image", first_img.id, "image")
+        v_img = int(first_img.write_date.timestamp()) if getattr(first_img, "write_date", False) else v
+        url = BaseApiController.build_image_url("jabin.product.image", first_img.id, "image")
+        return f"{url}?v={v_img}" if url else None
     return None
 
 
 def _serialize_product(product) -> Dict[str, Any]:
     """Return the full product dict used by get_product."""
     main_img_url = _get_product_main_image_url(product)
+    name_ar, name_en = _extract_multilang(product, "name")
+    desc_ar, desc_en = _extract_multilang(product, "description")
+    current_lang = _get_lang()
+    active_name = name_en if current_lang == "en_US" and name_en else (name_ar or name_en)
+    active_desc = desc_en if current_lang == "en_US" and desc_en else (desc_ar or desc_en)
+
+    is_on_offer = bool(product.is_on_offer or (product.offer_price and product.selling_price and product.offer_price < product.selling_price))
+    d_type = product.discount_type or "percentage"
+    d_val = float(product.discount_value or 0.0)
+    selling = float(product.selling_price or 0.0)
+    offer_pr = float(product.offer_price or 0.0)
+
     return {
         "id": product.id,
         "category_id": product.category_id.id,
         "category_name": product.category_id.name,
-        "name": product.name,
-        "description": product.description or "",
+        "name": active_name,
+        "name_ar": name_ar,
+        "name_en": name_en,
+        "description": active_desc,
+        "description_ar": desc_ar,
+        "description_en": desc_en,
         "sku": product.sku or "",
         "barcode": product.barcode or "",
         "purchase_price": product.purchase_price,
         "selling_price": product.selling_price,
-        "discount_type": product.discount_type or "percentage",
-        "discount_value": product.discount_value,
+        "discount_type": d_type,
+        "discount_value": d_val,
         "offer_price": product.offer_price,
         "offer_start_date": str(product.offer_start_date) if product.offer_start_date else None,
         "offer_end_date": str(product.offer_end_date) if product.offer_end_date else None,
-        "is_on_offer": product.is_on_offer,
+        "is_on_offer": is_on_offer,
         "profit": product.profit,
         "offer_profit": product.offer_profit,
         "profit_percentage": product.profit_percentage,
@@ -257,14 +328,21 @@ def _serialize_product(product) -> Dict[str, Any]:
         "is_available": product.is_available,
         "is_featured": product.is_featured,
         "is_best_seller": product.is_best_seller,
-        "is_offer": product.is_on_offer,
+        "is_offer": is_on_offer,
+        "is_carcass": bool(getattr(product, "is_carcass", False)),
         "has_sizes": getattr(product, "has_sizes", False),
         "sizes": [
             {
                 "id": s.id,
                 "name": s.name,
                 "sub_title": s.sub_title or "",
-                "price": s.price,
+                "portion_type": getattr(s, "portion_type", "full") or "full",
+                "weight_range": getattr(s, "weight_range", "") or "",
+                "min_weight": getattr(s, "min_weight", 0.0) or 0.0,
+                "max_weight": getattr(s, "max_weight", 0.0) or 0.0,
+                "price": round(s.price * (1 - d_val / 100), 2) if is_on_offer and d_type == "percentage" and d_val > 0 else (round(s.price * (offer_pr / selling), 2) if is_on_offer and offer_pr > 0 and selling > 0 and offer_pr < selling else s.price),
+                "original_price": s.price if is_on_offer else None,
+                "offer_price": round(s.price * (1 - d_val / 100), 2) if is_on_offer and d_type == "percentage" and d_val > 0 else (round(s.price * (offer_pr / selling), 2) if is_on_offer and offer_pr > 0 and selling > 0 and offer_pr < selling else None),
                 "calories": s.calories,
                 "loyalty_points": s.loyalty_points,
                 "points_price": s.points_price,
@@ -273,6 +351,35 @@ def _serialize_product(product) -> Dict[str, Any]:
             }
             for s in (product.size_ids.filtered(lambda x: x.active) if hasattr(product, "size_ids") else [])
         ],
+        "portions": [
+            {
+                "type": "full",
+                "name": "كامل",
+                "title": f"{product.name} كامل",
+                "subtitle": "ذبيحة كاملة مجهزة بالكامل",
+                "image_url": main_img_url,
+                "starting_price": min([s.price for s in product.size_ids.filtered(lambda x: x.active and getattr(x, 'portion_type', 'full') == 'full')] or [product.selling_price or 0.0]),
+                "size_count": len([s for s in product.size_ids.filtered(lambda x: x.active and getattr(x, 'portion_type', 'full') == 'full')]),
+            },
+            {
+                "type": "half",
+                "name": "نصف",
+                "title": f"نصف {product.name}",
+                "subtitle": "نصف ذبيحة طازج مقسوم بالطول",
+                "image_url": BaseApiController.build_image_url("jabin.product", product.id, "half_image", bool(getattr(product, 'half_image', False))) or main_img_url,
+                "starting_price": min([s.price for s in product.size_ids.filtered(lambda x: x.active and getattr(x, 'portion_type', 'full') == 'half')] or [round((product.selling_price or 0.0) * 0.5, 2)]),
+                "size_count": len([s for s in product.size_ids.filtered(lambda x: x.active and getattr(x, 'portion_type', 'full') == 'half')]),
+            },
+            {
+                "type": "quarter",
+                "name": "ربع",
+                "title": f"ربع {product.name}",
+                "subtitle": "ربع متكامل (كتف أو فخذ مع ضلوع)",
+                "image_url": BaseApiController.build_image_url("jabin.product", product.id, "quarter_image", bool(getattr(product, 'quarter_image', False))) or main_img_url,
+                "starting_price": min([s.price for s in product.size_ids.filtered(lambda x: x.active and getattr(x, 'portion_type', 'full') == 'quarter')] or [round((product.selling_price or 0.0) * 0.25, 2)]),
+                "size_count": len([s for s in product.size_ids.filtered(lambda x: x.active and getattr(x, 'portion_type', 'full') == 'quarter')]),
+            },
+        ] if getattr(product, "is_carcass", False) else [],
         "cutting_options": [
             {"id": opt.id, "name": opt.name}
             for opt in product.cutting_option_ids
@@ -347,7 +454,7 @@ class ProductController(BaseApiController):
                     if first_cat:
                         vals["category_id"] = first_cat.id
 
-                raw_sizes = vals.get("sizes")
+                raw_sizes = vals.pop("_raw_sizes", None) or vals.pop("sizes", None)
 
                 # Create product via service
                 product = ProductService.create(
@@ -367,6 +474,8 @@ class ProductController(BaseApiController):
                                     "price": float(s.get("price", 0.0)),
                                     "calories": int(s.get("calories") or 243),
                                     "sequence": int(s.get("sequence") or ((idx + 1) * 10)),
+                                    "portion_type": str(s.get("portion_type") or "full").lower().strip(),
+                                    "weight_range": str(s.get("weight_range") or "").strip(),
                                     "is_default": bool(s.get("is_default", idx == 0)),
                                     "active": bool(s.get("active", True) if "active" in s else s.get("is_active", True)),
                                 })
@@ -652,7 +761,7 @@ class ProductController(BaseApiController):
                             for idx, img_b64 in enumerate(extra_images)
                         ]
 
-                raw_sizes = vals.get("sizes")
+                raw_sizes = vals.pop("_raw_sizes", None) or vals.pop("sizes", None)
 
                 # Update product via service
                 product = ProductService.update(
@@ -673,9 +782,21 @@ class ProductController(BaseApiController):
                             "price": float(s.get("price", 0.0)),
                             "calories": int(s.get("calories") or 243),
                             "sequence": int(s.get("sequence") or ((idx + 1) * 10)),
+                            "portion_type": str(s.get("portion_type") or "full").lower().strip(),
+                            "weight_range": str(s.get("weight_range") or "").strip(),
                             "is_default": bool(s.get("is_default", False)),
                             "active": bool(s.get("active", True) if "active" in s else s.get("is_active", True)),
                         }
+                        if s.get("min_weight") is not None:
+                            try:
+                                size_vals["min_weight"] = float(s["min_weight"])
+                            except (ValueError, TypeError):
+                                pass
+                        if s.get("max_weight") is not None:
+                            try:
+                                size_vals["max_weight"] = float(s["max_weight"])
+                            except (ValueError, TypeError):
+                                pass
                         try:
                             if size_id:
                                 existing = request.env["jabin.product.size"].sudo().browse(int(size_id))

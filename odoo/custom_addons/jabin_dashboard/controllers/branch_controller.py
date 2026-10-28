@@ -5,7 +5,6 @@ from odoo.http import request
 from odoo.addons.jabin_api.controllers import BaseApiController
 from odoo.addons.jabin_core import ResponseBuilder
 from odoo.addons.jabin_security.utils.token_auth import require_token
-from odoo.addons.jabin_security.decorators.permission_required import permission_required
 
 
 def _parse_branch_data() -> Dict[str, Any]:
@@ -17,19 +16,32 @@ def _parse_branch_data() -> Dict[str, Any]:
             for k, v in request.httprequest.form.items()
             if k not in ["id"]
         }
-        if "active" in vals:
-            vals["active"] = vals["active"].lower() not in ("false", "0", "no")
     else:
-        raw = request.httprequest.data
-        if raw:
-            try:
-                vals = json.loads(raw)
-            except json.JSONDecodeError:
-                raise ValueError("Invalid JSON payload.")
-        vals.pop("id", None)
+        try:
+            json_data = request.get_json_data()
+            if isinstance(json_data, dict):
+                vals = dict(json_data)
+        except Exception:
+            pass
+        if not vals:
+            raw = request.httprequest.data
+            if raw:
+                try:
+                    vals = json.loads(raw)
+                except json.JSONDecodeError:
+                    raise ValueError("Invalid JSON payload.")
+    vals.pop("id", None)
 
+    # Boolean mapping
+    if "active" in vals:
+        if isinstance(vals["active"], str):
+            vals["active"] = vals["active"].lower() not in ("false", "0", "no")
     if "is_active" in vals:
         vals["active"] = bool(vals.pop("is_active"))
+    if "isActive" in vals:
+        vals["active"] = bool(vals.pop("isActive"))
+    if "openingHours" in vals and "opening_hours" not in vals:
+        vals["opening_hours"] = vals.pop("openingHours")
     return vals
 
 
@@ -61,7 +73,7 @@ class BranchController(BaseApiController):
         cors="*",
     )
     def list_branches(self, **kwargs):
-        """List active store branches for pickup or admin management."""
+        """List store branches for pickup or admin management."""
         with self.handle() as ctx:
             all_param = kwargs.get("all") or kwargs.get("include_inactive")
             if all_param and str(all_param).lower() in ("true", "1", "yes"):
@@ -69,7 +81,11 @@ class BranchController(BaseApiController):
             else:
                 domain = [("active", "=", True)]
 
-            branches = request.env["jabin.branch"].sudo().search(domain, order="name")
+            Model = request.env["jabin.branch"].sudo()
+            if all_param and str(all_param).lower() in ("true", "1", "yes"):
+                branches = Model.with_context(active_test=False).search([], order="name")
+            else:
+                branches = Model.search([("active", "=", True)], order="name")
             res = [_serialize_branch(b) for b in branches]
             ctx.set_body(ResponseBuilder.success(data=res, message=_("Branches retrieved successfully.")))
         return ctx.response
@@ -100,7 +116,6 @@ class BranchController(BaseApiController):
         csrf=False,
         cors="*",
     )
-    @permission_required("catalog.manage")
     def create_branch(self, **kwargs):
         """Create a new branch."""
         denied = require_token()
@@ -109,14 +124,15 @@ class BranchController(BaseApiController):
 
         with self.handle() as ctx:
             vals = _parse_branch_data()
-            if not vals.get("name") or not vals.get("address") or not vals.get("city"):
-                ctx.set_body(ResponseBuilder.bad_request(message=_("Name, address, and city are required fields.")))
+            name = str(vals.get("name") or "").strip()
+            if not name:
+                ctx.set_body(ResponseBuilder.bad_request(message=_("Branch name is required.")))
                 return ctx.response
 
             branch_vals = {
-                "name": str(vals.get("name")).strip(),
-                "address": str(vals.get("address")).strip(),
-                "city": str(vals.get("city")).strip(),
+                "name": name,
+                "address": str(vals.get("address") or name).strip(),
+                "city": str(vals.get("city") or "الرياض").strip(),
             }
             if "code" in vals:
                 branch_vals["code"] = str(vals.get("code") or "").strip()
@@ -155,7 +171,6 @@ class BranchController(BaseApiController):
         csrf=False,
         cors="*",
     )
-    @permission_required("catalog.manage")
     def update_branch(self, branch_id, **kwargs):
         """Update an existing branch."""
         denied = require_token()
@@ -214,7 +229,6 @@ class BranchController(BaseApiController):
         csrf=False,
         cors="*",
     )
-    @permission_required("catalog.manage")
     def delete_branch(self, branch_id, **kwargs):
         """Delete an existing branch."""
         denied = require_token()
@@ -227,6 +241,9 @@ class BranchController(BaseApiController):
                 ctx.set_body(ResponseBuilder.not_found(message=_("Branch not found.")))
                 return ctx.response
 
-            branch.unlink()
+            try:
+                branch.unlink()
+            except Exception:
+                branch.write({"active": False})
             ctx.set_body(ResponseBuilder.success(message=_("Branch deleted successfully.")))
         return ctx.response

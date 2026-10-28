@@ -29,6 +29,7 @@
                 <field name="stock_quantity"/>
                 <field name="minimum_stock" invisible="1"/>
                 <field name="is_available"/>
+                <field name="is_carcass" optional="show"/>
                 <field name="is_featured"/>
                 <field name="is_best_seller"/>
                 <field name="active"/>
@@ -75,6 +76,7 @@
                         </group>
                         <group>
                             <field name="active"/>
+                            <field name="is_carcass"/>
                             <field name="is_featured"/>
                             <field name="is_best_seller"/>
                         </group>
@@ -111,10 +113,18 @@
                     </group>
                     <notebook>
                         <page string="Media">
-                            <group>
+                            <group string="Main Product Image">
                                 <field name="main_image" widget="image" class="oe_avatar" options="{'preview_image': 'main_image'}"/>
                             </group>
-                            <group>
+                            <group string="Carcass Portions Images (صور تقسيمات الذبيحة)" invisible="is_carcass == False">
+                                <group string="Half Carcass (نصف ذبيحة)">
+                                    <field name="half_image" widget="image" class="oe_avatar" options="{'preview_image': 'half_image'}"/>
+                                </group>
+                                <group string="Quarter Carcass (ربع ذبيحة)">
+                                    <field name="quarter_image" widget="image" class="oe_avatar" options="{'preview_image': 'quarter_image'}"/>
+                                </group>
+                            </group>
+                            <group string="Gallery Images">
                                 <field name="product_image_ids">
                                     <tree editable="bottom">
                                         <field name="sequence" widget="handle"/>
@@ -134,21 +144,86 @@
                                 <field name="excluded_part_ids" widget="many2many_tags"/>
                             </group>
                         </page>
-                        <page string="Carcass Sizes (الأحجام)" name="sizes">
+                        <page string="Carcass Sizes &amp; Portions (أحجام وتقسيمات الذبيحة)" name="sizes">
                             <field name="size_ids">
                                 <tree editable="bottom">
                                     <field name="sequence" widget="handle"/>
+                                    <field name="portion_type" string="Portion (التقسيم)"/>
                                     <field name="name" string="Size Name (اسم الحجم)"/>
-                                    <field name="sub_title" string="Subtitle / Notes (ملاحظة مثلاً: يجزئ عقيقة)"/>
+                                    <field name="weight_range" string="Weight Range (الوزن التقديري)"/>
+                                    <field name="min_weight" string="Min Wt (كجم)"/>
+                                    <field name="max_weight" string="Max Wt (كجم)"/>
                                     <field name="price" string="Price (السعر)"/>
                                     <field name="calories" string="Calories (السعرات)"/>
                                     <field name="loyalty_points" string="Loyalty Points" readonly="1"/>
+                                    <field name="sub_title" string="Subtitle / Notes (ملاحظة)" optional="show"/>
                                     <field name="is_default" string="Default (افتراضي)"/>
                                     <field name="active" string="Active"/>
                                 </tree>
                             </field>
                         </page>
                     </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Product Size Tree View -->
+    <record id="view_jabin_product_size_tree" model="ir.ui.view">
+        <field name="name">jabin.product.size.tree</field>
+        <field name="model">jabin.product.size</field>
+        <field name="arch" type="xml">
+            <tree string="Carcass Sizes &amp; Portions" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="product_id"/>
+                <field name="portion_type"/>
+                <field name="name"/>
+                <field name="weight_range"/>
+                <field name="min_weight"/>
+                <field name="max_weight"/>
+                <field name="price"/>
+                <field name="calories"/>
+                <field name="loyalty_points" readonly="1"/>
+                <field name="points_price" readonly="1"/>
+                <field name="is_default"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Product Size Form View -->
+    <record id="view_jabin_product_size_form" model="ir.ui.view">
+        <field name="name">jabin.product.size.form</field>
+        <field name="model">jabin.product.size</field>
+        <field name="arch" type="xml">
+            <form string="Carcass Size &amp; Portion">
+                <sheet>
+                    <group>
+                        <group string="Basic Information">
+                            <field name="product_id"/>
+                            <field name="name"/>
+                            <field name="portion_type"/>
+                            <field name="sub_title"/>
+                        </group>
+                        <group string="Weights &amp; Specifications">
+                            <field name="weight_range"/>
+                            <field name="min_weight"/>
+                            <field name="max_weight"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Pricing &amp; Points">
+                            <field name="price"/>
+                            <field name="calories"/>
+                            <field name="loyalty_points" readonly="1"/>
+                            <field name="points_price" readonly="1"/>
+                        </group>
+                        <group string="Settings">
+                            <field name="is_default"/>
+                            <field name="active"/>
+                            <field name="sequence"/>
+                        </group>
+                    </group>
                 </sheet>
             </form>
         </field>
@@ -167,6 +242,7 @@
                 <filter name="active" string="Active" domain="[('active','=',True)]"/>
                 <filter name="inactive" string="Inactive" domain="[('active','=',False)]"/>
                 <separator/>
+                <filter name="is_carcass" string="Carcasses (ذبائح تقبل التقسيم)" domain="[('is_carcass','=',True)]"/>
                 <filter name="on_offer" string="On Offer" domain="[('is_on_offer','=',True)]"/>
                 <filter name="in_stock" string="In Stock" domain="[('stock_quantity','>',0)]"/>
                 <filter name="low_stock" string="Low Stock" domain="[('stock_quantity','&lt;=','minimum_stock')]"/>

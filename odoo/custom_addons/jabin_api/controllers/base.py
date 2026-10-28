@@ -180,7 +180,7 @@ class BaseApiController(http.Controller):
             headers = [
                 ("Content-Type", mimetype),
                 ("Content-Length", str(len(image_data))),
-                ("Cache-Control", "public, max-age=86400"),
+                ("Cache-Control", "public, max-age=300, must-revalidate"),
             ]
             return Response(image_data, status=200, headers=headers)
         except Exception:
@@ -204,6 +204,9 @@ class BaseApiController(http.Controller):
         body = JsonHelper.dumps(envelope)
         headers = {
             "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+            "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization, Accept-Language",
         }
         if extra_headers:
             headers.update(extra_headers)

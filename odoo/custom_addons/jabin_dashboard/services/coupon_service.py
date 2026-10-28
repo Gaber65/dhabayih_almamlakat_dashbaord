@@ -175,7 +175,39 @@ class CouponService:
             order = None
 
         if not order or not order.exists():
-            raise ValidationError(_("Active order not found."))
+            clean_code = (code or "").strip().upper()
+            coupon = env["jabin.coupon"].sudo().search([("code", "=", clean_code)], limit=1)
+            if not coupon or not coupon.exists():
+                raise ValidationError(_("Coupon code '%s' not found or invalid.") % clean_code)
+            if not coupon.active:
+                raise ValidationError(_("Coupon code '%s' is inactive.") % clean_code)
+            now = fields.Datetime.now()
+            if coupon.start_date and now < coupon.start_date:
+                raise ValidationError(_("Coupon is not valid yet."))
+            if coupon.end_date and now > coupon.end_date:
+                raise ValidationError(_("Coupon has expired."))
+            if coupon.usage_limit > 0 and coupon.used_count >= coupon.usage_limit:
+                raise ValidationError(_("Coupon usage limit has been reached."))
+
+            return {
+                "order_id": None,
+                "order_number": None,
+                "subtotal": 0.0,
+                "coupon": {
+                    "id": coupon.id,
+                    "code": coupon.code,
+                    "name": coupon.name,
+                    "discount_type": coupon.discount_type,
+                    "discount_value": coupon.discount_value,
+                    "maximum_discount": coupon.maximum_discount,
+                    "minimum_order_amount": coupon.minimum_order_amount,
+                },
+                "discount_amount": 0.0,
+                "total_after_discount": 0.0,
+                "tax_amount": 0.0,
+                "grand_total": 0.0,
+                "message": _("Coupon applied successfully"),
+            }
 
         if customer_id and order.customer_id.id != customer_id:
             raise ValidationError(_("Order does not belong to the authenticated user."))

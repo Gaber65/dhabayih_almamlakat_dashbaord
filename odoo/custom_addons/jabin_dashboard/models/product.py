@@ -103,6 +103,8 @@ class JabinProduct(models.Model):
 
     # Media
     main_image = fields.Binary(string='Main Image', attachment=True)
+    half_image = fields.Binary(string='Half Portion Image', attachment=True)
+    quarter_image = fields.Binary(string='Quarter Portion Image', attachment=True)
 
     # Status
     active = fields.Boolean(string='Active', default=True, )
@@ -113,6 +115,7 @@ class JabinProduct(models.Model):
     )
     is_featured = fields.Boolean(string='Is Featured', default=False)
     is_best_seller = fields.Boolean(string='Is Best Seller', default=False)
+    is_carcass = fields.Boolean(string='Is Dividable Carcass', default=False, help='If true, product can be divided into portions (full, half, quarter)')
 
     # Relationships
     cutting_option_ids = fields.Many2many(

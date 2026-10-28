@@ -329,3 +329,111 @@ class HomeController(BaseApiController):
             ctx.set_body(ResponseBuilder.success(data=data, message=_("Contact settings updated successfully.")))
         return ctx.response
 
+    @http.route(
+        ["/api/v1/admin/settings/invoice", "/api/v1/settings/invoice"],
+        type="http",
+        auth="public",
+        methods=["GET"],
+        csrf=False,
+        cors="*",
+    )
+    def get_invoice_settings(self, **kwargs):
+        """Get company tax & invoice printing settings."""
+        with self.handle() as ctx:
+            env = request.env
+            config = env['ir.config_parameter'].sudo()
+            main_comp = env.ref('base.main_company', raise_if_not_found=False) or env['res.company'].sudo().search([], limit=1)
+
+            company_raw = (main_comp.name or "") if main_comp else ""
+            company_name = "ذبائح المملكة" if (not company_raw or "YourCompany" in company_raw or "My Company" in company_raw) else company_raw
+
+            data = {
+                "company_name": company_name,
+                "company_name_en": "Dhabayih Lmamlaka",
+                "vat_number": (main_comp.vat if main_comp else "") or "310198765400003",
+                "cr_number": (main_comp.company_registry if main_comp else "") or "1010892341",
+                "phone": (main_comp.phone if main_comp else "") or config.get_param('jabin.support_phone', '0568741660'),
+                "email": (main_comp.email if main_comp else "") or "info@dhabayih.com",
+                "address": f"{main_comp.street or 'طريق الملك فهد'} - {main_comp.city or 'الرياض'}" if main_comp else "المملكة العربية السعودية - الرياض",
+                "paper_format": config.get_param('jabin_invoice.paper_format', 'thermal_80'),
+                "receipt_width": int(config.get_param('jabin_invoice.receipt_width', 80)),
+                "show_logo": config.get_param('jabin_invoice.show_logo', 'True') in ('True', 'true', '1'),
+                "show_qr": config.get_param('jabin_invoice.show_qr', 'True') in ('True', 'true', '1'),
+                "header_note": config.get_param('jabin_invoice.header_note', 'ذبائح ولحوم بلدية طازجة وفق الشريعة الإسلامية'),
+                "footer_note": config.get_param('jabin_invoice.footer_note', 'شكراً لتسوقكم من ذبائح المملكة | خدمة العملاء: 0568741660'),
+                "vat_rate": float(config.get_param('jabin_invoice.vat_rate', '15.0')),
+                "prefix": config.get_param('jabin_invoice.prefix', 'INV-'),
+            }
+            ctx.set_body(ResponseBuilder.success(data=data, message=_("Invoice settings retrieved successfully.")))
+        return ctx.response
+
+    @http.route(
+        ["/api/v1/admin/settings/invoice", "/api/v1/settings/invoice"],
+        type="http",
+        auth="public",
+        methods=["POST", "PUT"],
+        csrf=False,
+        cors="*",
+    )
+    def update_invoice_settings(self, **kwargs):
+        """Update company tax & invoice printing settings."""
+        denied = require_token()
+        if denied:
+            return denied
+
+        with self.handle() as ctx:
+            content_type = request.httprequest.content_type or ""
+            vals = {}
+            if "multipart/form-data" in content_type:
+                vals = dict(request.httprequest.form.items())
+            else:
+                raw = request.httprequest.data
+                if raw:
+                    try:
+                        vals = json.loads(raw)
+                    except json.JSONDecodeError:
+                        raise ValueError("Invalid JSON payload.")
+
+            env = request.env
+            config = env['ir.config_parameter'].sudo()
+            main_comp = env.ref('base.main_company', raise_if_not_found=False) or env['res.company'].sudo().search([], limit=1)
+
+            if main_comp:
+                comp_vals = {}
+                if "company_name" in vals and vals["company_name"]:
+                    comp_vals["name"] = str(vals["company_name"]).strip()
+                if "vat_number" in vals:
+                    comp_vals["vat"] = str(vals["vat_number"]).strip()
+                if "cr_number" in vals:
+                    comp_vals["company_registry"] = str(vals["cr_number"]).strip()
+                if "phone" in vals:
+                    comp_vals["phone"] = str(vals["phone"]).strip()
+                if "email" in vals:
+                    comp_vals["email"] = str(vals["email"]).strip()
+                if "address" in vals:
+                    comp_vals["street"] = str(vals["address"]).strip()
+                if comp_vals:
+                    main_comp.sudo().write(comp_vals)
+
+            if "paper_format" in vals:
+                config.set_param('jabin_invoice.paper_format', str(vals["paper_format"]))
+            if "receipt_width" in vals:
+                config.set_param('jabin_invoice.receipt_width', str(int(vals["receipt_width"])))
+            if "show_logo" in vals:
+                val_bool = vals["show_logo"] in (True, 'True', 'true', '1', 1)
+                config.set_param('jabin_invoice.show_logo', str(val_bool))
+            if "show_qr" in vals:
+                val_bool = vals["show_qr"] in (True, 'True', 'true', '1', 1)
+                config.set_param('jabin_invoice.show_qr', str(val_bool))
+            if "header_note" in vals:
+                config.set_param('jabin_invoice.header_note', str(vals["header_note"]).strip())
+            if "footer_note" in vals:
+                config.set_param('jabin_invoice.footer_note', str(vals["footer_note"]).strip())
+            if "vat_rate" in vals:
+                config.set_param('jabin_invoice.vat_rate', str(float(vals["vat_rate"])))
+            if "prefix" in vals:
+                config.set_param('jabin_invoice.prefix', str(vals["prefix"]).strip())
+
+            return self.get_invoice_settings()
+
+

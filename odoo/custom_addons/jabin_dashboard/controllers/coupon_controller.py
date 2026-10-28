@@ -304,14 +304,15 @@ class CouponController(BaseApiController):
         cors="*",
     )
     def apply_coupon_to_order(self, **kwargs):
-        """Apply a coupon code to an order."""
-        denied = require_token()
-        if denied:
-            return denied
+        vals = _parse_request_data()
+        order_id = vals.get("order_id") or kwargs.get("order_id")
+        customer_id = _get_auth_user_id()
+        if order_id and not customer_id:
+            denied = require_token()
+            if denied:
+                return denied
 
         with self.handle() as ctx:
-            customer_id = _get_auth_user_id()
-            vals = _parse_request_data()
             code = vals.get("code") or kwargs.get("code")
             order_id = vals.get("order_id") or kwargs.get("order_id")
 

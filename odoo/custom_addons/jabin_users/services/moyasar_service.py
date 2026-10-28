@@ -7,9 +7,11 @@ from odoo.exceptions import ValidationError
 
 _logger = logging.getLogger(__name__)
 
-# Fallback test keys from Moyasar Dashboard
-DEFAULT_TEST_PK = "pk_test_jmsPpaHEyAKUgFwNnLzhnzsCzbSPg11Lu7hN3Ex4"
-DEFAULT_TEST_SK = "sk_test_pBw5i2exRNwmWxkGmfshPSA1tnW6a5C5KRkevCjy"
+# Live / Fallback keys from Moyasar Dashboard
+DEFAULT_LIVE_PK = ""
+DEFAULT_LIVE_SK = ""
+DEFAULT_TEST_PK = ""
+DEFAULT_TEST_SK = ""
 
 
 class MoyasarService:

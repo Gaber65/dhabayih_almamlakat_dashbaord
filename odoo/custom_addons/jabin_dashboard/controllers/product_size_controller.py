@@ -26,12 +26,19 @@ def _parse_size_request_data() -> Dict[str, Any]:
             if k not in ["id"]
         }
     else:
-        raw = request.httprequest.data
-        if raw:
-            try:
-                vals = json.loads(raw)
-            except json.JSONDecodeError:
-                raise ValueError("Invalid JSON payload.")
+        try:
+            json_data = request.get_json_data()
+            if isinstance(json_data, dict):
+                vals = dict(json_data)
+        except Exception:
+            pass
+        if not vals:
+            raw = request.httprequest.data
+            if raw:
+                try:
+                    vals = json.loads(raw)
+                except json.JSONDecodeError:
+                    raise ValueError("Invalid JSON payload.")
 
     vals.pop("id", None)
 
@@ -78,6 +85,25 @@ def _parse_size_request_data() -> Dict[str, Any]:
     if "sub_title" in vals and vals["sub_title"]:
         vals["sub_title"] = str(vals["sub_title"]).strip()
 
+    if "portion_type" in vals:
+        pt = str(vals["portion_type"] or "full").lower().strip()
+        vals["portion_type"] = pt if pt in ("full", "half", "quarter") else "full"
+
+    if "weight_range" in vals:
+        vals["weight_range"] = str(vals["weight_range"] or "").strip()
+
+    if "min_weight" in vals and vals["min_weight"] is not None:
+        try:
+            vals["min_weight"] = float(vals["min_weight"])
+        except (ValueError, TypeError):
+            pass
+
+    if "max_weight" in vals and vals["max_weight"] is not None:
+        try:
+            vals["max_weight"] = float(vals["max_weight"])
+        except (ValueError, TypeError):
+            pass
+
     # Pop read-only compute fields
     vals.pop("loyalty_points", None)
     vals.pop("points_price", None)
@@ -93,6 +119,10 @@ def _serialize_size(size) -> Dict[str, Any]:
         "product_name": size.product_id.name if size.product_id else "",
         "name": size.name or "",
         "sub_title": size.sub_title or "",
+        "portion_type": size.portion_type or "full",
+        "weight_range": size.weight_range or "",
+        "min_weight": size.min_weight or 0.0,
+        "max_weight": size.max_weight or 0.0,
         "price": size.price,
         "calories": size.calories,
         "loyalty_points": size.loyalty_points,
@@ -244,6 +274,8 @@ class ProductSizeController(BaseApiController):
                     return ctx.response
 
                 vals = _parse_size_request_data()
+                if not vals.get("product_id"):
+                    vals.pop("product_id", None)
                 size.write(vals)
 
                 ctx.set_body(
