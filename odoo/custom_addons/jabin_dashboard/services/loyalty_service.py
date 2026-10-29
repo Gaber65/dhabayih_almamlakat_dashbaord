@@ -84,69 +84,125 @@ class LoyaltyService(models.AbstractModel):
         return max(0.0, discount)
 
     @api.model
-    def validate_redemption(self, env, customer_id: int, points: int, order_total: float) -> bool:
+    def validate_redemption(self, *args, **kwargs) -> bool:
         """Validate points redemption against customer balance and limits."""
-        settings = self.get_settings(env)
-        customer = env['res.users'].sudo().browse(customer_id)
+        target_env = _resolve_env(self)
+        if len(args) == 4:
+            target_env = _resolve_env(args[0])
+            cid = args[1]
+            pts = args[2]
+            total = args[3]
+        elif len(args) == 3:
+            cid = args[0]
+            pts = args[1]
+            total = args[2]
+        else:
+            cid = kwargs.get('customer_id')
+            pts = kwargs.get('points', 0)
+            total = kwargs.get('order_total', 0.0)
+            if 'env' in kwargs:
+                target_env = _resolve_env(kwargs['env'])
+
+        settings = self.get_settings(target_env)
+        customer = target_env['res.users'].sudo().browse(cid)
         if not customer.exists():
             raise ValidationError(_("Customer not found."))
 
         LoyaltyValidator.validate_redemption(
             customer=customer,
-            points=points,
-            order_total=order_total,
+            points=pts,
+            order_total=total,
             min_redemption=settings['min_redemption'],
             redemption_rate=settings['redemption_rate']
         )
         return True
 
     @api.model
-    def deduct_redeemed_points(self, env, customer_id: int, points: int, order_id: Optional[int] = None):
-        """Deduct redeemed points from customer wallet and create ledger transaction."""
-        customer = env['res.users'].sudo().browse(customer_id)
+    def deduct_redeemed_points(self, *args, **kwargs):
+        """Deduct redeemed points from customer wallet and create ledger transaction (idempotent per order)."""
+        target_env = _resolve_env(self)
+        if len(args) >= 4:
+            target_env = _resolve_env(args[0])
+            cid = args[1]
+            pts = args[2]
+            oid = args[3]
+        elif len(args) == 3:
+            cid = args[0]
+            pts = args[1]
+            oid = args[2]
+        elif len(args) == 2:
+            cid = args[0]
+            pts = args[1]
+            oid = kwargs.get('order_id')
+        else:
+            cid = kwargs.get('customer_id')
+            pts = kwargs.get('points', 0)
+            oid = kwargs.get('order_id')
+            if 'env' in kwargs:
+                target_env = _resolve_env(kwargs['env'])
+
+        customer = target_env['res.users'].sudo().browse(cid)
         if not customer.exists():
             raise ValidationError(_("Customer not found."))
 
-        order = env['jabin.order'].sudo().browse(order_id) if order_id else False
-        order_total = order.total if order else 999999.0
+        order = target_env['jabin.order'].sudo().browse(oid) if oid else False
+        if order and getattr(order, 'loyalty_points_deducted', False):
+            # Prevent double deduction on retries
+            return False
 
-        self.validate_redemption(env, customer_id, points, order_total)
+        if order:
+            order_total = float(order.total or 0.0) + float(getattr(order, 'loyalty_discount_amount', 0.0) or 0.0)
+        else:
+            order_total = 999999.0
 
-        new_balance = customer.loyalty_points - points
+        self.validate_redemption(target_env, cid, pts, order_total)
+
+        new_balance = max(0, customer.loyalty_points - pts)
         customer.sudo().write({
             'loyalty_points': new_balance,
-            'total_redeemed_points': customer.total_redeemed_points + points
+            'total_redeemed_points': customer.total_redeemed_points + pts
         })
 
         if order:
             order.sudo().write({'loyalty_points_deducted': True})
 
         order_name = order.name if order else ''
-        desc = _("Redeemed %s points on Order %s") % (points, order_name) if order_name else _("Redeemed %s points") % points
+        desc = _("Redeemed %s points on Order %s") % (pts, order_name) if order_name else _("Redeemed %s points") % pts
 
-        tx = env['jabin.loyalty.transaction'].sudo().create({
+        tx = target_env['jabin.loyalty.transaction'].sudo().create({
             'customer_id': customer.id,
             'order_id': order.id if order else False,
             'transaction_type': 'redeem',
-            'points': -points,
+            'points': -pts,
             'balance_after': new_balance,
             'description': desc
         })
 
-        if "jabin.notification.service" in env:
+        if "jabin.notification.service" in target_env:
             try:
-                env["jabin.notification.service"].send_loyalty_points(env, customer.id, points, 'redeem')
+                target_env["jabin.notification.service"].send_loyalty_points(target_env, customer.id, pts, 'redeem')
             except Exception:
                 pass
 
         return tx
 
     @api.model
-    def award_earned_points(self, env, order_id: int):
+    def award_earned_points(self, *args, **kwargs):
         """
         Award earned loyalty points to customer after order is successfully delivered.
         """
-        order = env['jabin.order'].sudo().browse(order_id)
+        target_env = _resolve_env(self)
+        if len(args) == 2:
+            target_env = _resolve_env(args[0])
+            oid = args[1]
+        elif len(args) == 1:
+            oid = args[0]
+        else:
+            oid = kwargs.get('order_id')
+            if 'env' in kwargs:
+                target_env = _resolve_env(kwargs['env'])
+
+        order = target_env['jabin.order'].sudo().browse(oid)
         if not order.exists():
             return False
 
@@ -156,7 +212,7 @@ class LoyaltyService(models.AbstractModel):
         if order.state != 'delivered':
             return False
 
-        earned_points = self.calculate_earned_points(env, order.total)
+        earned_points = self.calculate_earned_points(target_env, order.total)
         if earned_points <= 0:
             order.sudo().write({'loyalty_points_earned': 0, 'loyalty_points_awarded': True})
             return False
@@ -173,7 +229,7 @@ class LoyaltyService(models.AbstractModel):
             'loyalty_points_awarded': True
         })
 
-        tx = env['jabin.loyalty.transaction'].sudo().create({
+        tx = target_env['jabin.loyalty.transaction'].sudo().create({
             'customer_id': customer.id,
             'order_id': order.id,
             'transaction_type': 'earn',
@@ -182,21 +238,31 @@ class LoyaltyService(models.AbstractModel):
             'description': _("Earned %s points from completed Order %s") % (earned_points, order.name)
         })
 
-        if "jabin.notification.service" in env:
+        if "jabin.notification.service" in target_env:
             try:
-                env["jabin.notification.service"].send_loyalty_points(env, customer.id, earned_points, 'earn')
+                target_env["jabin.notification.service"].send_loyalty_points(target_env, customer.id, earned_points, 'earn')
             except Exception:
                 pass
 
         return tx
 
-
     @api.model
-    def reverse_order_points(self, env, order_id: int):
+    def reverse_order_points(self, *args, **kwargs):
         """
         Reverse awarded points and/or restore redeemed points if an order is cancelled or refunded.
         """
-        order = env['jabin.order'].sudo().browse(order_id)
+        target_env = _resolve_env(self)
+        if len(args) == 2:
+            target_env = _resolve_env(args[0])
+            oid = args[1]
+        elif len(args) == 1:
+            oid = args[0]
+        else:
+            oid = kwargs.get('order_id')
+            if 'env' in kwargs:
+                target_env = _resolve_env(kwargs['env'])
+
+        order = target_env['jabin.order'].sudo().browse(oid)
         if not order.exists():
             return False
 
@@ -211,7 +277,7 @@ class LoyaltyService(models.AbstractModel):
                 'total_earned_points': max(0, customer.total_earned_points - earned)
             })
             order.sudo().write({'loyalty_points_awarded': False})
-            env['jabin.loyalty.transaction'].sudo().create({
+            target_env['jabin.loyalty.transaction'].sudo().create({
                 'customer_id': customer.id,
                 'order_id': order.id,
                 'transaction_type': 'refund_adjustment',
@@ -221,7 +287,7 @@ class LoyaltyService(models.AbstractModel):
             })
 
         # 2. Restore redeemed points
-        if order.loyalty_points_deducted and order.points_redeemed > 0:
+        if getattr(order, 'loyalty_points_deducted', False) and getattr(order, 'points_redeemed', 0) > 0:
             redeemed = order.points_redeemed
             new_balance = customer.loyalty_points + redeemed
             customer.sudo().write({
@@ -229,7 +295,7 @@ class LoyaltyService(models.AbstractModel):
                 'total_redeemed_points': max(0, customer.total_redeemed_points - redeemed)
             })
             order.sudo().write({'loyalty_points_deducted': False})
-            env['jabin.loyalty.transaction'].sudo().create({
+            target_env['jabin.loyalty.transaction'].sudo().create({
                 'customer_id': customer.id,
                 'order_id': order.id,
                 'transaction_type': 'refund_adjustment',

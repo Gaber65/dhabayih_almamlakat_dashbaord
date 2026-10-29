@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import requests
 from typing import Dict, Any, Optional
 from odoo import _, fields
@@ -7,11 +8,15 @@ from odoo.exceptions import ValidationError
 
 _logger = logging.getLogger(__name__)
 
-# Live / Fallback keys from Moyasar Dashboard
-DEFAULT_LIVE_PK = ""
-DEFAULT_LIVE_SK = ""
-DEFAULT_TEST_PK = ""
-DEFAULT_TEST_SK = ""
+
+def _is_valid_pk(key: str) -> bool:
+    k = (key or "").strip()
+    return (k.startswith("pk_test_") or k.startswith("pk_live_")) and len(k) > 12 and "placeholder" not in k.lower() and "dummy" not in k.lower()
+
+
+def _is_valid_sk(key: str) -> bool:
+    k = (key or "").strip()
+    return (k.startswith("sk_test_") or k.startswith("sk_live_")) and len(k) > 12 and "placeholder" not in k.lower() and "dummy" not in k.lower()
 
 
 class MoyasarService:
@@ -22,20 +27,43 @@ class MoyasarService:
     @classmethod
     def _get_config(cls, env) -> Dict[str, str]:
         params = env['ir.config_parameter'].sudo()
-        pk = params.get_param('moyasar.publishable_key', '').strip()
-        sk = params.get_param('moyasar.secret_key', '').strip()
-        env_mode = params.get_param('moyasar.environment', 'test').strip().lower()
+        env_mode = (
+            os.environ.get('MOYASAR_ENV')
+            or params.get_param('moyasar.environment', 'live')
+            or 'live'
+        ).strip().lower()
 
-        if not pk:
-            pk = DEFAULT_TEST_PK
-        if not sk:
-            sk = DEFAULT_TEST_SK
+        raw_pk = (
+            os.environ.get('MOYASAR_PUBLISHABLE_KEY')
+            or params.get_param('moyasar.publishable_key', '')
+            or (params.get_param('moyasar.live_pk', '') if env_mode == 'live' else params.get_param('moyasar.test_pk', ''))
+            or ''
+        ).strip()
+
+        raw_sk = (
+            os.environ.get('MOYASAR_SECRET_KEY')
+            or params.get_param('moyasar.secret_key', '')
+            or (params.get_param('moyasar.live_sk', '') if env_mode == 'live' else params.get_param('moyasar.test_sk', ''))
+            or ''
+        ).strip()
+
+        # Clean up legacy seeded placeholder strings if present in DB
+        if raw_pk in ('dummy_public_key_placeholder', 'your_publishable_key'):
+            params.set_param('moyasar.publishable_key', '')
+            raw_pk = ''
+        if raw_sk in ('dummy_secret_key_placeholder', 'your_secret_key'):
+            params.set_param('moyasar.secret_key', '')
+            raw_sk = ''
+
+        pk = raw_pk if _is_valid_pk(raw_pk) else ''
+        sk = raw_sk if _is_valid_sk(raw_sk) else ''
 
         return {
             'publishable_key': pk,
             'secret_key': sk,
             'env_mode': env_mode,
             'base_url': cls.BASE_URL,
+            'is_configured': bool(pk and sk),
         }
 
     @classmethod
@@ -52,12 +80,19 @@ class MoyasarService:
         Order remains in 'pending_payment' state until verified.
         """
         config = cls._get_config(env)
-        order_total = float(getattr(order, "total", getattr(order, "total_amount", 0.0)))
+        order_total = round(float(getattr(order, "total", getattr(order, "total_amount", 0.0)) or 0.0), 2)
         if order_total <= 0:
-            raise ValidationError(_("Order total must be greater than zero to initiate payment."))
+            raise ValidationError(_("إجمالي الطلب صفر، لا يلزم إجراء دفع إلكتروني."))
 
-        # Moyasar requires amount in minor currency units (Halalas for SAR)
+        # Moyasar requires amount in minor currency units (Halalas for SAR), minimum 100 Halalas (1.00 SAR)
         amount_minor = int(round(order_total * 100))
+        if amount_minor < 100:
+            raise ValidationError(_("الحد الأدنى للدفع الإلكتروني عبر بوابة ميسر هو 1.00 ر.س (100 هللة)."))
+
+        if not config['secret_key']:
+            raise ValidationError(
+                _("مفتاح الربط السري لبوابة ميسر (moyasar.secret_key) غير مضبوط في إعدادات النظام.")
+            )
 
         endpoint = f"{config['base_url']}/invoices"
         auth = (config['secret_key'], '')
@@ -91,12 +126,12 @@ class MoyasarService:
             data = resp.json()
         except requests.RequestException as exc:
             _logger.error("Failed to connect to Moyasar API: %s", exc)
-            raise ValidationError(_("Connection error while communicating with Moyasar payment gateway."))
+            raise ValidationError(_("تعذر الاتصال ببوابة الدفع ميسر، يرجى التحقق من الاتصال والمحاولة مجدداً."))
 
         if resp.status_code not in (200, 201):
-            error_msg = data.get("message") or "Failed to initiate Moyasar payment."
+            error_msg = data.get("message") or "تعذر إنشاء جلسة الدفع عبر ميسر."
             _logger.error("Moyasar payment initiation rejected (%s): %s", resp.status_code, data)
-            raise ValidationError(_("Payment Gateway Error: %s") % error_msg)
+            raise ValidationError(_("خطأ من بوابة الدفع ميسر: %s") % error_msg)
 
         invoice_id = data.get("id")
         payment_url = data.get("url")
@@ -109,7 +144,8 @@ class MoyasarService:
             ], limit=1)
 
             pm = env["jabin.payment.method"].sudo().search([
-                ("provider", "=", "moyasar")
+                ("provider", "=", "moyasar"),
+                ("code", "!=", "myfatoorah"),
             ], limit=1)
             if not pm:
                 pm = order.payment_method_id
@@ -154,15 +190,9 @@ class MoyasarService:
         Fetches payment details using secret key via HTTP Basic Auth.
         """
         if not payment_id:
-            return {"success": False, "message": "payment_id or invoice_id is required."}
+            return {"success": False, "message": "معرف عملية الدفع مطلوب للتحقق."}
 
-        config = cls._get_config(env)
-        auth = (config['secret_key'], '')
-        headers = {"Accept": "application/json"}
-
-        _logger.info("Verifying Moyasar reference %s (expected_order_id=%s, force_check=%s)", payment_id, expected_order_id, force_check)
-
-        # 0. Early check: if the order is already marked paid in DB, return success immediately UNLESS force_check is True
+        # 0. Early idempotent check: if the order is already marked paid in DB, return success immediately
         if expected_order_id and not force_check:
             try:
                 existing_order = env["jabin.order"].sudo().browse(int(expected_order_id))
@@ -187,19 +217,34 @@ class MoyasarService:
             except Exception as e:
                 _logger.warning("Error checking pre-existing order status: %s", e)
 
+        config = cls._get_config(env)
+        if not config['secret_key']:
+            return {
+                "success": False,
+                "message": "مفتاح الربط السري لبوابة ميسر (moyasar.secret_key) غير مضبوط على الخادم للتحقق من الدفع.",
+                "payment_id": payment_id,
+            }
+
+        auth = (config['secret_key'], '')
+        headers = {"Accept": "application/json"}
+
+        _logger.info("Verifying Moyasar reference %s (expected_order_id=%s, force_check=%s)", payment_id, expected_order_id, force_check)
+
         # 1. Try checking as a Payment ID directly
         payment_endpoint = f"{config['base_url']}/payments/{payment_id}"
         payment_data = None
         status = None
         amount_halalas = 0
+        currency = "SAR"
         order_meta_id = None
 
         try:
             resp = requests.get(payment_endpoint, headers=headers, auth=auth, timeout=15)
             if resp.status_code == 200:
                 payment_data = resp.json()
-                status = payment_data.get("status")  # 'paid', 'refunded', 'failed', 'initiated', etc.
+                status = payment_data.get("status")
                 amount_halalas = payment_data.get("amount", 0)
+                currency = payment_data.get("currency", "SAR")
                 metadata = payment_data.get("metadata") or {}
                 order_meta_id = metadata.get("order_id")
         except Exception as e:
@@ -212,8 +257,9 @@ class MoyasarService:
                 inv_resp = requests.get(invoice_endpoint, headers=headers, auth=auth, timeout=15)
                 if inv_resp.status_code == 200:
                     inv_data = inv_resp.json()
-                    inv_status = inv_data.get("status")  # 'paid', 'initiated', 'expired', 'refunded'
+                    inv_status = inv_data.get("status")
                     amount_halalas = inv_data.get("amount", 0)
+                    currency = inv_data.get("currency", "SAR")
                     metadata = inv_data.get("metadata") or {}
                     order_meta_id = metadata.get("order_id")
                     if inv_status in ("paid", "refunded"):
@@ -229,15 +275,48 @@ class MoyasarService:
                 _logger.warning("Moyasar invoice fetch failed: %s", e)
 
         if not status:
+            target_oid = expected_order_id or (int(order_meta_id) if order_meta_id and str(order_meta_id).isdigit() else None)
+            if target_oid:
+                try:
+                    unpaid_ord = env["jabin.order"].sudo().browse(int(target_oid))
+                    if unpaid_ord.exists() and unpaid_ord.payment_status != "paid" and unpaid_ord.state in ("draft", "pending_payment", "confirmed"):
+                        try:
+                            env["jabin.customer.service"].sudo().trigger_status_transition(
+                                unpaid_ord.id,
+                                "cancelled",
+                                description="Order automatically cancelled because online payment was not completed."
+                            )
+                        except Exception:
+                            pass
+                        unpaid_ord.sudo().write({"payment_status": "cancelled", "state": "cancelled"})
+                except Exception as cancel_err:
+                    _logger.warning("Failed to auto-cancel incomplete order %s: %s", target_oid, cancel_err)
+
             return {
                 "success": False,
-                "message": "Payment or invoice not found on Moyasar gateway.",
+                "status": "cancelled",
+                "payment_status": "cancelled",
+                "state": "cancelled",
+                "message": "لم يتم العثور على عملية الدفع في بوابة ميسر أو تم إلغاء العملية.",
                 "payment_id": payment_id
+            }
+
+        if currency and str(currency).upper() != "SAR":
+            return {
+                "success": False,
+                "message": f"عملة الدفع غير صالحة ({currency})، يجب أن تكون بالريال السعودي (SAR).",
+                "payment_id": payment_id,
             }
 
         # 3. Locate target order in Odoo
         order = None
         if expected_order_id:
+            if order_meta_id and str(order_meta_id).isdigit() and int(order_meta_id) != int(expected_order_id):
+                return {
+                    "success": False,
+                    "message": "عملية الدفع لا تطابق رقم الطلب الحالي.",
+                    "payment_id": payment_id,
+                }
             order = env["jabin.order"].sudo().browse(int(expected_order_id))
         elif order_meta_id and str(order_meta_id).isdigit():
             order = env["jabin.order"].sudo().browse(int(order_meta_id))
@@ -245,7 +324,7 @@ class MoyasarService:
         if not order or not order.exists():
             return {
                 "success": False,
-                "message": "Associated order could not be located in system.",
+                "message": "لم يتم العثور على الطلب المرتبط بعملية الدفع.",
                 "payment_id": payment_id,
             }
 
@@ -262,19 +341,25 @@ class MoyasarService:
                 )
                 return {
                     "success": False,
-                    "message": "Security mismatch: Paid amount does not match order total.",
+                    "message": "المبلغ المدفوع لا يطابق إجمالي الطلب.",
                     "order_id": order.id,
                 }
 
-            # Update Order to Confirmed and Paid
             write_vals = {"payment_status": "paid"}
             if order.state in ("draft", "pending_payment"):
                 write_vals["state"] = "confirmed"
             order.sudo().write(write_vals)
 
-            # Create or update transaction record
-            pm = env["jabin.payment.method"].sudo().search([("provider", "=", "moyasar")], limit=1)
-            tx = env["jabin.payment.transaction"].sudo().search([("order_id", "=", order.id)], limit=1)
+            pm = env["jabin.payment.method"].sudo().search([
+                ("provider", "=", "moyasar"),
+                ("code", "!=", "myfatoorah"),
+            ], limit=1)
+            tx = env["jabin.payment.transaction"].sudo().search([
+                ("order_id", "=", order.id),
+                "|",
+                ("transaction_ref", "=", str(payment_id)),
+                ("status", "=", "pending"),
+            ], limit=1)
             if tx:
                 tx.sudo().write({
                     "status": "paid",
@@ -293,7 +378,6 @@ class MoyasarService:
                     "paid_date": fields.Datetime.now(),
                 })
 
-            # Trigger push notification / payment success event and confirmed order notification
             try:
                 if "jabin.notification.service" in env:
                     env["jabin.notification.service"].send_payment_success(env, order, tx)
@@ -301,7 +385,6 @@ class MoyasarService:
             except Exception as notif_err:
                 _logger.warning("Could not send payment notification: %s", notif_err)
 
-            # Close active customer cart
             try:
                 active_cart = env["jabin.cart"].sudo().search([
                     ("customer_id", "=", order.customer_id.id),
@@ -331,7 +414,6 @@ class MoyasarService:
                 "payment_id": payment_id,
             }
         elif status == "refunded" or (payment_data and payment_data.get("refunded", 0) > 0):
-            # Payment has been refunded on Moyasar
             refunded_halalas = payment_data.get("refunded", amount_halalas) if payment_data else amount_halalas
             refunded_sar = round(float(refunded_halalas) / 100.0, 2)
 
@@ -345,6 +427,8 @@ class MoyasarService:
             except Exception as trans_err:
                 _logger.warning("trigger_status_transition failed: %s, updating directly", trans_err)
                 order.sudo().write({"payment_status": "refunded", "state": "refunded"})
+                if "jabin.loyalty.service" in env:
+                    env["jabin.loyalty.service"].reverse_order_points(env, order.id)
 
             txs = env["jabin.payment.transaction"].sudo().search([("order_id", "=", order.id)])
             if txs:
@@ -363,38 +447,44 @@ class MoyasarService:
                 "amount": paid_amount_sar,
                 "refunded_amount": refunded_sar,
                 "payment_id": payment_id,
-                "message": _("Order %s has been refunded successfully on Moyasar (%s SAR).") % (order.name, refunded_sar),
+                "message": _("تم استرجاع مبلغ الطلب %s بنجاح عبر ميسر (%s ر.س).") % (order.name, refunded_sar),
             }
         else:
-            # Payment failed or cancelled
-            order.sudo().write({"payment_status": "failed"})
+            source_msg = ""
+            if payment_data and isinstance(payment_data.get("source"), dict):
+                source_msg = payment_data["source"].get("message") or ""
+            # Transition pending order to cancelled FIRST so cart and loyalty points are restored
+            try:
+                env["jabin.customer.service"].sudo().trigger_status_transition(
+                    order.id, "cancelled", description=_("Order cancelled due to uncompleted/failed online payment.")
+                )
+            except Exception:
+                pass
+            order.sudo().write({"payment_status": "failed", "state": "cancelled"})
             tx = env["jabin.payment.transaction"].sudo().search([("order_id", "=", order.id)], limit=1)
             if tx:
                 tx.sudo().write({
                     "status": "failed",
-                    "failure_reason": f"Moyasar payment status: {status}"
+                    "failure_reason": f"Moyasar status: {status} {source_msg}".strip()
                 })
 
             return {
                 "success": False,
                 "status": status,
                 "payment_status": "failed",
-                "message": f"Payment was not completed (Status: {status}).",
+                "message": source_msg or f"لم تكتمل عملية الدفع (الحالة: {status}).",
                 "order_id": order.id,
                 "payment_id": payment_id,
             }
 
     @classmethod
     def sync_order_status(cls, env, order) -> Dict[str, Any]:
-        """
-        Manually or periodically synchronize an order's payment status with Moyasar.
-        Inspects existing transactions or invoices and queries Moyasar API.
-        """
+        """Manually or periodically synchronize an order's payment status with Moyasar."""
         txs = env["jabin.payment.transaction"].sudo().search([("order_id", "=", order.id)])
         candidate_refs = [tx.transaction_ref for tx in txs if tx.transaction_ref]
 
         if not candidate_refs:
-            return {"success": False, "message": _("No payment reference found for order %s.") % order.name}
+            return {"success": False, "message": _("لا يوجد مرجع عملية دفع للطلب %s.") % order.name}
 
         last_res = None
         for ref in candidate_refs:
@@ -403,25 +493,25 @@ class MoyasarService:
                 return res
             last_res = res
 
-        return last_res or {"success": False, "message": _("Could not synchronize payment with Moyasar.")}
+        return last_res or {"success": False, "message": _("تعذر مزامنة حالة الدفع مع بوابة ميسر.")}
 
     @classmethod
     def refund_payment(cls, env, order, amount_sar: Optional[float] = None) -> Dict[str, Any]:
-        """
-        Triggers a refund for an order via Moyasar API:
-        POST https://api.moyasar.com/v1/payments/{payment_id}/refund
-        """
+        """Triggers a refund for an order via Moyasar API."""
         config = cls._get_config(env)
+        if not config['secret_key']:
+            return {
+                "success": False,
+                "message": _("مفتاح الربط السري لبوابة ميسر غير مضبوط على الخادم.")
+            }
         auth = (config['secret_key'], '')
         headers = {"Accept": "application/json", "Content-Type": "application/json"}
 
-        # Resolve payment_id
         payment_id = None
         txs = env["jabin.payment.transaction"].sudo().search([("order_id", "=", order.id)])
         candidate_refs = [tx.transaction_ref for tx in txs if tx.transaction_ref]
 
         for ref in candidate_refs:
-            # 1. Try checking as payment
             try:
                 p_resp = requests.get(f"{config['base_url']}/payments/{ref}", headers=headers, auth=auth, timeout=10)
                 if p_resp.status_code == 200:
@@ -430,7 +520,6 @@ class MoyasarService:
             except Exception:
                 pass
 
-            # 2. Try checking as invoice
             try:
                 inv_resp = requests.get(f"{config['base_url']}/invoices/{ref}", headers=headers, auth=auth, timeout=10)
                 if inv_resp.status_code == 200:
@@ -444,7 +533,7 @@ class MoyasarService:
         if not payment_id:
             return {
                 "success": False,
-                "message": _("No valid Moyasar payment ID could be found for order %s.") % order.name
+                "message": _("لم يتم العثور على معرف عملية دفع صالح في ميسر للطلب %s.") % order.name
             }
 
         refund_endpoint = f"{config['base_url']}/payments/{payment_id}/refund"
@@ -456,11 +545,10 @@ class MoyasarService:
             r = requests.post(refund_endpoint, json=payload, headers=headers, auth=auth, timeout=15)
             if r.status_code in (200, 201):
                 refund_data = r.json()
-                # Run sync to apply changes in DB
                 cls.verify_payment(env, payment_id=payment_id, expected_order_id=order.id, force_check=True)
                 return {
                     "success": True,
-                    "message": _("Order payment refunded successfully on Moyasar."),
+                    "message": _("تم استرجاع مبلغ الطلب بنجاح عبر بوابة ميسر."),
                     "data": refund_data
                 }
             else:
@@ -470,10 +558,10 @@ class MoyasarService:
                     err_msg = r.text
                 return {
                     "success": False,
-                    "message": _("Moyasar refund failed: %s") % err_msg
+                    "message": _("فشل استرجاع المبلغ عبر ميسر: %s") % err_msg
                 }
         except Exception as e:
             return {
                 "success": False,
-                "message": _("Error communicating with Moyasar refund API: %s") % e
+                "message": _("خطأ في الاتصال بواجهة استرجاع المدفوعات في ميسر: %s") % e
             }

@@ -25,7 +25,7 @@
             <field name="name">Visa / Mastercard</field>
             <field name="code">card</field>
             <field name="payment_type">card</field>
-            <field name="provider">stripe</field>
+            <field name="provider">moyasar</field>
             <field name="is_installment" eval="False"/>
         </record>
 
@@ -33,7 +33,7 @@
             <field name="name">Mada</field>
             <field name="code">mada</field>
             <field name="payment_type">card</field>
-            <field name="provider">mada</field>
+            <field name="provider">moyasar</field>
             <field name="is_installment" eval="False"/>
         </record>
 
@@ -41,7 +41,7 @@
             <field name="name">STC Pay</field>
             <field name="code">stc_pay</field>
             <field name="payment_type">wallet</field>
-            <field name="provider">stc_pay</field>
+            <field name="provider">moyasar</field>
             <field name="is_installment" eval="False"/>
         </record>
 
@@ -62,11 +62,12 @@
         </record>
 
         <record id="payment_method_myfatoorah" model="jabin.payment.method">
-            <field name="name">بوابة ماي فاتورة (مدى / بطاقات إلكترونية)</field>
+            <field name="name">بوابة ماي فاتورة (متوقفة)</field>
             <field name="code">myfatoorah</field>
             <field name="payment_type">card</field>
-            <field name="provider">moyasar</field>
+            <field name="provider">myfatoorah</field>
             <field name="is_installment" eval="False"/>
+            <field name="active" eval="False"/>
         </record>
 
         <record id="payment_method_tamara" model="jabin.payment.method">
@@ -92,11 +93,11 @@
         <!-- ==================== MOYASAR CONFIG PARAMETERS ==================== -->
         <record id="param_moyasar_pk" model="ir.config_parameter">
             <field name="key">moyasar.publishable_key</field>
-            <field name="value">dummy_public_key_placeholder</field>
+            <field name="value"></field>
         </record>
         <record id="param_moyasar_sk" model="ir.config_parameter">
             <field name="key">moyasar.secret_key</field>
-            <field name="value">dummy_secret_key_placeholder</field>
+            <field name="value"></field>
         </record>
         <record id="param_moyasar_env" model="ir.config_parameter">
             <field name="key">moyasar.environment</field>

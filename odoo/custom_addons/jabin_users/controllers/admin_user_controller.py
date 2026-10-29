@@ -22,6 +22,49 @@ class AdminUserController(BaseApiController):
     """Admin User Management REST API Controller."""
 
     @http.route(
+        [
+            "/api/v1/admin/users/<int:user_id>/loyalty/adjust",
+            "/api/v1/admin/users/<int:user_id>/loyalty",
+        ],
+        type="http",
+        auth="public",
+        methods=["POST"],
+        csrf=False,
+        cors="*",
+    )
+    def adjust_user_loyalty(self, user_id: int, **kwargs):
+        """Admin API: Adjust customer loyalty points balance with audit record."""
+        denied = require_token()
+        if denied:
+            return denied
+
+        with self.handle() as ctx:
+            data = _parse_json_body()
+            points_change = int(data.get("points_change", data.get("points", 0)))
+            operation = data.get("operation")
+            if operation == "deduct" and points_change > 0:
+                points_change = -points_change
+            reason = str(data.get("reason", "")).strip() or _("Administrative loyalty point adjustment")
+
+            service = request.env['jabin.loyalty.service']
+            tx = service.manual_adjust_points(
+                request.env,
+                customer_id=user_id,
+                points_change=points_change,
+                reason=reason,
+                admin_user_id=request.env.user.id
+            )
+
+            ctx.set_body(ResponseBuilder.success(data={
+                "transaction_id": tx.id,
+                "customer_id": user_id,
+                "points_change": points_change,
+                "new_balance": tx.balance_after,
+                "reason": reason,
+            }, message=_("Customer loyalty points adjusted successfully.")))
+        return ctx.response
+
+    @http.route(
         "/api/v1/admin/users",
         type="http",
         auth="public",
@@ -48,7 +91,7 @@ class AdminUserController(BaseApiController):
             if user_type_filter:
                 domain.append(("user_type", "=", user_type_filter))
 
-            q = kwargs.get("q") or kwargs.get("search")
+            q = kwargs.get("q") or kwargs.get("search") or kwargs.get("query")
             if q:
                 domain.extend(["|", "|", ("name", "ilike", q), ("login", "ilike", q), ("phone", "ilike", q)])
 

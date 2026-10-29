@@ -9,6 +9,12 @@ class JabinCuttingOption(models.Model):
 
     name = fields.Char(string='Name', required=True, translate=True)
     description = fields.Text(string='Description', translate=True)
+    extra_price = fields.Float(
+        string='Extra Price',
+        default=0.0,
+        digits='Product Price',
+        help='Additional preparation/cutting cost per complete product unit',
+    )
     active = fields.Boolean(string='Active', default=True)
 
     product_ids = fields.Many2many(
@@ -31,4 +37,3 @@ class JabinCuttingOption(models.Model):
                 ('id', '!=', record.id)
             ]) > 0:
                 raise ValidationError(_('Cutting Option name must be unique!'))
-

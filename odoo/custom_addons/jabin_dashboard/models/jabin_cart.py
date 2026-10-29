@@ -61,6 +61,8 @@ class JabinCart(models.Model):
         default=0.0,
         currency_field='currency_id'
     )
+    slaughter_date = fields.Date(string='Slaughter Date')
+    slaughter_time = fields.Char(string='Slaughter Time')
     notes = fields.Text(string='Notes')
 
     # --- Computed Fields ---
@@ -127,7 +129,8 @@ class JabinCart(models.Model):
             cart.discount_amount = sum(lines.mapped('discount_amount'))
             cart.tax_amount = sum(lines.mapped('tax_amount'))
             cart.total_quantity = sum(lines.mapped('quantity'))
-            cart.grand_total = cart.subtotal - cart.discount_amount + cart.tax_amount + cart.delivery_fee
+            # line.price_subtotal is already net of line.discount_amount and includes cutting/packaging extras
+            cart.grand_total = cart.subtotal + cart.tax_amount
 
     # --- ORM Overrides ---
     def write(self, vals):
@@ -153,6 +156,35 @@ class JabinCart(models.Model):
                 _("Only active carts can be modified.")
             )
 
+    def _resolve_and_validate_size(self, product, size_id):
+        """Validate selected size against the product's active sizes (dashboard is source of truth)."""
+        active_sizes = product.with_context(active_test=False).size_ids.filtered(lambda s: s.active).sorted(key=lambda s: (s.sequence, s.id))
+        if size_id:
+            try:
+                sid = int(size_id)
+            except (ValueError, TypeError):
+                raise ValidationError(_("معرف الحجم غير صالح."))
+            size_obj = self.env['jabin.product.size'].sudo().with_context(active_test=False).browse(sid)
+            if not size_obj.exists() or not size_obj.active or size_obj.product_id.id != product.id:
+                raise ValidationError(
+                    _("عذراً، الحجم المختار للمنتج '%s' لم يعد متاحاً. يرجى تحديث الصفحة واختيار حجم متاح.") % product.name
+                )
+            return size_obj
+        if active_sizes:
+            default_size = active_sizes.filtered(lambda s: s.is_default)[:1]
+            return default_size or active_sizes[:1]
+        return None
+
+    def _compute_effective_product_price(self, product, size_obj=None):
+        """Compute effective base price and discount percent for a product or size."""
+        raw_price = float(size_obj.price if (size_obj and size_obj.exists()) else (product.selling_price or 0.0))
+        discount = 0.0
+        if product.is_on_offer and product.selling_price > 0 and product.offer_price < product.selling_price:
+            discount = round(((product.selling_price - product.offer_price) / product.selling_price) * 100.0, 2)
+        elif product.is_on_offer and product.discount_type == 'percentage' and product.discount_value > 0:
+            discount = float(product.discount_value)
+        return raw_price, discount
+
     def add_product(self, product_id, quantity=1.0, cutting_option_id=None, packaging_ids=None, excluded_part_ids=None, notes=None, size_id=None):
         """Add a product to the cart with optional customization options."""
         self.ensure_one()
@@ -166,9 +198,13 @@ class JabinCart(models.Model):
         if not product.is_available:
             raise ValidationError(_("Product is not available."))
 
+        size_obj = self._resolve_and_validate_size(product, size_id)
+        resolved_size_id = size_obj.id if size_obj else False
+        base_price, discount = self._compute_effective_product_price(product, size_obj)
+
         existing_line = self.line_ids.filtered(
-            lambda l: l.product_id.id == product_id and (l.size_id.id == size_id if size_id else not l.size_id)
-        )
+            lambda l: l.product_id.id == product_id and (l.size_id.id == resolved_size_id if resolved_size_id else not l.size_id)
+        )[:1]
         current_qty = existing_line.quantity if existing_line else 0.0
         total_qty = current_qty + quantity
         if product.stock_quantity and total_qty > product.stock_quantity:
@@ -181,9 +217,13 @@ class JabinCart(models.Model):
             )
 
         if existing_line:
-            vals = {'quantity': existing_line.quantity + quantity}
-            if cutting_option_id:
-                vals['cutting_option_id'] = cutting_option_id
+            vals = {
+                'quantity': existing_line.quantity + quantity,
+                'price_unit': base_price,
+                'discount_percent': discount,
+            }
+            if cutting_option_id is not None:
+                vals['cutting_option_id'] = cutting_option_id or False
             if packaging_ids is not None:
                 vals['packaging_ids'] = [(6, 0, packaging_ids)]
             if excluded_part_ids is not None:
@@ -192,21 +232,10 @@ class JabinCart(models.Model):
                 vals['notes'] = notes
             existing_line.write(vals)
         else:
-            # Determine base price: check carcass size first, otherwise product selling_price
-            size_obj = self.env['jabin.product.size'].sudo().browse(size_id) if size_id else None
-            base_price = size_obj.price if (size_obj and size_obj.exists()) else product.selling_price
-
-            # Determine discount percent from offer_price
-            discount = 0.0
-            if product.is_on_offer and product.selling_price > 0 and product.offer_price < product.selling_price:
-                discount = round(((product.selling_price - product.offer_price) / product.selling_price) * 100.0, 2)
-            elif product.is_on_offer and product.discount_type == 'percentage':
-                discount = product.discount_value
-
             line_vals = {
                 'cart_id': self.id,
                 'product_id': product_id,
-                'size_id': size_id or False,
+                'size_id': resolved_size_id,
                 'quantity': quantity,
                 'price_unit': base_price,
                 'discount_percent': discount,
@@ -264,13 +293,25 @@ class JabinCart(models.Model):
                 }
             )
 
+        size_obj = self._resolve_and_validate_size(product, size_id)
+        resolved_size_id = size_obj.id if size_obj else False
+        base_price, discount = self._compute_effective_product_price(product, size_obj)
+
         existing_line = self.line_ids.filtered(
-            lambda l: l.product_id.id == product_id and (l.size_id.id == size_id if size_id else not l.size_id)
-        )
+            lambda l: l.product_id.id == product_id and (l.size_id.id == resolved_size_id if resolved_size_id else not l.size_id)
+        )[:1]
+        if not existing_line and not size_id:
+            existing_line = self.line_ids.filtered(lambda l: l.product_id.id == product_id)[:1]
+
         if existing_line:
-            vals = {'quantity': quantity}
-            if cutting_option_id:
-                vals['cutting_option_id'] = cutting_option_id
+            vals = {
+                'quantity': quantity,
+                'size_id': resolved_size_id,
+                'price_unit': base_price,
+                'discount_percent': discount,
+            }
+            if cutting_option_id is not None:
+                vals['cutting_option_id'] = cutting_option_id or False
             if packaging_ids is not None:
                 vals['packaging_ids'] = [(6, 0, packaging_ids)]
             if excluded_part_ids is not None:
@@ -279,20 +320,10 @@ class JabinCart(models.Model):
                 vals['notes'] = notes
             existing_line.write(vals)
         else:
-            size_obj = self.env['jabin.product.size'].sudo().browse(size_id) if size_id else None
-            base_price = size_obj.price if (size_obj and size_obj.exists()) else product.selling_price
-
-            discount = 0.0
-            if product.is_on_offer:
-                if product.discount_type == 'percentage':
-                    discount = product.discount_value
-                elif product.discount_type == 'fixed' and product.selling_price:
-                    discount = (product.discount_value / product.selling_price) * 100.0
-
             line_vals = {
                 'cart_id': self.id,
                 'product_id': product_id,
-                'size_id': size_id or False,
+                'size_id': resolved_size_id,
                 'quantity': quantity,
                 'price_unit': base_price,
                 'discount_percent': discount,
@@ -306,9 +337,6 @@ class JabinCart(models.Model):
                 line_vals['excluded_part_ids'] = [(6, 0, excluded_part_ids)]
 
             self.env['jabin.cart.line'].sudo().create(line_vals)
-
-        self.write({'updated_date': fields.Datetime.now()})
-        return self
 
         self.write({'updated_date': fields.Datetime.now()})
         return self
@@ -517,12 +545,12 @@ class JabinCartLine(models.Model):
     size_id = fields.Many2one(
         'jabin.product.size',
         string='Carcass Size',
-        ondelete='restrict'
+        ondelete='set null'
     )
     cutting_option_id = fields.Many2one(
         'jabin.cutting.option',
         string='Cutting Option',
-        ondelete='restrict'
+        ondelete='set null'
     )
     packaging_ids = fields.Many2many(
         'jabin.packaging',
@@ -541,12 +569,24 @@ class JabinCartLine(models.Model):
     notes = fields.Text(string='Notes')
 
     # --- Computed Methods ---
-    @api.depends('price_unit', 'quantity', 'discount_percent', 'tax_percent')
+    @api.depends(
+        'price_unit',
+        'quantity',
+        'discount_percent',
+        'tax_percent',
+        'cutting_option_id',
+        'cutting_option_id.extra_price',
+        'packaging_ids',
+        'packaging_ids.extra_price',
+    )
     def _compute_line_totals(self):
         for line in self:
+            cutting_extra = float(getattr(line.cutting_option_id, 'extra_price', 0.0) or 0.0) if line.cutting_option_id else 0.0
+            packaging_extra = sum(float(getattr(p, 'extra_price', 0.0) or 0.0) for p in line.packaging_ids)
+            options_extra_unit = cutting_extra + packaging_extra
             base = line.price_unit * line.quantity
             line.discount_amount = base * (line.discount_percent / 100.0)
-            line.price_subtotal = base - line.discount_amount
+            line.price_subtotal = (base - line.discount_amount) + (options_extra_unit * line.quantity)
             line.tax_amount = line.price_subtotal * (line.tax_percent / 100.0)
             line.line_total = line.price_subtotal + line.tax_amount
 
@@ -579,29 +619,52 @@ class JabinCartLine(models.Model):
     def get_summary_line(self):
         """Get line summary as a dictionary."""
         self.ensure_one()
+        cutting_extra = float(getattr(self.cutting_option_id, 'extra_price', 0.0) or 0.0) if self.cutting_option_id else 0.0
+        packaging_extra = sum(float(getattr(p, 'extra_price', 0.0) or 0.0) for p in self.packaging_ids)
+        discounted_base_unit = round(self.price_unit * (1.0 - (self.discount_percent / 100.0)), 2)
+        effective_unit_price = round(discounted_base_unit + cutting_extra + packaging_extra, 2)
         return {
             'id': self.id,
             'product_id': self.product_id.id,
             'product_name': self.product_id.display_name,
             'product_image_url': self._build_product_image_url(self.product_id),
             'quantity': self.quantity,
-            'price_unit': self.price_unit,
+            'base_price_unit': discounted_base_unit,
+            'price_unit': effective_unit_price,
+            'cutting_price': cutting_extra,
+            'packaging_price': packaging_extra,
+            'options_extra_unit': round(cutting_extra + packaging_extra, 2),
             'discount_percent': self.discount_percent,
             'tax_percent': self.tax_percent,
             'price_subtotal': self.price_subtotal,
             'discount_amount': self.discount_amount,
             'tax_amount': self.tax_amount,
             'line_total': self.line_total,
-            'cutting_option': {'id': self.cutting_option_id.id, 'name': self.cutting_option_id.name} if self.cutting_option_id else None,
-            'packaging_options': [{'id': p.id, 'name': p.name} for p in self.packaging_ids],
-            'excluded_parts': [{'id': p.id, 'name': p.name} for p in self.excluded_part_ids],
+            'cutting_option': {
+                'id': self.cutting_option_id.id,
+                'name': self.cutting_option_id.name,
+                'extra_price': cutting_extra,
+            } if self.cutting_option_id else None,
+            'packaging_options': [
+                {
+                    'id': p.id,
+                    'name': p.name,
+                    'extra_price': float(getattr(p, 'extra_price', 0.0) or 0.0),
+                }
+                for p in self.packaging_ids
+            ],
+            'excluded_parts': [{'id': p.id, 'name': p.name, 'extra_price': 0.0} for p in self.excluded_part_ids],
+            'size_id': self.size_id.id if self.size_id else None,
+            'size_name': self.size_id.name if self.size_id else None,
+            'size_price': discounted_base_unit if self.size_id else None,
             'size': {
                 'id': self.size_id.id,
                 'name': self.size_id.name,
                 'sub_title': self.size_id.sub_title or '',
-                'price': self.size_id.price,
+                'price': discounted_base_unit,
                 'calories': self.size_id.calories,
                 'loyalty_points': self.size_id.loyalty_points,
+                'active': self.size_id.active,
             } if self.size_id else None,
             'notes': self.notes or None,
         }

@@ -294,6 +294,48 @@ def _serialize_product(product) -> Dict[str, Any]:
     selling = float(product.selling_price or 0.0)
     offer_pr = float(product.offer_price or 0.0)
 
+    active_sizes = (
+        product.size_ids.filtered(lambda x: x.active).sorted(key=lambda x: (x.sequence, x.id))
+        if hasattr(product, "size_ids")
+        else []
+    )
+    full_sizes = [s for s in active_sizes if (getattr(s, "portion_type", "full") or "full") == "full"]
+    half_sizes = [s for s in active_sizes if getattr(s, "portion_type", "full") == "half"]
+    quarter_sizes = [s for s in active_sizes if getattr(s, "portion_type", "full") == "quarter"]
+
+    portions_list = []
+    if getattr(product, "is_carcass", False) and active_sizes:
+        if full_sizes:
+            portions_list.append({
+                "type": "full",
+                "name": "كامل",
+                "title": f"{product.name} كامل",
+                "subtitle": "ذبيحة كاملة مجهزة بالكامل",
+                "image_url": main_img_url,
+                "starting_price": min(s.price for s in full_sizes),
+                "size_count": len(full_sizes),
+            })
+        if half_sizes:
+            portions_list.append({
+                "type": "half",
+                "name": "نصف",
+                "title": f"نصف {product.name}",
+                "subtitle": "نصف ذبيحة طازج مقسوم بالطول",
+                "image_url": BaseApiController.build_image_url("jabin.product", product.id, "half_image", bool(getattr(product, 'half_image', False))) or main_img_url,
+                "starting_price": min(s.price for s in half_sizes),
+                "size_count": len(half_sizes),
+            })
+        if quarter_sizes:
+            portions_list.append({
+                "type": "quarter",
+                "name": "ربع",
+                "title": f"ربع {product.name}",
+                "subtitle": "ربع متكامل (كتف أو فخذ مع ضلوع)",
+                "image_url": BaseApiController.build_image_url("jabin.product", product.id, "quarter_image", bool(getattr(product, 'quarter_image', False))) or main_img_url,
+                "starting_price": min(s.price for s in quarter_sizes),
+                "size_count": len(quarter_sizes),
+            })
+
     return {
         "id": product.id,
         "category_id": product.category_id.id,
@@ -330,7 +372,7 @@ def _serialize_product(product) -> Dict[str, Any]:
         "is_best_seller": product.is_best_seller,
         "is_offer": is_on_offer,
         "is_carcass": bool(getattr(product, "is_carcass", False)),
-        "has_sizes": getattr(product, "has_sizes", False),
+        "has_sizes": bool(active_sizes),
         "sizes": [
             {
                 "id": s.id,
@@ -348,49 +390,35 @@ def _serialize_product(product) -> Dict[str, Any]:
                 "points_price": s.points_price,
                 "is_default": s.is_default,
                 "sequence": s.sequence,
+                "active": s.active,
+                "is_active": s.active,
             }
-            for s in (product.size_ids.filtered(lambda x: x.active) if hasattr(product, "size_ids") else [])
+            for s in active_sizes
         ],
-        "portions": [
-            {
-                "type": "full",
-                "name": "كامل",
-                "title": f"{product.name} كامل",
-                "subtitle": "ذبيحة كاملة مجهزة بالكامل",
-                "image_url": main_img_url,
-                "starting_price": min([s.price for s in product.size_ids.filtered(lambda x: x.active and getattr(x, 'portion_type', 'full') == 'full')] or [product.selling_price or 0.0]),
-                "size_count": len([s for s in product.size_ids.filtered(lambda x: x.active and getattr(x, 'portion_type', 'full') == 'full')]),
-            },
-            {
-                "type": "half",
-                "name": "نصف",
-                "title": f"نصف {product.name}",
-                "subtitle": "نصف ذبيحة طازج مقسوم بالطول",
-                "image_url": BaseApiController.build_image_url("jabin.product", product.id, "half_image", bool(getattr(product, 'half_image', False))) or main_img_url,
-                "starting_price": min([s.price for s in product.size_ids.filtered(lambda x: x.active and getattr(x, 'portion_type', 'full') == 'half')] or [round((product.selling_price or 0.0) * 0.5, 2)]),
-                "size_count": len([s for s in product.size_ids.filtered(lambda x: x.active and getattr(x, 'portion_type', 'full') == 'half')]),
-            },
-            {
-                "type": "quarter",
-                "name": "ربع",
-                "title": f"ربع {product.name}",
-                "subtitle": "ربع متكامل (كتف أو فخذ مع ضلوع)",
-                "image_url": BaseApiController.build_image_url("jabin.product", product.id, "quarter_image", bool(getattr(product, 'quarter_image', False))) or main_img_url,
-                "starting_price": min([s.price for s in product.size_ids.filtered(lambda x: x.active and getattr(x, 'portion_type', 'full') == 'quarter')] or [round((product.selling_price or 0.0) * 0.25, 2)]),
-                "size_count": len([s for s in product.size_ids.filtered(lambda x: x.active and getattr(x, 'portion_type', 'full') == 'quarter')]),
-            },
-        ] if getattr(product, "is_carcass", False) else [],
+        "portions": portions_list,
         "cutting_options": [
-            {"id": opt.id, "name": opt.name}
-            for opt in product.cutting_option_ids
+            {
+                "id": opt.id,
+                "name": opt.name,
+                "extra_price": float(getattr(opt, "extra_price", 0.0) or 0.0),
+            }
+            for opt in product.cutting_option_ids.filtered(lambda x: x.active)
         ],
         "packaging_options": [
-            {"id": pkg.id, "name": pkg.name}
-            for pkg in product.packaging_ids
+            {
+                "id": pkg.id,
+                "name": pkg.name,
+                "extra_price": float(getattr(pkg, "extra_price", 0.0) or 0.0),
+            }
+            for pkg in product.packaging_ids.filtered(lambda x: x.active)
         ],
         "excluded_parts": [
-            {"id": part.id, "name": part.name}
-            for part in product.excluded_part_ids
+            {
+                "id": part.id,
+                "name": part.name,
+                "extra_price": 0.0,
+            }
+            for part in product.excluded_part_ids.filtered(lambda x: x.active)
         ],
         "images": [
             {
@@ -454,7 +482,9 @@ class ProductController(BaseApiController):
                     if first_cat:
                         vals["category_id"] = first_cat.id
 
-                raw_sizes = vals.pop("_raw_sizes", None) or vals.pop("sizes", None)
+                raw_sizes = vals.pop("_raw_sizes", None)
+                if raw_sizes is None:
+                    raw_sizes = vals.pop("sizes", None)
 
                 # Create product via service
                 product = ProductService.create(
@@ -462,7 +492,7 @@ class ProductController(BaseApiController):
                     vals,
                 )
 
-                # Save custom carcass sizes if provided
+                # Save custom carcass sizes ONLY if explicitly provided in raw_sizes
                 if raw_sizes and isinstance(raw_sizes, list):
                     for idx, s in enumerate(raw_sizes):
                         if isinstance(s, dict) and s.get("name") and s.get("price") is not None:
@@ -481,24 +511,14 @@ class ProductController(BaseApiController):
                                 })
                             except Exception as size_err:
                                 _logger.warning("Failed to save size on create: %s", size_err)
+                product.invalidate_recordset()
+                active_sizes = product.with_context(active_test=False).size_ids.filtered(lambda x: x.active)
+                product.sudo().write({"has_sizes": bool(active_sizes)})
 
-                img_url = BaseApiController.build_image_url(
-                    "jabin.product", product.id, "main_image", bool(product.main_image)
-                )
                 # Build success response
                 ctx.set_body(
                     ResponseBuilder.success(
-                        data={
-                            "id": product.id,
-                            "name": product.name,
-                            "sku": product.sku,
-                            "price": product.selling_price or 0.0,
-                            "selling_price": product.selling_price,
-                            "offer_price": product.offer_price,
-                            "is_on_offer": product.is_on_offer,
-                            "stock_quantity": product.stock_quantity,
-                            "image_url": img_url,
-                        },
+                        data=_serialize_product(product),
                         message=_("Product created successfully"),
                         code=201,
                     )
@@ -761,7 +781,9 @@ class ProductController(BaseApiController):
                             for idx, img_b64 in enumerate(extra_images)
                         ]
 
-                raw_sizes = vals.pop("_raw_sizes", None) or vals.pop("sizes", None)
+                raw_sizes = vals.pop("_raw_sizes", None)
+                if raw_sizes is None:
+                    raw_sizes = vals.pop("sizes", None)
 
                 # Update product via service
                 product = ProductService.update(
@@ -770,8 +792,10 @@ class ProductController(BaseApiController):
                     vals,
                 )
 
-                # Save or update custom carcass sizes if provided
+                # Synchronize custom carcass sizes when provided (dashboard is source of truth)
                 if raw_sizes is not None and isinstance(raw_sizes, list):
+                    SizeModel = request.env["jabin.product.size"].sudo().with_context(active_test=False)
+                    kept_size_ids = set()
                     for idx, s in enumerate(raw_sizes):
                         if not isinstance(s, dict) or not s.get("name"):
                             continue
@@ -799,23 +823,35 @@ class ProductController(BaseApiController):
                                 pass
                         try:
                             if size_id:
-                                existing = request.env["jabin.product.size"].sudo().browse(int(size_id))
+                                existing = SizeModel.browse(int(size_id))
                                 if existing.exists() and existing.product_id.id == product.id:
                                     existing.write(size_vals)
+                                    kept_size_ids.add(existing.id)
                                     continue
                             size_vals["product_id"] = product.id
-                            request.env["jabin.product.size"].sudo().create(size_vals)
+                            created_size = SizeModel.create(size_vals)
+                            kept_size_ids.add(created_size.id)
                         except Exception as size_err:
                             _logger.warning("Failed to save size on update: %s", size_err)
 
+                    # Remove or deactivate sizes that were removed in the dashboard
+                    existing_all = SizeModel.search([("product_id", "=", product.id)])
+                    for old_size in existing_all:
+                        if old_size.id not in kept_size_ids:
+                            try:
+                                old_size.unlink()
+                            except Exception:
+                                old_size.write({"active": False})
+
+                    product.invalidate_recordset()
+                    active_sizes = SizeModel.search([("product_id", "=", product.id), ("active", "=", True)])
+                    product.sudo().write({"has_sizes": bool(active_sizes)})
+
+                product.invalidate_recordset()
                 # Build success response
                 ctx.set_body(
                     ResponseBuilder.success(
-                        data={
-                            "id": product.id,
-                            "name": product.name,
-                            "sku": product.sku,
-                        },
+                        data=_serialize_product(product),
                         message=_("Product updated successfully"),
                     )
                 )

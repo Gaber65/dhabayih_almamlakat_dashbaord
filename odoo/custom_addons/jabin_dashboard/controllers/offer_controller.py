@@ -70,72 +70,26 @@ def _parse_offer_data() -> Dict[str, Any]:
 class OfferController(BaseApiController):
 
     def _serialize_product(self, product, offer=None):
+        from .product_controller import _serialize_product as base_serialize_product
+        base_data = base_serialize_product(product)
         selling_price = product.selling_price
         if offer:
             offer_price = offer.calculate_discounted_price(selling_price)
         else:
             offer_price = product.offer_price or selling_price
 
-        # Calculate discount percentage for display
         if selling_price > 0 and offer_price < selling_price:
             discount_pct = round(((selling_price - offer_price) / selling_price) * 100)
         else:
             discount_pct = 0
 
-        # Primary image URL: check main_image first, then gallery
-        main_img_url = None
-        if getattr(product, "main_image", False):
-            main_img_url = BaseApiController.build_image_url(
-                "jabin.product", product.id, "main_image", bool(product.main_image)
-            )
-        elif product.product_image_ids:
-            first_img = product.product_image_ids[0]
-            main_img_url = BaseApiController.build_image_url(
-                "jabin.product.image", first_img.id, "image", bool(first_img.image)
-            )
-
-        return {
-            "id": product.id,
-            "name": product.name,
-            "sku": product.sku or "",
-            "category_id": product.category_id.id if product.category_id else None,
-            "category_name": product.category_id.name if product.category_id else "",
+        base_data.update({
             "selling_price": selling_price,
             "offer_price": offer_price,
             "discount_percentage": discount_pct,
             "is_on_offer": True,
-            "stock_quantity": product.stock_quantity,
-            "is_available": product.stock_quantity > 0,
-            "main_image": main_img_url,
-            "main_image_url": main_img_url,
-            "image_url": main_img_url,
-            "description": product.description or "",
-            "cutting_options": [
-                {"id": opt.id, "name": opt.name}
-                for opt in product.cutting_option_ids
-            ],
-            "packaging_options": [
-                {"id": pkg.id, "name": pkg.name}
-                for pkg in product.packaging_ids
-            ],
-            "excluded_parts": [
-                {"id": part.id, "name": part.name}
-                for part in product.excluded_part_ids
-            ],
-            "images": [
-                {
-                    "id": img.id,
-                    "sequence": img.sequence,
-                    "image": BaseApiController.build_image_url(
-                        "jabin.product.image", img.id, "image", bool(img.image)
-                    ),
-                    "image_url": BaseApiController.build_image_url(
-                        "jabin.product.image", img.id, "image", bool(img.image)
-                    ),
-                }
-                for img in product.product_image_ids
-            ],
-        }
+        })
+        return base_data
 
     def _serialize_offer(self, offer, include_products=True):
         banner_url = BaseApiController.build_image_url(

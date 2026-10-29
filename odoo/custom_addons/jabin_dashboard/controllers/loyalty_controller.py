@@ -265,10 +265,10 @@ class LoyaltyController(BaseApiController):
         return ctx.response
 
     @http.route(
-        "/api/v1/loyalty/settings",
+        ["/api/v1/loyalty/settings", "/api/v1/admin/settings/loyalty"],
         type="http",
         auth="public",
-        methods=["GET", "PUT"],
+        methods=["GET", "PUT", "POST"],
         csrf=False,
         cors="*",
     )

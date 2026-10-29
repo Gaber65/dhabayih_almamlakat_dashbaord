@@ -5,6 +5,7 @@ from odoo.exceptions import ValidationError
 from odoo.addons.jabin_api.controllers import BaseApiController
 from odoo.addons.jabin_core import ResponseBuilder
 from odoo.addons.jabin_security.utils.token_auth import require_token
+from ..services.moyasar_service import MoyasarService
 
 
 def _get_auth_user_id() -> int:
@@ -41,7 +42,7 @@ def _parse_json_body():
 
 
 class PaymentMethodController(BaseApiController):
-    """Payment Methods & Transactions REST API Controller."""
+    """Payment Methods & Transactions REST API Controller (Moyasar Active Gateway)."""
 
     @http.route(
         "/api/v1/payment-methods",
@@ -52,19 +53,33 @@ class PaymentMethodController(BaseApiController):
         cors="*",
     )
     def list_payment_methods(self, **kwargs):
-        """List all payment methods (optionally active-only)."""
+        """List active payment methods, excluding deprecated MyFatoorah."""
         with self.handle() as ctx:
             all_param = kwargs.get("all") or kwargs.get("include_inactive")
-            if all_param and str(all_param).lower() in ("true", "1", "yes"):
-                domain = []
-            else:
-                domain = [("active", "=", True)]
-
             Model = request.env["jabin.payment.method"].sudo()
+
+            # Ensure COD is active
+            cod_record = Model.with_context(active_test=False).search([("code", "=", "cod")], limit=1)
+            if cod_record and not cod_record.active:
+                cod_record.write({"active": True})
+
+            # Ensure any legacy / unsupported payment method record is deactivated (strictly Moyasar and COD allowed)
+            unsupported = Model.search([
+                ("code", "not in", ("moyasar", "cod")),
+            ])
+            if unsupported:
+                unsupported.write({"active": False})
+
             if all_param and str(all_param).lower() in ("true", "1", "yes"):
-                methods = Model.with_context(active_test=False).search([], order="name")
+                methods = Model.with_context(active_test=False).search([
+                    ("code", "in", ("moyasar", "cod")),
+                ], order="name")
             else:
-                methods = Model.search([("active", "=", True)], order="name")
+                methods = Model.search([
+                    ("active", "=", True),
+                    ("code", "in", ("moyasar", "cod")),
+                ], order="name")
+
             res = []
             for m in methods:
                 res.append({
@@ -72,7 +87,7 @@ class PaymentMethodController(BaseApiController):
                     "name": m.name,
                     "code": m.code,
                     "payment_type": m.payment_type,
-                    "provider": m.provider,
+                    "provider": "moyasar" if m.payment_type in ("card", "wallet") and m.code != "cod" else m.provider,
                     "is_installment": m.is_installment,
                     "max_installments": m.max_installments,
                     "description": m.description or "",
@@ -91,7 +106,7 @@ class PaymentMethodController(BaseApiController):
         cors="*",
     )
     def create_payment_method(self, **kwargs):
-        """Create a new payment method."""
+        """Create a new payment method (Moyasar / Manual / Installment)."""
         denied = require_token()
         if denied:
             return denied
@@ -100,15 +115,22 @@ class PaymentMethodController(BaseApiController):
             vals = _parse_json_body()
             name = str(vals.get("name") or "").strip()
             code = str(vals.get("code") or "").strip().lower()
+            provider = str(vals.get("provider") or "moyasar").strip().lower()
             if not name or not code:
                 ctx.set_body(ResponseBuilder.bad_request(message=_("Name and code are required.")))
+                return ctx.response
+
+            if code == "myfatoorah" or provider == "myfatoorah":
+                ctx.set_body(ResponseBuilder.bad_request(
+                    message=_("بوابة ماي فاتورة غير مدعومة، البوابة المعتمدة هي ميسر (Moyasar).")
+                ))
                 return ctx.response
 
             create_vals = {
                 "name": name,
                 "code": code,
                 "payment_type": vals.get("payment_type", "card"),
-                "provider": vals.get("provider", "moyasar"),
+                "provider": provider,
                 "description": str(vals.get("description") or "").strip(),
                 "is_installment": bool(vals.get("is_installment", False)),
                 "max_installments": int(vals.get("max_installments") or 0),
@@ -148,12 +170,18 @@ class PaymentMethodController(BaseApiController):
             return denied
 
         with self.handle() as ctx:
-            method = request.env["jabin.payment.method"].sudo().browse(method_id)
+            method = request.env["jabin.payment.method"].sudo().with_context(active_test=False).browse(method_id)
             if not method.exists():
                 ctx.set_body(ResponseBuilder.not_found(message=_("Payment method not found.")))
                 return ctx.response
 
             vals = _parse_json_body()
+            if str(vals.get("provider") or "").lower() == "myfatoorah" or method.code == "myfatoorah":
+                ctx.set_body(ResponseBuilder.bad_request(
+                    message=_("بوابة ماي فاتورة متوقفة، البوابة المعتمدة هي ميسر (Moyasar).")
+                ))
+                return ctx.response
+
             update_vals = {}
             if "name" in vals:
                 update_vals["name"] = str(vals["name"]).strip()
@@ -210,7 +238,7 @@ class PaymentMethodController(BaseApiController):
             return denied
 
         with self.handle() as ctx:
-            method = request.env["jabin.payment.method"].sudo().browse(method_id)
+            method = request.env["jabin.payment.method"].sudo().with_context(active_test=False).browse(method_id)
             if not method.exists():
                 ctx.set_body(ResponseBuilder.not_found(message=_("Payment method not found.")))
                 return ctx.response
@@ -232,7 +260,7 @@ class PaymentMethodController(BaseApiController):
         cors="*",
     )
     def list_payment_transactions(self, **kwargs):
-        """List payment transactions with filters for admin dashboard."""
+        """List payment transactions with filters for admin dashboard (preserving historical records)."""
         with self.handle() as ctx:
             domain = []
             status = kwargs.get("status")
@@ -306,95 +334,34 @@ class PaymentMethodController(BaseApiController):
         cors="*",
     )
     def verify_payment(self, **kwargs):
-        """Verify payment with Moyasar/MyFatoorah and update order status."""
+        """Verify payment with Moyasar gateway and update order status."""
         denied = require_token()
         if denied:
             return denied
 
-        user_id = _get_auth_user_id()
         with self.handle() as ctx:
             data = _parse_json_body()
             order_id = data.get("order_id")
-            payment_id = data.get("payment_id")
+            payment_id = data.get("payment_id") or data.get("paymentId") or data.get("id")
 
-            if not order_id or not payment_id:
-                raise ValidationError(_("order_id and payment_id are required."))
+            if not payment_id:
+                raise ValidationError(_("معرف عملية الدفع مطلوب للتحقق."))
 
-            order = request.env["jabin.order"].sudo().browse(order_id)
-            if not order.exists() or order.customer_id.id != user_id:
-                raise ValidationError(_("Order not found."))
+            res = MoyasarService.verify_payment(
+                request.env,
+                payment_id=str(payment_id),
+                expected_order_id=int(order_id) if order_id else None,
+            )
 
-            api_token = request.env['ir.config_parameter'].sudo().get_param('jabin.myfatoorah.api_token', 'myfatoorah_test_token')
-
-            import requests
-            url = "https://api.myfatoorah.com/v2/GetPaymentStatus"
-            headers = {
-                "Authorization": f"Bearer {api_token}",
-                "Content-Type": "application/json"
-            }
-            payload = {
-                "Key": payment_id,
-                "KeyType": "PaymentId"
-            }
-            
-            try:
-                resp = requests.post(url, headers=headers, json=payload)
-            except Exception as exc:
-                raise ValidationError(_("Failed to connect to MyFatoorah: %s") % str(exc))
-
-            if resp.status_code != 200:
-                raise ValidationError(_("Failed to fetch payment details from MyFatoorah (status code %s).") % resp.status_code)
-
-            payment_data = resp.json().get("Data", {})
-            status = payment_data.get("InvoiceStatus")
-            
-            transactions = payment_data.get("InvoiceTransactions", [])
-            currency = "SAR"
-            amount = 0
-            if transactions:
-                currency = transactions[0].get("Currency", "SAR")
-                amount = float(transactions[0].get("TransationValue", 0))
-
-            if currency != "SAR":
-                raise ValidationError(_("Invalid payment currency: %s") % currency)
-
-            expected_amount = order.total
-            if abs(amount - expected_amount) > 0.1:
-                raise ValidationError(_("Payment amount mismatch. Expected %s, got %s.") % (expected_amount, amount))
-
-            if status == "Paid":
-                tx = request.env["jabin.customer.service"].sudo().process_payment_transaction(
-                    order_id=order.id,
-                    status="paid",
-                    ref=payment_id,
-                )
-                ctx.set_body(ResponseBuilder.success(data={
-                    "order_id": order.id,
-                    "order_number": order.name,
-                    "state": order.state,
-                    "payment_status": order.payment_status,
-                    "subtotal": getattr(order, "subtotal", order.total),
-                    "discount_amount": getattr(order, "discount_amount", 0.0),
-                    "points_redeemed": getattr(order, "points_redeemed", 0),
-                    "loyalty_discount_amount": getattr(order, "loyalty_discount_amount", 0.0),
-                    "delivery_fee": getattr(order, "delivery_fee", 0.0),
-                    "total": order.total,
-                }, message=_("Payment verified and order confirmed successfully.")))
+            if res.get("success"):
+                ctx.set_body(ResponseBuilder.success(
+                    data=res,
+                    message=_("تم التحقق من الدفع عبر ميسر وتأكيد الطلب بنجاح.")
+                ))
             else:
-                failure_reason = _("Payment not completed (Status: %s).") % status
-                tx = request.env["jabin.customer.service"].sudo().process_payment_transaction(
-                    order_id=order.id,
-                    status="failed",
-                    ref=payment_id,
-                    failure_reason=failure_reason
-                )
                 ctx.set_body(ResponseBuilder.error(
-                    message=_("Payment verification failed: %s") % failure_reason,
+                    message=res.get("message") or _("فشل التحقق من عملية الدفع عبر ميسر."),
                     code=400,
-                    data={
-                        "order_id": order.id,
-                        "payment_status": "failed",
-                        "transaction_id": tx.id
-                    }
+                    data=res
                 ))
         return ctx.response

@@ -51,7 +51,11 @@ def _parse_request_data() -> Dict[str, Any]:
     # Sanitize fields for jabin.packaging model
     if "is_active" in vals:
         vals["active"] = bool(vals.pop("is_active"))
-    vals.pop("extra_price", None)
+    if "extra_price" in vals:
+        try:
+            vals["extra_price"] = max(0.0, float(vals["extra_price"] or 0.0))
+        except (ValueError, TypeError):
+            vals["extra_price"] = 0.0
     vals.pop("type", None)
 
     return vals
@@ -95,7 +99,7 @@ class PackagingController(BaseApiController):
                         "description": packaging.description,
                         "active": packaging.active,
                         "is_active": packaging.active,
-                        "extra_price": 0.0,
+                        "extra_price": float(getattr(packaging, "extra_price", 0.0) or 0.0),
                         "type": "packaging",
                     },
                     message=_("Packaging created successfully"),
@@ -141,7 +145,7 @@ class PackagingController(BaseApiController):
                         "description": packaging.description,
                         "active": packaging.active,
                         "is_active": packaging.active,
-                        "extra_price": 0.0,
+                        "extra_price": float(getattr(packaging, "extra_price", 0.0) or 0.0),
                         "type": "packaging",
                     },
                     message=_("Packaging updated successfully"),
@@ -215,6 +219,8 @@ class PackagingController(BaseApiController):
                 "name": packaging.name,
                 "description": packaging.description,
                 "active": packaging.active,
+                "is_active": packaging.active,
+                "extra_price": float(getattr(packaging, "extra_price", 0.0) or 0.0),
                 "product_count": len(packaging.product_ids),
             }
 
@@ -284,6 +290,8 @@ class PackagingController(BaseApiController):
                         "name": packaging.name,
                         "description": packaging.description,
                         "active": packaging.active,
+                        "is_active": packaging.active,
+                        "extra_price": float(getattr(packaging, "extra_price", 0.0) or 0.0),
                     }
                     for packaging in packagings
                 ],

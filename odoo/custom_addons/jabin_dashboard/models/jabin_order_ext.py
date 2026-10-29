@@ -30,6 +30,14 @@ class JabinOrder(models.Model):
         ondelete='restrict',
         help='Store branch chosen by customer for order pickup'
     )
+    slaughter_date = fields.Date(
+        string='تاريخ الذبح',
+        help='Selected slaughter date for the order'
+    )
+    slaughter_time = fields.Char(
+        string='وقت الذبح',
+        help='Selected slaughter time slot for the order'
+    )
     total_after_discount = fields.Monetary(
         string='Total After Discount',
         compute='_compute_totals',
@@ -95,8 +103,8 @@ class JabinOrder(models.Model):
     def _compute_totals(self):
         for order in self:
             lines = order.order_line_ids
+            # Note: line.price_subtotal is already net of line.discount_amount and includes cutting/packaging fees
             subtotal = sum(lines.mapped('price_subtotal'))
-            line_discount = sum(lines.mapped('discount_amount'))
             coupon_discount = order._calculate_coupon_discount(subtotal)
 
             loyalty_discount = 0.0
@@ -104,13 +112,14 @@ class JabinOrder(models.Model):
                 loyalty_discount = self.env['jabin.loyalty.service'].calculate_redemption_value(
                     self.env, order.points_redeemed
                 )
+                loyalty_discount = min(loyalty_discount, max(0.0, subtotal - coupon_discount))
 
-            total_discount = line_discount + coupon_discount + loyalty_discount
-            order.loyalty_discount_amount = loyalty_discount
-            order.subtotal = subtotal
-            order.discount_amount = total_discount
-            order.total_after_discount = max(0.0, subtotal - total_discount)
-            order.total = order.total_after_discount + order.tax_amount
+            total_discount = coupon_discount + loyalty_discount
+            order.loyalty_discount_amount = round(loyalty_discount, 2)
+            order.subtotal = round(subtotal, 2)
+            order.discount_amount = round(total_discount, 2)
+            order.total_after_discount = round(max(0.0, subtotal - total_discount), 2)
+            order.total = round(order.total_after_discount + (order.tax_amount or 0.0), 2)
 
     def _calculate_coupon_discount(self, subtotal: float = 0.0) -> float:
         """Calculate discount amount for the applied coupon based on order lines."""

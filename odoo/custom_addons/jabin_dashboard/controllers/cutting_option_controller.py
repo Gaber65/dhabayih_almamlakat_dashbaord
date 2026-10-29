@@ -51,7 +51,11 @@ def _parse_request_data() -> Dict[str, Any]:
     # Sanitize fields for jabin.cutting.option model
     if "is_active" in vals:
         vals["active"] = bool(vals.pop("is_active"))
-    vals.pop("extra_price", None)
+    if "extra_price" in vals:
+        try:
+            vals["extra_price"] = max(0.0, float(vals["extra_price"] or 0.0))
+        except (ValueError, TypeError):
+            vals["extra_price"] = 0.0
     vals.pop("type", None)
 
     return vals
@@ -95,7 +99,7 @@ class CuttingOptionController(BaseApiController):
                         "description": cutting_option.description,
                         "active": cutting_option.active,
                         "is_active": cutting_option.active,
-                        "extra_price": 0.0,
+                        "extra_price": float(getattr(cutting_option, "extra_price", 0.0) or 0.0),
                         "type": "cutting",
                     },
                     message=_("Cutting option created successfully"),
@@ -141,7 +145,7 @@ class CuttingOptionController(BaseApiController):
                         "description": cutting_option.description,
                         "active": cutting_option.active,
                         "is_active": cutting_option.active,
-                        "extra_price": 0.0,
+                        "extra_price": float(getattr(cutting_option, "extra_price", 0.0) or 0.0),
                         "type": "cutting",
                     },
                     message=_("Cutting option updated successfully"),
@@ -215,6 +219,8 @@ class CuttingOptionController(BaseApiController):
                 "name": cutting_option.name,
                 "description": cutting_option.description,
                 "active": cutting_option.active,
+                "is_active": cutting_option.active,
+                "extra_price": float(getattr(cutting_option, "extra_price", 0.0) or 0.0),
                 "product_count": len(cutting_option.product_ids),
             }
 
@@ -284,6 +290,8 @@ class CuttingOptionController(BaseApiController):
                         "name": option.name,
                         "description": option.description,
                         "active": option.active,
+                        "is_active": option.active,
+                        "extra_price": float(getattr(option, "extra_price", 0.0) or 0.0),
                     }
                     for option in cutting_options
                 ],

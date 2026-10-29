@@ -65,17 +65,45 @@ class JabinCustomerService(models.AbstractModel):
                 pass
         return order
 
+    def _restore_cancelled_order_resources(self, order):
+        if "jabin.loyalty.service" in self.env:
+            try:
+                self.env["jabin.loyalty.service"].reverse_order_points(self.env, order.id)
+            except Exception:
+                pass
+        try:
+            cart = self.env['jabin.cart'].sudo().search([('checked_out_order_id', '=', order.id)], limit=1)
+            if cart and cart.status == 'checked_out':
+                active_cart = self.env['jabin.cart'].sudo().search([
+                    ('customer_id', '=', order.customer_id.id),
+                    ('status', '=', 'active'),
+                    ('id', '!=', cart.id),
+                ], limit=1)
+                if active_cart and not active_cart.line_ids:
+                    active_cart.sudo().unlink()
+                    active_cart = False
+                if not active_cart:
+                    cart.sudo().write({'status': 'active', 'checked_out_order_id': False})
+                else:
+                    for l in cart.line_ids:
+                        l.sudo().write({'cart_id': active_cart.id})
+                    cart.sudo().write({'checked_out_order_id': False})
+        except Exception:
+            pass
+
     @api.model
     def trigger_status_transition(self, order_id, new_state, description=None):
         """
         Triggers a business state transition, updates status timeline, and logs activity.
         """
-        order = self.env["jabin.order"].browse(order_id)
+        order = self.env["jabin.order"].sudo().browse(order_id)
         if not order.exists():
             raise ValidationError(_("Order %s not found.") % order_id)
 
         old_state = order.state
         if old_state == new_state:
+            if new_state == "cancelled":
+                self._restore_cancelled_order_resources(order)
             return True
 
         allowed = self.STATE_TRANSITIONS.get(old_state, [])
@@ -99,11 +127,13 @@ class JabinCustomerService(models.AbstractModel):
             if "jabin.loyalty.service" in self.env:
                 self.env["jabin.loyalty.service"].award_earned_points(self.env, order.id)
         elif new_state == "cancelled":
-            order.customer_id.log_activity("cancelled_order", related_record=f"jabin.order,{order.id}")
-            if order.payment_status in ("pending", "authorized"):
+            try:
+                order.customer_id.sudo().log_activity("cancelled_order", related_record=f"jabin.order,{order.id}")
+            except Exception:
+                pass
+            if order.payment_status in ("pending", "authorized", "failed"):
                 order.sudo().write({"payment_status": "cancelled"})
-            if "jabin.loyalty.service" in self.env:
-                self.env["jabin.loyalty.service"].reverse_order_points(self.env, order.id)
+            self._restore_cancelled_order_resources(order)
         elif new_state == "refunded":
             order.customer_id.log_activity("requested_refund", related_record=f"jabin.order,{order.id}")
             order.sudo().write({"payment_status": "refunded"})

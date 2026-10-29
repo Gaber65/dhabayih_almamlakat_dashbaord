@@ -71,6 +71,11 @@
                     <div><strong>السجل التجاري:</strong> <span t-esc="o.env.company.company_registry or '1010892341'"/></div>
                     <div><strong>العميل:</strong> <span t-esc="o.customer_id.name or 'عميل محترم'"/></div>
                     <div><strong>الجوال:</strong> <span style="font-family: monospace;" t-esc="o.customer_id.phone or o.customer_id.mobile or (o.customer_id.partner_id and o.customer_id.partner_id.phone) or (o.customer_id.partner_id and o.customer_id.partner_id.mobile) or '-'"/></div>
+                    <div t-if="o.slaughter_date or o.slaughter_time">
+                        <strong>موعد الذبح:</strong>
+                        <span t-if="o.slaughter_date" t-esc="o.slaughter_date"/>
+                        <span t-if="o.slaughter_time"> — <t t-esc="o.slaughter_time"/></span>
+                    </div>
                     <div><strong>طريقة الدفع:</strong> <span t-esc="o.payment_method_id.name if o.payment_method_id else 'دفع إلكتروني'"/></div>
                     <div>
                         <strong>حالة السداد:</strong>
@@ -96,15 +101,20 @@
                             <tr style="border-bottom: 1px dotted #cbd5e1;">
                                 <td style="padding: 4px 2px; text-align: right;">
                                     <div style="font-weight: bold;" t-esc="line.name"/>
-                                    <div t-if="line.size_id" style="font-size: 9px; color: #475569;">
-                                        <span>حجم: </span><span t-esc="line.size_id.name"/>
+                                    <div t-if="line.size_name or line.size_id" style="font-size: 9px; color: #475569;">
+                                        <span>حجم: </span><span t-esc="line.size_name or line.size_id.name"/>
                                     </div>
-                                    <div t-if="line.cutting_option_id" style="font-size: 9px; color: #475569;">
-                                        <span t-esc="line.cutting_option_id.name"/>
+                                    <div t-if="line.cutting_option_name or line.cutting_option_id" style="font-size: 9px; color: #475569;">
+                                        <span>تقطيع: </span><span t-esc="line.cutting_option_name or line.cutting_option_id.name"/>
+                                        <span t-if="line.cutting_price and line.cutting_price &gt; 0" t-esc="' (+%.0f ر.س)' % line.cutting_price"/>
+                                    </div>
+                                    <div t-if="line.packaging_name or line.packaging_id" style="font-size: 9px; color: #475569;">
+                                        <span>تغليف: </span><span t-esc="line.packaging_name or line.packaging_id.name"/>
+                                        <span t-if="line.packaging_price and line.packaging_price &gt; 0" t-esc="' (+%.0f ر.س)' % line.packaging_price"/>
                                     </div>
                                 </td>
                                 <td style="padding: 4px 2px; text-align: center;" t-esc="int(line.quantity)"/>
-                                <td style="padding: 4px 2px; text-align: center; font-family: monospace;" t-esc="'%.2f' % line.price_unit"/>
+                                <td style="padding: 4px 2px; text-align: center; font-family: monospace;" t-esc="'%.2f' % (line.price_unit + (line.cutting_price or 0.0) + (line.packaging_price or 0.0))"/>
                                 <td style="padding: 4px 2px; text-align: left; font-family: monospace; font-weight: bold;" t-esc="'%.2f' % line.price_subtotal"/>
                             </tr>
                         </t>
@@ -114,32 +124,26 @@
                 <div style="border-top: 1px dashed #475569; margin: 6px 0;"/>
 
                 <!-- Totals -->
+                <t t-set="coupon_disc" t-value="max(0.0, (o.discount_amount or 0.0) - (o.loyalty_discount_amount or 0.0))"/>
                 <table style="width: 100%; font-size: 10px; text-align: right; line-height: 18px;">
                     <tr>
-                        <td>المجموع قبل الضريبة:</td>
+                        <td>المجموع الفرعي:</td>
                         <td style="text-align: left; font-family: monospace; font-weight: bold;" t-esc="'%.2f ر.س' % o.subtotal"/>
                     </tr>
-                    <tr t-if="o.discount_amount and o.discount_amount > 0">
+                    <tr t-if="coupon_disc and coupon_disc &gt; 0">
                         <td>الخصم:</td>
-                        <td style="text-align: left; font-family: monospace;" t-esc="'- %.2f ر.س' % o.discount_amount"/>
+                        <td style="text-align: left; font-family: monospace;" t-esc="'- %.2f ر.س' % coupon_disc"/>
                     </tr>
-                    <tr t-if="o.loyalty_discount_amount and o.loyalty_discount_amount > 0">
+                    <tr t-if="o.loyalty_discount_amount and o.loyalty_discount_amount &gt; 0">
                         <td>خصم نقاط الولاء:</td>
                         <td style="text-align: left; font-family: monospace;" t-esc="'- %.2f ر.س' % o.loyalty_discount_amount"/>
                     </tr>
-                    <tr>
+                    <tr t-if="o.tax_amount and o.tax_amount &gt; 0">
                         <td>ضريبة القيمة المضافة (15%):</td>
                         <td style="text-align: left; font-family: monospace; font-weight: bold;" t-esc="'%.2f ر.س' % o.tax_amount"/>
                     </tr>
-                    <tr>
-                        <td>رسوم التوصيل:</td>
-                        <td style="text-align: left; font-family: monospace;">
-                            <span t-if="o.delivery_fee and o.delivery_fee > 0" t-esc="'%.2f ر.س' % o.delivery_fee"/>
-                            <span t-else="">مجاني</span>
-                        </td>
-                    </tr>
                     <tr style="border-top: 1px solid #000000; font-size: 13px; font-weight: 900;">
-                        <td style="padding-top: 4px;">الإجمالي الكلي:</td>
+                        <td style="padding-top: 4px;">الإجمالي الكلي (شامل الضريبة):</td>
                         <td style="padding-top: 4px; text-align: left; font-family: monospace;" t-esc="'%.2f ر.س' % o.total"/>
                     </tr>
                 </table>
@@ -218,6 +222,13 @@
                                     <td style="color: #64748b;">تاريخ ووقت الإصدار:</td>
                                     <td style="font-weight: bold; color: #0f172a;" t-esc="o.date.strftime('%Y-%m-%d %H:%M') if o.date else ''"/>
                                 </tr>
+                                <tr t-if="o.slaughter_date or o.slaughter_time">
+                                    <td style="color: #64748b;">موعد الذبح والتجهيز:</td>
+                                    <td style="font-weight: bold; color: #0f766e;">
+                                        <span t-if="o.slaughter_date" t-esc="o.slaughter_date"/>
+                                        <span t-if="o.slaughter_time"> — <t t-esc="o.slaughter_time"/></span>
+                                    </td>
+                                </tr>
                                 <tr>
                                     <td style="color: #64748b;">طريقة الدفع:</td>
                                     <td style="font-weight: bold; color: #0f172a;">
@@ -293,16 +304,18 @@
                                 <td style="padding: 10px 8px; text-align: center; color: #64748b;" t-esc="idx"/>
                                 <td style="padding: 10px 8px; text-align: right;">
                                     <div style="font-weight: bold; color: #0f172a;" t-esc="line.name"/>
-                                    <div t-if="line.size_id" style="font-size: 11px; color: #0f766e;">
-                                        <span>الحجم: </span><span t-esc="line.size_id.name"/>
+                                    <div t-if="line.size_name or line.size_id" style="font-size: 11px; color: #0f766e;">
+                                        <span>الحجم: </span><span t-esc="line.size_name or line.size_id.name"/>
                                     </div>
                                 </td>
                                 <td style="padding: 10px 8px; text-align: right; font-size: 11px; color: #475569;">
-                                    <div t-if="line.cutting_option_id">
-                                        <span>✂️ التقطيع: </span><span style="font-weight: bold;" t-esc="line.cutting_option_id.name"/>
+                                    <div t-if="line.cutting_option_name or line.cutting_option_id">
+                                        <span>✂️ التقطيع: </span><span style="font-weight: bold;" t-esc="line.cutting_option_name or line.cutting_option_id.name"/>
+                                        <span t-if="line.cutting_price and line.cutting_price &gt; 0" t-esc="' (+%.0f ر.س)' % line.cutting_price"/>
                                     </div>
-                                    <div t-if="line.packaging_id">
-                                        <span>📦 التغليف: </span><span style="font-weight: bold;" t-esc="line.packaging_id.name"/>
+                                    <div t-if="line.packaging_name or line.packaging_id">
+                                        <span>📦 التغليف: </span><span style="font-weight: bold;" t-esc="line.packaging_name or line.packaging_id.name"/>
+                                        <span t-if="line.packaging_price and line.packaging_price &gt; 0" t-esc="' (+%.0f ر.س)' % line.packaging_price"/>
                                     </div>
                                     <div t-if="line.excluded_part_ids">
                                         <span>🚫 بدون: </span>
@@ -310,7 +323,7 @@
                                     </div>
                                 </td>
                                 <td style="padding: 10px 8px; text-align: center; font-weight: bold; color: #0f172a;" t-esc="int(line.quantity)"/>
-                                <td style="padding: 10px 8px; text-align: center; font-family: monospace; color: #0f172a;" t-esc="'%.2f' % line.price_unit"/>
+                                <td style="padding: 10px 8px; text-align: center; font-family: monospace; color: #0f172a;" t-esc="'%.2f' % (line.price_unit + (line.cutting_price or 0.0) + (line.packaging_price or 0.0))"/>
                                 <td style="padding: 10px 8px; text-align: center; font-weight: bold; font-family: monospace; color: #0f766e;" t-esc="'%.2f' % line.price_subtotal"/>
                             </tr>
                             <t t-set="idx" t-value="idx + 1"/>
@@ -336,32 +349,26 @@
                         </td>
 
                         <td style="width: 50%; vertical-align: top;">
+                            <t t-set="a4_coupon_disc" t-value="max(0.0, (o.discount_amount or 0.0) - (o.loyalty_discount_amount or 0.0))"/>
                             <table style="width: 100%; border-collapse: collapse; font-size: 12px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
                                 <tr style="border-bottom: 1px solid #e2e8f0;">
-                                    <td style="padding: 8px 12px; color: #475569;">المجموع قبل الخصم والضريبة:</td>
+                                    <td style="padding: 8px 12px; color: #475569;">المجموع الفرعي:</td>
                                     <td style="padding: 8px 12px; text-align: left; font-family: monospace; font-weight: bold;" t-esc="'%.2f ر.س' % o.subtotal"/>
                                 </tr>
-                                <tr t-if="o.discount_amount and o.discount_amount > 0" style="border-bottom: 1px solid #e2e8f0; color: #dc2626;">
+                                <tr t-if="a4_coupon_disc and a4_coupon_disc &gt; 0" style="border-bottom: 1px solid #e2e8f0; color: #dc2626;">
                                     <td style="padding: 8px 12px;">خصم الكوبون / العرض:</td>
-                                    <td style="padding: 8px 12px; text-align: left; font-family: monospace; font-weight: bold;" t-esc="'- %.2f ر.س' % o.discount_amount"/>
+                                    <td style="padding: 8px 12px; text-align: left; font-family: monospace; font-weight: bold;" t-esc="'- %.2f ر.س' % a4_coupon_disc"/>
                                 </tr>
-                                <tr t-if="o.loyalty_discount_amount and o.loyalty_discount_amount > 0" style="border-bottom: 1px solid #e2e8f0; color: #dc2626;">
+                                <tr t-if="o.loyalty_discount_amount and o.loyalty_discount_amount &gt; 0" style="border-bottom: 1px solid #e2e8f0; color: #dc2626;">
                                     <td style="padding: 8px 12px;">خصم نقاط الولاء:</td>
                                     <td style="padding: 8px 12px; text-align: left; font-family: monospace; font-weight: bold;" t-esc="'- %.2f ر.س' % o.loyalty_discount_amount"/>
                                 </tr>
-                                <tr style="border-bottom: 1px solid #e2e8f0;">
+                                <tr t-if="o.tax_amount and o.tax_amount &gt; 0" style="border-bottom: 1px solid #e2e8f0;">
                                     <td style="padding: 8px 12px; color: #475569;">ضريبة القيمة المضافة (15%):</td>
                                     <td style="padding: 8px 12px; text-align: left; font-family: monospace; font-weight: bold;" t-esc="'%.2f ر.س' % o.tax_amount"/>
                                 </tr>
-                                <tr style="border-bottom: 1px solid #e2e8f0;">
-                                    <td style="padding: 8px 12px; color: #475569;">رسوم التوصيل المبرد:</td>
-                                    <td style="padding: 8px 12px; text-align: left; font-family: monospace; font-weight: bold;">
-                                        <span t-if="o.delivery_fee and o.delivery_fee > 0" t-esc="'%.2f ر.س' % o.delivery_fee"/>
-                                        <span t-else="" style="color: #16a34a;">مجاني</span>
-                                    </td>
-                                </tr>
                                 <tr style="background-color: #0f766e; color: #ffffff; font-size: 14px; font-weight: 800;">
-                                    <td style="padding: 12px;">الإجمالي الكلي المستحق:</td>
+                                    <td style="padding: 12px;">الإجمالي الكلي المستحق (شامل الضريبة):</td>
                                     <td style="padding: 12px; text-align: left; font-family: monospace;" t-esc="'%.2f ر.س' % o.total"/>
                                 </tr>
                             </table>

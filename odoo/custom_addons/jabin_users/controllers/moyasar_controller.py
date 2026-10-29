@@ -27,7 +27,6 @@ class MoyasarController(BaseApiController):
         [
             "/api/v1/payments/moyasar/initiate",
             "/api/v1/payments/initiate",
-            "/api/v1/payments/myfatoorah/initiate",
         ],
         type="http",
         auth="public",
@@ -74,8 +73,6 @@ class MoyasarController(BaseApiController):
         [
             "/api/v1/payments/moyasar/verify",
             "/api/v1/payments/verify",
-            "/api/v1/payment/verify",
-            "/api/v1/payments/myfatoorah/verify",
         ],
         type="http",
         auth="public",
@@ -398,3 +395,54 @@ class MoyasarController(BaseApiController):
             json.dumps({"status": "received"}),
             headers=[("Content-Type", "application/json")]
         )
+
+    @http.route(
+        ["/api/v1/admin/settings/moyasar", "/api/v1/settings/moyasar"],
+        type="http",
+        auth="public",
+        methods=["GET", "POST", "PUT"],
+        csrf=False,
+        cors="*",
+    )
+    def moyasar_gateway_settings(self, **kwargs):
+        """Get or update Moyasar gateway configuration (secret key masked in GET response)."""
+        from odoo.addons.jabin_security.utils.token_auth import require_token
+        denied = require_token()
+        if denied:
+            return denied
+
+        with self.handle() as ctx:
+            params = request.env["ir.config_parameter"].sudo()
+            if request.httprequest.method in ("POST", "PUT"):
+                vals = _parse_body()
+                if "publishable_key" in vals and vals["publishable_key"] is not None:
+                    pk_val = str(vals["publishable_key"]).strip()
+                    if pk_val and not (pk_val.startswith("pk_test_") or pk_val.startswith("pk_live_")):
+                        raise ValidationError(_("مفتاح النشر (Publishable Key) يجب أن يبدأ بـ pk_test_ أو pk_live_."))
+                    params.set_param("moyasar.publishable_key", pk_val)
+                if "secret_key" in vals and vals["secret_key"]:
+                    sk_val = str(vals["secret_key"]).strip()
+                    if "*" not in sk_val:
+                        if not (sk_val.startswith("sk_test_") or sk_val.startswith("sk_live_")):
+                            raise ValidationError(_("المفتاح السري (Secret Key) يجب أن يبدأ بـ sk_test_ أو sk_live_."))
+                        params.set_param("moyasar.secret_key", sk_val)
+                if "environment" in vals and vals["environment"] in ("test", "live"):
+                    params.set_param("moyasar.environment", vals["environment"])
+
+            cfg = MoyasarService._get_config(request.env)
+            sk = cfg.get("secret_key", "")
+            masked_sk = (sk[:8] + "••••••••••••" + sk[-4:]) if len(sk) > 12 else ""
+            ctx.set_body(
+                ResponseBuilder.success(
+                    data={
+                        "provider": "moyasar",
+                        "environment": cfg.get("env_mode", "live"),
+                        "publishable_key": cfg.get("publishable_key", ""),
+                        "secret_key_masked": masked_sk,
+                        "has_secret_key": bool(sk),
+                        "is_configured": bool(cfg.get("is_configured")),
+                    },
+                    message=_("Moyasar gateway settings retrieved successfully."),
+                )
+            )
+        return ctx.response

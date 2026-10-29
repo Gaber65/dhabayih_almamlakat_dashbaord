@@ -166,7 +166,7 @@ class ProductSizeController(BaseApiController):
                 limit = int(kwargs.get("limit", 100))
                 offset = int(kwargs.get("offset", 0))
 
-                Model = request.env["jabin.product.size"].sudo()
+                Model = request.env["jabin.product.size"].sudo().with_context(active_test=False)
                 total = Model.search_count(domain)
                 records = Model.search(domain, limit=limit, offset=offset, order="sequence, id")
 
@@ -193,7 +193,7 @@ class ProductSizeController(BaseApiController):
     def get_size_detail(self, size_id, **kwargs):
         """Get size detail by ID."""
         with self.handle() as ctx:
-            size = request.env["jabin.product.size"].sudo().browse(size_id)
+            size = request.env["jabin.product.size"].sudo().with_context(active_test=False).browse(size_id)
             if not size.exists():
                 ctx.set_body(ResponseBuilder.not_found(message=_("Size not found")))
             else:
@@ -268,7 +268,7 @@ class ProductSizeController(BaseApiController):
 
         with self.handle() as ctx:
             try:
-                size = request.env["jabin.product.size"].sudo().browse(size_id)
+                size = request.env["jabin.product.size"].sudo().with_context(active_test=False).browse(size_id)
                 if not size.exists():
                     ctx.set_body(ResponseBuilder.not_found(message=_("Size not found")))
                     return ctx.response
@@ -277,6 +277,9 @@ class ProductSizeController(BaseApiController):
                 if not vals.get("product_id"):
                     vals.pop("product_id", None)
                 size.write(vals)
+                if size.product_id and size.product_id.exists():
+                    active_sizes = size.product_id.with_context(active_test=False).size_ids.filtered(lambda s: s.active)
+                    size.product_id.sudo().write({"has_sizes": bool(active_sizes)})
 
                 ctx.set_body(
                     ResponseBuilder.success(
@@ -306,17 +309,21 @@ class ProductSizeController(BaseApiController):
 
         with self.handle() as ctx:
             try:
-                size = request.env["jabin.product.size"].sudo().browse(size_id)
+                size = request.env["jabin.product.size"].sudo().with_context(active_test=False).browse(size_id)
                 if not size.exists():
                     ctx.set_body(ResponseBuilder.not_found(message=_("Size not found")))
                     return ctx.response
 
                 product = size.product_id
-                size.unlink()
+                try:
+                    size.unlink()
+                except Exception:
+                    size.write({"active": False})
 
-                # If no more sizes remain, update has_sizes
-                if product and product.exists() and not product.size_ids:
-                    product.sudo().write({"has_sizes": False})
+                # If no more active sizes remain, update has_sizes
+                if product and product.exists():
+                    active_sizes = product.with_context(active_test=False).size_ids.filtered(lambda s: s.active)
+                    product.sudo().write({"has_sizes": bool(active_sizes)})
 
                 ctx.set_body(
                     ResponseBuilder.success(

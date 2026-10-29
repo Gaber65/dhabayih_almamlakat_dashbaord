@@ -233,12 +233,32 @@ class HomeController(BaseApiController):
             wa_number = env['ir.config_parameter'].sudo().get_param('jabin.whatsapp_number', '+966500000000')
             wa_msg = env['ir.config_parameter'].sudo().get_param('jabin.whatsapp_default_message', 'مرحباً، أود الاستفسار عن ذبائح المملكة')
             wa_enabled = env['ir.config_parameter'].sudo().get_param('jabin.whatsapp_enabled', 'True') in ('True', 'true', '1')
-            delivery_fee = float(env['ir.config_parameter'].sudo().get_param('jabin.delivery.fee', '31.95'))
+            delivery_fee = float(env['ir.config_parameter'].sudo().get_param('jabin.delivery.fee', '0.0'))
 
             import re
             import urllib.parse
             clean_digits = re.sub(r'[^0-9]', '', wa_number)
             wa_url = f"https://wa.me/{clean_digits}?text={urllib.parse.quote(wa_msg)}"
+            config = env['ir.config_parameter'].sudo()
+
+            app_updates = {
+                "android": {
+                    "latest_version": config.get_param('jabin.app.android.latest_version', '1.0.0'),
+                    "min_version": config.get_param('jabin.app.android.min_version', '1.0.0'),
+                    "force_update": config.get_param('jabin.app.android.force_update', 'false').lower() in ('true', '1'),
+                    "store_url": config.get_param('jabin.app.android.store_url', 'https://play.google.com/store/apps/details?id=com.dhabayih.lmamlaka'),
+                },
+                "ios": {
+                    "latest_version": config.get_param('jabin.app.ios.latest_version', '1.0.0'),
+                    "min_version": config.get_param('jabin.app.ios.min_version', '1.0.0'),
+                    "force_update": config.get_param('jabin.app.ios.force_update', 'false').lower() in ('true', '1'),
+                    "store_url": config.get_param('jabin.app.ios.store_url', 'https://apps.apple.com/app/id6470000000'),
+                },
+                "title_ar": config.get_param('jabin.app.update_title_ar', 'تحديث جديد متوفر'),
+                "title_en": config.get_param('jabin.app.update_title_en', 'New Update Available'),
+                "message_ar": config.get_param('jabin.app.update_message_ar', 'يتوفر إصدار جديد من تطبيق ذبائح المملكة بمزايا وتحسينات جديدة. يرجى التحديث للمتابعة.'),
+                "message_en": config.get_param('jabin.app.update_message_en', 'A new version of Dhabayih Al-Mamlaka is available with new improvements. Please update to continue.'),
+            }
 
             data = {
                 "whatsapp": {
@@ -248,10 +268,200 @@ class HomeController(BaseApiController):
                     "default_message": wa_msg,
                     "chat_url": wa_url,
                 },
-                "support_phone": env['ir.config_parameter'].sudo().get_param('jabin.support_phone', '920000000'),
+                "support_phone": config.get_param('jabin.support_phone', '920000000'),
                 "delivery_fee": delivery_fee,
+                "app_updates": app_updates,
             }
             ctx.set_body(ResponseBuilder.success(data=data, message=_("Settings retrieved successfully.")))
+        return ctx.response
+
+    @http.route(
+        "/api/v1/app/check_update",
+        type="http",
+        auth="public",
+        methods=["GET"],
+        csrf=False,
+        cors="*",
+    )
+    def check_app_update(self, **kwargs):
+        """Check whether the client app requires a mandatory (force) or optional update."""
+        with self.handle() as ctx:
+            env = request.env
+            config = env['ir.config_parameter'].sudo()
+
+            platform = (kwargs.get('platform') or 'android').lower().strip()
+            if platform not in ('android', 'ios'):
+                platform = 'android'
+
+            current_version = (kwargs.get('version') or kwargs.get('current_version') or '1.0.0').strip()
+            lang = (kwargs.get('lang') or 'ar').lower().strip()
+
+            latest_version = config.get_param(f'jabin.app.{platform}.latest_version', '1.0.0').strip()
+            min_version = config.get_param(f'jabin.app.{platform}.min_version', '1.0.0').strip()
+            force_flag = config.get_param(f'jabin.app.{platform}.force_update', 'false').lower() in ('true', '1')
+            store_url = config.get_param(
+                f'jabin.app.{platform}.store_url',
+                'https://play.google.com/store/apps/details?id=com.dhabayih.lmamlaka' if platform == 'android' else 'https://apps.apple.com/app/id6470000000'
+            ).strip()
+
+            def _parse_version(v_str):
+                clean = (v_str or '0').split('+')[0].strip()
+                res = []
+                for p in clean.split('.'):
+                    try:
+                        res.append(int(p))
+                    except (ValueError, TypeError):
+                        res.append(0)
+                return res
+
+            def _cmp_versions(v1, v2):
+                p1, p2 = _parse_version(v1), _parse_version(v2)
+                ml = max(len(p1), len(p2))
+                p1 += [0] * (ml - len(p1))
+                p2 += [0] * (ml - len(p2))
+                for a, b in zip(p1, p2):
+                    if a > b:
+                        return 1
+                    if a < b:
+                        return -1
+                return 0
+
+            is_below_min = _cmp_versions(current_version, min_version) < 0
+            is_below_latest = _cmp_versions(current_version, latest_version) < 0
+
+            # Force update is triggered if current version is below minimum supported version,
+            # or if the admin explicitly enabled the global force_update flag and an update exists.
+            force_update = is_below_min or (force_flag and is_below_latest)
+            update_available = is_below_latest or is_below_min
+
+            if lang == 'en':
+                title = config.get_param('jabin.app.update_title_en', 'New Update Available')
+                message = config.get_param('jabin.app.update_message_en', 'A new version of Dhabayih Al-Mamlaka is available with new improvements. Please update to continue.')
+            else:
+                title = config.get_param('jabin.app.update_title_ar', 'تحديث جديد متوفر')
+                message = config.get_param('jabin.app.update_message_ar', 'يتوفر إصدار جديد من تطبيق ذبائح المملكة بمزايا وتحسينات جديدة. يرجى التحديث للمتابعة.')
+
+            data = {
+                "update_available": update_available,
+                "force_update": force_update,
+                "current_version": current_version,
+                "latest_version": latest_version,
+                "min_version": min_version,
+                "platform": platform,
+                "store_url": store_url,
+                "title": title,
+                "message": message,
+            }
+            ctx.set_body(ResponseBuilder.success(data=data, message=_("Update status retrieved successfully.")))
+        return ctx.response
+
+    @http.route(
+        ["/api/v1/admin/settings/app_version", "/api/v1/settings/app_version"],
+        type="http",
+        auth="public",
+        methods=["GET", "POST", "PUT"],
+        csrf=False,
+        cors="*",
+    )
+    def manage_app_version_settings(self, **kwargs):
+        """Get or update mobile app version update rules (force/optional)."""
+        env = request.env
+        config = env['ir.config_parameter'].sudo()
+
+        if request.httprequest.method in ("POST", "PUT"):
+            denied = require_token()
+            if denied:
+                return denied
+
+            with self.handle() as ctx:
+                content_type = request.httprequest.content_type or ""
+                vals = {}
+                if "multipart/form-data" in content_type:
+                    vals = dict(request.httprequest.form.items())
+                else:
+                    raw = request.httprequest.data
+                    if raw:
+                        try:
+                            vals = json.loads(raw)
+                        except json.JSONDecodeError:
+                            raise ValueError("Invalid JSON payload.")
+
+                # Android parameters
+                if "android_latest_version" in vals:
+                    config.set_param('jabin.app.android.latest_version', str(vals['android_latest_version']).strip())
+                if "android_min_version" in vals:
+                    config.set_param('jabin.app.android.min_version', str(vals['android_min_version']).strip())
+                if "android_force_update" in vals:
+                    val = vals['android_force_update']
+                    is_true = val if isinstance(val, bool) else str(val).lower() not in ('false', '0', 'no')
+                    config.set_param('jabin.app.android.force_update', str(is_true).lower())
+                if "android_store_url" in vals:
+                    config.set_param('jabin.app.android.store_url', str(vals['android_store_url']).strip())
+
+                # iOS parameters
+                if "ios_latest_version" in vals:
+                    config.set_param('jabin.app.ios.latest_version', str(vals['ios_latest_version']).strip())
+                if "ios_min_version" in vals:
+                    config.set_param('jabin.app.ios.min_version', str(vals['ios_min_version']).strip())
+                if "ios_force_update" in vals:
+                    val = vals['ios_force_update']
+                    is_true = val if isinstance(val, bool) else str(val).lower() not in ('false', '0', 'no')
+                    config.set_param('jabin.app.ios.force_update', str(is_true).lower())
+                if "ios_store_url" in vals:
+                    config.set_param('jabin.app.ios.store_url', str(vals['ios_store_url']).strip())
+
+                # Messages
+                if "title_ar" in vals:
+                    config.set_param('jabin.app.update_title_ar', str(vals['title_ar']).strip())
+                if "title_en" in vals:
+                    config.set_param('jabin.app.update_title_en', str(vals['title_en']).strip())
+                if "message_ar" in vals:
+                    config.set_param('jabin.app.update_message_ar', str(vals['message_ar']).strip())
+                if "message_en" in vals:
+                    config.set_param('jabin.app.update_message_en', str(vals['message_en']).strip())
+
+                data = {
+                    "android": {
+                        "latest_version": config.get_param('jabin.app.android.latest_version', '1.0.0'),
+                        "min_version": config.get_param('jabin.app.android.min_version', '1.0.0'),
+                        "force_update": config.get_param('jabin.app.android.force_update', 'false').lower() in ('true', '1'),
+                        "store_url": config.get_param('jabin.app.android.store_url', 'https://play.google.com/store/apps/details?id=com.dhabayih.lmamlaka'),
+                    },
+                    "ios": {
+                        "latest_version": config.get_param('jabin.app.ios.latest_version', '1.0.0'),
+                        "min_version": config.get_param('jabin.app.ios.min_version', '1.0.0'),
+                        "force_update": config.get_param('jabin.app.ios.force_update', 'false').lower() in ('true', '1'),
+                        "store_url": config.get_param('jabin.app.ios.store_url', 'https://apps.apple.com/app/id6470000000'),
+                    },
+                    "title_ar": config.get_param('jabin.app.update_title_ar', 'تحديث جديد متوفر'),
+                    "title_en": config.get_param('jabin.app.update_title_en', 'New Update Available'),
+                    "message_ar": config.get_param('jabin.app.update_message_ar', 'يتوفر إصدار جديد من تطبيق ذبائح المملكة بمزايا وتحسينات جديدة. يرجى التحديث للمتابعة.'),
+                    "message_en": config.get_param('jabin.app.update_message_en', 'A new version of Dhabayih Al-Mamlaka is available with new improvements. Please update to continue.'),
+                }
+                ctx.set_body(ResponseBuilder.success(data=data, message=_("App version settings updated successfully.")))
+            return ctx.response
+
+        # GET method
+        with self.handle() as ctx:
+            data = {
+                "android": {
+                    "latest_version": config.get_param('jabin.app.android.latest_version', '1.0.0'),
+                    "min_version": config.get_param('jabin.app.android.min_version', '1.0.0'),
+                    "force_update": config.get_param('jabin.app.android.force_update', 'false').lower() in ('true', '1'),
+                    "store_url": config.get_param('jabin.app.android.store_url', 'https://play.google.com/store/apps/details?id=com.dhabayih.lmamlaka'),
+                },
+                "ios": {
+                    "latest_version": config.get_param('jabin.app.ios.latest_version', '1.0.0'),
+                    "min_version": config.get_param('jabin.app.ios.min_version', '1.0.0'),
+                    "force_update": config.get_param('jabin.app.ios.force_update', 'false').lower() in ('true', '1'),
+                    "store_url": config.get_param('jabin.app.ios.store_url', 'https://apps.apple.com/app/id6470000000'),
+                },
+                "title_ar": config.get_param('jabin.app.update_title_ar', 'تحديث جديد متوفر'),
+                "title_en": config.get_param('jabin.app.update_title_en', 'New Update Available'),
+                "message_ar": config.get_param('jabin.app.update_message_ar', 'يتوفر إصدار جديد من تطبيق ذبائح المملكة بمزايا وتحسينات جديدة. يرجى التحديث للمتابعة.'),
+                "message_en": config.get_param('jabin.app.update_message_en', 'A new version of Dhabayih Al-Mamlaka is available with new improvements. Please update to continue.'),
+            }
+            ctx.set_body(ResponseBuilder.success(data=data, message=_("App version settings retrieved successfully.")))
         return ctx.response
 
     @http.route(
@@ -310,7 +520,7 @@ class HomeController(BaseApiController):
             wa_msg = config.get_param('jabin.whatsapp_default_message', 'مرحباً، أود الاستفسار عن ذبائح المملكة')
             wa_enabled = config.get_param('jabin.whatsapp_enabled', 'True') in ('True', 'true', '1')
             support_phone = config.get_param('jabin.support_phone', '920000000')
-            delivery_fee = float(config.get_param('jabin.delivery.fee', '31.95'))
+            delivery_fee = float(config.get_param('jabin.delivery.fee', '0.0'))
 
             clean_digits = re.sub(r'[^0-9]', '', wa_number)
             wa_url = f"https://wa.me/{clean_digits}?text={urllib.parse.quote(wa_msg)}"
