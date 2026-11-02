@@ -123,27 +123,24 @@ try:
     cur.execute("DELETE FROM res_company_users_rel WHERE user_id NOT IN %s", (admin_ids,))
     cur.execute("DELETE FROM res_users WHERE id NOT IN %s", (admin_ids,))
 
-    print("4. Cleaning old products & attachments...
-4. Cleaning old products & attachments...
-cur.execute("""
-    DO $$ 
-    BEGIN 
-        IF NOT EXISTS (
-            SELECT 1 FROM information_schema.columns 
-            WHERE table_name = 'jabin_product' AND column_name = 'sequence'
-        ) THEN 
-            ALTER TABLE jabin_product ADD COLUMN sequence integer DEFAULT 10;
-        END IF;
-        IF NOT EXISTS (
-            SELECT 1 FROM information_schema.columns 
-            WHERE table_name = 'jabin_category' AND column_name = 'sequence'
-        ) THEN 
-            ALTER TABLE jabin_category ADD COLUMN sequence integer DEFAULT 10;
-        END IF;
-    END $$;
-""")
-conn.commit()
-")
+    print("4. Cleaning old products & attachments...")
+    cur.execute("""
+        DO $$ 
+        BEGIN 
+            IF NOT EXISTS (
+                SELECT 1 FROM information_schema.columns 
+                WHERE table_name = 'jabin_product' AND column_name = 'sequence'
+            ) THEN 
+                ALTER TABLE jabin_product ADD COLUMN sequence integer DEFAULT 10;
+            END IF;
+            IF NOT EXISTS (
+                SELECT 1 FROM information_schema.columns 
+                WHERE table_name = 'jabin_category' AND column_name = 'sequence'
+            ) THEN 
+                ALTER TABLE jabin_category ADD COLUMN sequence integer DEFAULT 10;
+            END IF;
+        END $$;
+    """)
     product_tables = [
         'jabin_product_cutting_rel',
         'jabin_product_packaging_rel',
