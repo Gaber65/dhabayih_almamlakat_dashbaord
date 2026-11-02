@@ -157,16 +157,40 @@ try:
     print("   -> Products cleared.")
 
     print("5. Setting up 7 active categories...")
+    # Define our 7 official categories
+    categories_def = [
+        {"id": 27, "name": "ذبائح غنم وماعز", "seq": 1, "desc": "أجود أنواع الذبائح البلدية الطازجة"},
+        {"id": 28, "name": "حاشي وإبل", "seq": 2, "desc": "لحوم حاشي وإبل بلدية طازجة ومختارة"},
+        {"id": 29, "name": "عجول وأبقار", "seq": 3, "desc": "لحم عجل بلدي طازج ومقطع بعناية"},
+        {"id": 30, "name": "أجزاء وأنصاف ذبائح", "seq": 4, "desc": "أنصاف وأرباع ذبائح تناسب جميع الاحتياجات"},
+        {"id": 31, "name": "لحوم ومفروم بالكيلو", "seq": 5, "desc": "لحوم ومفروم طازج يومياً بالكيلو"},
+        {"id": 32, "name": "بوكسات وعروض الشواء", "seq": 6, "desc": "بوكسات مجهزة متكاملة للشواء والمناسبات"},
+        {"id": 33, "name": "عروض وتخفيضات حصرية", "seq": 7, "desc": "أفضل عروض وتخفيضات ذبائح المملكة"}
+    ]
+
+    # Deactivate all existing categories first
     cur.execute("UPDATE jabin_category SET active = false;")
-    cur.execute("UPDATE jabin_category SET active = true WHERE id IN (27, 28, 29, 30, 31, 32);")
-    cat33_name = json.dumps({'en_US': 'عروض وتخفيضات حصرية', 'ar_001': 'عروض وتخفيضات حصرية'})
-    cat33_desc = json.dumps({'en_US': 'أفضل عروض وتخفيضات ذبائح المملكة', 'ar_001': 'أفضل عروض وتخفيضات ذبائح المملكة'})
-    cur.execute("""
-        INSERT INTO jabin_category (id, name, description, active, sequence, product_count, create_uid, write_uid, create_date, write_date)
-        VALUES (33, %s, %s, true, 7, 0, 1, 1, NOW(), NOW())
-        ON CONFLICT (id) DO UPDATE SET active = true, name = %s;
-    """, (cat33_name, cat33_desc, cat33_name))
-    print("   -> 7 Categories ready.")
+
+    # Insert or update each of the 7 official categories with their fixed IDs
+    for c in categories_def:
+        c_name = json.dumps({'en_US': c['name'], 'ar_001': c['name']})
+        c_desc = json.dumps({'en_US': c['desc'], 'ar_001': c['desc']})
+        cur.execute("""
+            INSERT INTO jabin_category (
+                id, name, description, active, sequence, product_count,
+                create_uid, write_uid, create_date, write_date
+            ) VALUES (
+                %s, %s, %s, true, %s, 0,
+                1, 1, NOW(), NOW()
+            )
+            ON CONFLICT (id) DO UPDATE SET
+                active = true,
+                sequence = EXCLUDED.sequence,
+                name = EXCLUDED.name,
+                description = EXCLUDED.description;
+        """, (c['id'], c_name, c_desc, c['seq']))
+
+    print("   -> 7 Categories inserted and activated.")
 
     print("6. Activating Moyasar Live Gateway and COD...")
     # Activate Moyasar (9) and COD (1)
