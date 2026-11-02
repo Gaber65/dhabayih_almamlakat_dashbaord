@@ -1,4 +1,4 @@
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
+﻿# Part of Odoo. See LICENSE file for full copyright and licensing details.
 r"""\
 Odoo HTTP layer / WSGI application
 
@@ -711,7 +711,7 @@ class Controller:
     To *override* a controller, :ref:`inherit <python:tut-inheritance>`
     from its class, override relevant methods and re-expose them with
     :func:`~odoo.http.route`:. Please note that the decorators of all
-    methods are combined, if the overriding method’s decorator has no
+    methods are combined, if the overriding methodâ€™s decorator has no
     argument all previous ones will be kept, any provided argument will
     override previously defined ones.
 
@@ -2053,9 +2053,23 @@ class Dispatcher(ABC):
 
         set_header = self.request.future_response.headers.set
         cors = routing.get('cors')
+        req_origin = self.request.httprequest.headers.get('Origin', '')
         if cors:
-            set_header('Access-Control-Allow-Origin', cors)
-            set_header('Access-Control-Allow-Methods', (
+            allowed_origin = cors
+            if cors == '*' and req_origin:
+                import re as _re
+                # Match zbayhalmmlkh.network, zbayhalmmlkh.com and local development origins
+                trusted_pattern = r'^https?://([a-zA-Z0-9-]+\.)?zbayhalmmlkh\.(network|com)(:[0-9]+)?$|^https?://(localhost|127\.0\.0\.1|192\.168\.1\.[0-9]+)(:[0-9]+)?$'
+                if _re.match(trusted_pattern, req_origin):
+                    allowed_origin = req_origin
+                else:
+                    allowed_origin = cors
+            elif req_origin and (req_origin == cors or cors == '*'):
+                allowed_origin = req_origin
+
+            set_header('Access-Control-Allow-Origin', allowed_origin)
+            set_header('Access-Control-Allow-Credentials', 'true')
+            set_header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS' if self.request.httprequest.method == 'OPTIONS' else (
                 'POST' if routing['type'] == 'json'
                 else ', '.join(routing['methods'] or ['GET', 'POST'])
             ))

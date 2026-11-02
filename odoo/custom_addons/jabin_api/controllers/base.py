@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import contextlib
 import json as _stdlib_json
@@ -204,9 +204,6 @@ class BaseApiController(http.Controller):
         body = JsonHelper.dumps(envelope)
         headers = {
             "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-            "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization, Accept-Language",
         }
         if extra_headers:
             headers.update(extra_headers)

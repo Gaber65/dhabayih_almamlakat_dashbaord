@@ -460,7 +460,7 @@ class CategoryController(BaseApiController):
                 domain=domain,
                 limit=limit,
                 offset=offset,
-                order="name",
+                order="sequence, name, id",
                 lang=lang
             )
 
@@ -480,6 +480,50 @@ class CategoryController(BaseApiController):
                 ResponseBuilder.success(
                     data=response_data,
                     message=_("Products retrieved successfully"),
+                )
+            )
+
+        return ctx.response
+
+    @http.route(
+        ["/api/v1/categories/reorder", "/api/v1/catalog/category/reorder"],
+        type="http",
+        auth="public",
+        methods=["POST"],
+        csrf=False,
+        cors="*",
+    )
+    @permission_required("categories.manage")
+    def reorder_category(self, **kwargs):
+        """Reorder category globally."""
+        denied = require_token()
+        if denied:
+            return denied
+
+        with self.handle() as ctx:
+            vals = _parse_request_data()
+            category_id = vals.get("category_id") or kwargs.get("category_id")
+            if not category_id:
+                raise ValueError("category_id is required.")
+            
+            position = vals.get("position", kwargs.get("position", "last"))
+            target_category_id = vals.get("target_category_id") or kwargs.get("target_category_id")
+
+            cat = CategoryService.reorder_category(
+                request.env,
+                int(category_id),
+                position=position,
+                target_category_id=int(target_category_id) if target_category_id else None
+            )
+
+            ctx.set_body(
+                ResponseBuilder.success(
+                    data={
+                        "id": cat.id,
+                        "name": cat.name,
+                        "sequence": cat.sequence,
+                    },
+                    message=_("Category reordered successfully")
                 )
             )
 

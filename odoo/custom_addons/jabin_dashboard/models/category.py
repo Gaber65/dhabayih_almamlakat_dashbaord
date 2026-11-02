@@ -5,7 +5,7 @@ from odoo.exceptions import ValidationError
 class JabinCategory(models.Model):
     _name = 'jabin.category'
     _description = 'Dhabayih Lmamlaka Category'
-    _order = 'sequence, name'
+    _order = 'sequence, name, id'
 
     name = fields.Char(string='Name', required=True, translate=True)
     image = fields.Binary(string='Image', attachment=True)

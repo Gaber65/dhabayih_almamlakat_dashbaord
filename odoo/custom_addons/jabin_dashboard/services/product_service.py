@@ -138,7 +138,7 @@ class ProductService:
         domain=None,
         limit=100,
         offset=0,
-        order='name',
+        order='sequence, name, id',
         lang=None
     ):
         """
@@ -242,5 +242,72 @@ class ProductService:
         ProductValidator.validate_exists(product)
 
         product.write({'active': not product.active})
+
+        return product
+
+    @staticmethod
+    def reorder_product(env, product_id, category_id, position='last', target_product_id=None):
+        """
+        Reorder product inside a specific category.
+        
+        Args:
+            env: Odoo environment
+            product_id: Product ID to move
+            category_id: Category ID context
+            position: 'first', 'last', int index (1-based), 'before', or 'after'
+            target_product_id: ID of reference product for 'before' or 'after'
+        """
+        product = env['jabin.product'].sudo().browse(product_id)
+        if not product.exists():
+            raise ValidationError(_('Product not found.'))
+
+        category = env['jabin.category'].sudo().browse(category_id)
+        if not category.exists():
+            raise ValidationError(_('Category not found.'))
+
+        # Check if product is in this category or moving into this category
+        if product.category_id.id != category_id:
+            product.write({'category_id': category_id})
+
+        # Fetch all products in this category ordered by current sequence, id
+        category_products = env['jabin.product'].sudo().search(
+            [('category_id', '=', category_id)],
+            order='sequence, id'
+        )
+
+        prod_list = [p for p in category_products if p.id != product.id]
+
+        if position == 'first':
+            prod_list.insert(0, product)
+        elif position == 'last':
+            prod_list.append(product)
+        elif position in ('before', 'after'):
+            target_idx = -1
+            if target_product_id:
+                for idx, p in enumerate(prod_list):
+                    if p.id == target_product_id:
+                        target_idx = idx
+                        break
+            if target_idx == -1:
+                if position == 'before':
+                    prod_list.insert(0, product)
+                else:
+                    prod_list.append(product)
+            else:
+                insert_idx = target_idx if position == 'before' else target_idx + 1
+                prod_list.insert(insert_idx, product)
+        else:
+            try:
+                pos_idx = int(position) - 1 # 1-based index
+                pos_idx = max(0, min(len(prod_list), pos_idx))
+                prod_list.insert(pos_idx, product)
+            except (ValueError, TypeError):
+                prod_list.append(product)
+
+        # Re-index all products in this category with clean gap (10, 20, 30...)
+        for idx, p in enumerate(prod_list):
+            new_seq = (idx + 1) * 10
+            if p.sequence != new_seq:
+                p.write({'sequence': new_seq})
 
         return product

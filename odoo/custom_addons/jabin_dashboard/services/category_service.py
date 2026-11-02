@@ -255,3 +255,56 @@ class CategoryService:
         category.write({"active": not category.active})
 
         return category
+
+    @staticmethod
+    def reorder_category(env, category_id, position='last', target_category_id=None):
+        """
+        Reorder category globally.
+        
+        Args:
+            env: Odoo environment
+            category_id: Category ID to move
+            position: 'first', 'last', int index (1-based), 'before', or 'after'
+            target_category_id: Reference category ID for 'before'/'after'
+        """
+        category = env['jabin.category'].sudo().browse(category_id)
+        if not category.exists():
+            raise ValidationError(_('Category not found.'))
+
+        all_cats = env['jabin.category'].sudo().search([], order='sequence, id')
+        cat_list = [c for c in all_cats if c.id != category.id]
+
+        if position == 'first':
+            cat_list.insert(0, category)
+        elif position == 'last':
+            cat_list.append(category)
+        elif position in ('before', 'after'):
+            target_idx = -1
+            if target_category_id:
+                for idx, c in enumerate(cat_list):
+                    if c.id == target_category_id:
+                        target_idx = idx
+                        break
+            if target_idx == -1:
+                if position == 'before':
+                    cat_list.insert(0, category)
+                else:
+                    cat_list.append(category)
+            else:
+                insert_idx = target_idx if position == 'before' else target_idx + 1
+                cat_list.insert(insert_idx, category)
+        else:
+            try:
+                pos_idx = int(position) - 1 # 1-based index
+                pos_idx = max(0, min(len(cat_list), pos_idx))
+                cat_list.insert(pos_idx, category)
+            except (ValueError, TypeError):
+                cat_list.append(category)
+
+        # Re-index all categories cleanly
+        for idx, c in enumerate(cat_list):
+            new_seq = (idx + 1) * 10
+            if c.sequence != new_seq:
+                c.write({'sequence': new_seq})
+
+        return category

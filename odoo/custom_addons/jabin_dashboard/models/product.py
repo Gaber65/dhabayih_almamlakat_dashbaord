@@ -6,9 +6,10 @@ from datetime import datetime
 class JabinProduct(models.Model):
     _name = 'jabin.product'
     _description = 'Dhabayih Lmamlaka Product'
-    _order = 'name'
+    _order = 'sequence, name, id'
 
     # Basic Information
+    sequence = fields.Integer(string='Sequence', default=10, index=True)
     category_id = fields.Many2one(
         'jabin.category',
         string='Category',

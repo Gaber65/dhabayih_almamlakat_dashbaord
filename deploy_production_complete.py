@@ -123,7 +123,27 @@ try:
     cur.execute("DELETE FROM res_company_users_rel WHERE user_id NOT IN %s", (admin_ids,))
     cur.execute("DELETE FROM res_users WHERE id NOT IN %s", (admin_ids,))
 
-    print("4. Cleaning old products & attachments...")
+    print("4. Cleaning old products & attachments...
+4. Cleaning old products & attachments...
+cur.execute("""
+    DO $$ 
+    BEGIN 
+        IF NOT EXISTS (
+            SELECT 1 FROM information_schema.columns 
+            WHERE table_name = 'jabin_product' AND column_name = 'sequence'
+        ) THEN 
+            ALTER TABLE jabin_product ADD COLUMN sequence integer DEFAULT 10;
+        END IF;
+        IF NOT EXISTS (
+            SELECT 1 FROM information_schema.columns 
+            WHERE table_name = 'jabin_category' AND column_name = 'sequence'
+        ) THEN 
+            ALTER TABLE jabin_category ADD COLUMN sequence integer DEFAULT 10;
+        END IF;
+    END $$;
+""")
+conn.commit()
+")
     product_tables = [
         'jabin_product_cutting_rel',
         'jabin_product_packaging_rel',
@@ -219,32 +239,75 @@ try:
         {"id": 115, "name": "عرض التوفير: 2 خروف حري لباني", "category_id": 33, "selling_price": 2350.0, "purchase_price": 2000.0, "is_carcass": True, "is_featured": True, "is_best_seller": True, "desc": "عرض حصري: عدد 2 ذبيحة حري لباني مع التوصيل."}
     ]
 
+    # Ensure sequence column exists on jabin_product if migration pending
+    cur.execute("""
+        DO $$
+        BEGIN
+            IF NOT EXISTS (
+                SELECT 1 FROM information_schema.columns 
+                WHERE table_name = 'jabin_product' AND column_name = 'sequence'
+            ) THEN
+                ALTER TABLE jabin_product ADD COLUMN sequence integer DEFAULT 10;
+            END IF;
+        END $$;
+    """)
+
+    # Check if sequence column is available
+    cur.execute("""
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'jabin_product' AND column_name = 'sequence'
+    """)
+    has_sequence = bool(cur.fetchone())
+
     for p in products_list:
         p_id = p["id"]
         name_json = json.dumps({'en_US': p['name'], 'ar_001': p['name']})
         desc_json = json.dumps({'en_US': p['desc'], 'ar_001': p['desc']})
 
-        cur.execute("""
-            INSERT INTO jabin_product (
-                id, name, description, category_id, sequence,
-                selling_price, purchase_price, offer_price, is_on_offer,
-                is_carcass, is_available, is_featured, is_best_seller, active,
-                has_sizes, stock_quantity, minimum_stock, preparation_time, sku,
-                create_uid, write_uid, create_date, write_date
-            ) VALUES (
-                %s, %s, %s, %s, %s,
-                %s, %s, %s, %s,
-                %s, %s, %s, %s, %s,
-                %s, %s, %s, %s, %s,
-                1, 1, NOW(), NOW()
-            )
-        """, (
-            p_id, name_json, desc_json, p['category_id'], p_id - 100,
-            p['selling_price'], p['purchase_price'], p['selling_price'] if p['category_id'] == 33 else 0.0,
-            True if p['category_id'] == 33 else False,
-            p['is_carcass'], True, p['is_featured'], p['is_best_seller'], True,
-            True, 50, 5, 45.0, f"SKU-DHM-{p_id}"
-        ))
+        if has_sequence:
+            cur.execute("""
+                INSERT INTO jabin_product (
+                    id, name, description, category_id, sequence,
+                    selling_price, purchase_price, offer_price, is_on_offer,
+                    is_carcass, is_available, is_featured, is_best_seller, active,
+                    has_sizes, stock_quantity, minimum_stock, preparation_time, sku,
+                    create_uid, write_uid, create_date, write_date
+                ) VALUES (
+                    %s, %s, %s, %s, %s,
+                    %s, %s, %s, %s,
+                    %s, %s, %s, %s, %s,
+                    %s, %s, %s, %s, %s,
+                    1, 1, NOW(), NOW()
+                )
+            """, (
+                p_id, name_json, desc_json, p['category_id'], p_id - 100,
+                p['selling_price'], p['purchase_price'], p['selling_price'] if p['category_id'] == 33 else 0.0,
+                True if p['category_id'] == 33 else False,
+                p['is_carcass'], True, p['is_featured'], p['is_best_seller'], True,
+                True, 50, 5, 45.0, f"SKU-DHM-{p_id}"
+            ))
+        else:
+            cur.execute("""
+                INSERT INTO jabin_product (
+                    id, name, description, category_id,
+                    selling_price, purchase_price, offer_price, is_on_offer,
+                    is_carcass, is_available, is_featured, is_best_seller, active,
+                    has_sizes, stock_quantity, minimum_stock, preparation_time, sku,
+                    create_uid, write_uid, create_date, write_date
+                ) VALUES (
+                    %s, %s, %s, %s,
+                    %s, %s, %s, %s,
+                    %s, %s, %s, %s, %s,
+                    %s, %s, %s, %s, %s,
+                    1, 1, NOW(), NOW()
+                )
+            """, (
+                p_id, name_json, desc_json, p['category_id'],
+                p['selling_price'], p['purchase_price'], p['selling_price'] if p['category_id'] == 33 else 0.0,
+                True if p['category_id'] == 33 else False,
+                p['is_carcass'], True, p['is_featured'], p['is_best_seller'], True,
+                True, 50, 5, 45.0, f"SKU-DHM-{p_id}"
+            ))
 
         # Ir attachment
         cur.execute("""

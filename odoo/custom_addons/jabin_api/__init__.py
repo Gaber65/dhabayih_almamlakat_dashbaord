@@ -1,4 +1,4 @@
-import odoo.http
+﻿import odoo.http
 
 _original_route = odoo.http.route
 
@@ -10,4 +10,3 @@ def _custom_route(route=None, **routing):
 odoo.http.route = _custom_route
 
 from . import controllers
-
