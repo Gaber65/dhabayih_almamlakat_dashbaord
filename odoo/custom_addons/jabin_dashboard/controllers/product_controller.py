@@ -17,6 +17,7 @@ from odoo.addons.jabin_security.decorators.permission_required import permission
 
 from ..services.product_service import ProductService
 from ..validators.product_validator import ProductValidator
+from ..watermark_utils import apply_watermark
 
 
 # Allowed image MIME types for upload
@@ -92,8 +93,12 @@ def _parse_request_data() -> Dict[str, Any]:
                         clean_ids.append(int(item["id"]))
                 vals[m2m_field] = [(6, 0, clean_ids)]
 
-    # Handle base64 image in JSON
-    if "main_image" in vals and isinstance(vals["main_image"], str):
+    # Handle base64 image in JSON & explicit image removal
+    if vals.get("remove_main_image") or vals.get("main_image") is False or (isinstance(vals.get("main_image"), str) and vals["main_image"].strip() == ""):
+        vals["main_image"] = False
+        vals.pop("remove_main_image", None)
+        vals.pop("image", None)
+    elif "main_image" in vals and isinstance(vals["main_image"], str):
         img_str = vals["main_image"].strip()
         if img_str.startswith("http://") or img_str.startswith("https://"):
             vals.pop("main_image", None)
@@ -102,13 +107,23 @@ def _parse_request_data() -> Dict[str, Any]:
         else:
             vals["main_image"] = img_str
 
-    if "image" in vals and not vals.get("main_image"):
-        img_str = str(vals.pop("image")).strip()
-        if not (img_str.startswith("http://") or img_str.startswith("https://")):
-            if "," in img_str and "base64" in img_str:
-                vals["main_image"] = img_str.split(",", 1)[1].strip()
-            else:
-                vals["main_image"] = img_str
+    if "image" in vals:
+        if not vals.get("main_image") and vals.get("main_image") is not False:
+            img_str = str(vals.pop("image")).strip()
+            if not (img_str.startswith("http://") or img_str.startswith("https://")):
+                if "," in img_str and "base64" in img_str:
+                    vals["main_image"] = img_str.split(",", 1)[1].strip()
+                else:
+                    vals["main_image"] = img_str
+        else:
+            vals.pop("image", None)
+
+    # Automatic Brand Watermark
+    if vals.get("main_image") and isinstance(vals["main_image"], str):
+        try:
+            vals["main_image"] = apply_watermark(vals["main_image"])
+        except Exception as _wm_e:
+            _logger.warning("Auto-watermark error: %s", _wm_e)
 
     # Preserve raw_sizes before stripping non-model fields
     if "sizes" in vals:
@@ -119,7 +134,7 @@ def _parse_request_data() -> Dict[str, Any]:
         "is_available", "is_on_offer", "offer_price", "profit",
         "offer_profit", "profit_percentage", "loyalty_points",
         "has_sizes", "cutting_options", "packaging_options",
-        "excluded_parts", "images"
+        "excluded_parts", "images", "image", "remove_main_image"
     ):
         vals.pop(f, None)
 
@@ -340,6 +355,7 @@ def _serialize_product(product) -> Dict[str, Any]:
         "id": product.id,
         "category_id": product.category_id.id,
         "category_name": product.category_id.name,
+        "sequence": getattr(product, "sequence", 10) or 10,
         "name": active_name,
         "name_ar": name_ar,
         "name_en": name_en,
@@ -690,7 +706,7 @@ class ProductController(BaseApiController):
                     domain=domain,
                     limit=limit,
                     offset=offset,
-                    order="name",
+                    order="sequence, name, id",
                     lang=lang
                 )
 
@@ -785,12 +801,38 @@ class ProductController(BaseApiController):
                 if raw_sizes is None:
                     raw_sizes = vals.pop("sizes", None)
 
+                # Multilingual & explicit lang handling for product name
+                req_lang = _get_lang()
+                name_val = vals.get("name")
+
                 # Update product via service
                 product = ProductService.update(
                     request.env,
                     product_id,
                     vals,
                 )
+
+                # Ensure Arabic and English translations are both updated for name and description
+                if name_val and isinstance(name_val, str) and name_val.strip():
+                    clean_name = name_val.strip()
+                    try:
+                        product.sudo().with_context(lang="ar_001").write({"name": clean_name})
+                        name_ar, name_en = _extract_multilang(product, "name")
+                        if not name_en:
+                            product.sudo().with_context(lang="en_US").write({"name": clean_name})
+                    except Exception as _tr_err:
+                        _logger.warning("Failed to sync name translations: %s", _tr_err)
+
+                desc_val = vals.get("description")
+                if desc_val is not None and isinstance(desc_val, str):
+                    clean_desc = desc_val.strip()
+                    try:
+                        product.sudo().with_context(lang="ar_001").write({"description": clean_desc})
+                        desc_ar, desc_en = _extract_multilang(product, "description")
+                        if not desc_en:
+                            product.sudo().with_context(lang="en_US").write({"description": clean_desc})
+                    except Exception as _tr_err:
+                        _logger.warning("Failed to sync description translations: %s", _tr_err)
 
                 # Synchronize custom carcass sizes when provided (dashboard is source of truth)
                 if raw_sizes is not None and isinstance(raw_sizes, list):
@@ -1059,5 +1101,60 @@ class ProductController(BaseApiController):
                         code=500
                     )
                 )
+
+        return ctx.response
+
+    @http.route(
+        ["/api/v1/products/reorder", "/api/v1/catalog/product/reorder"],
+        type="http",
+        auth="public",
+        methods=["POST"],
+        csrf=False,
+        cors="*",
+    )
+    @permission_required("products.manage")
+    def reorder_product(self, **kwargs):
+        """Reorder product inside category."""
+        denied = require_token()
+        if denied:
+            return denied
+
+        with self.handle() as ctx:
+            vals = _parse_request_data()
+            product_id = vals.get("product_id") or kwargs.get("product_id")
+            category_id = vals.get("category_id") or kwargs.get("category_id")
+
+            if not product_id:
+                raise ValueError("product_id is required.")
+            if not category_id:
+                # If category_id not passed, infer from product
+                prod = request.env['jabin.product'].sudo().browse(int(product_id))
+                if prod.exists() and prod.category_id:
+                    category_id = prod.category_id.id
+                else:
+                    raise ValueError("category_id is required.")
+
+            position = vals.get("position", kwargs.get("position", "last"))
+            target_product_id = vals.get("target_product_id") or kwargs.get("target_product_id")
+
+            prod = ProductService.reorder_product(
+                request.env,
+                int(product_id),
+                int(category_id),
+                position=position,
+                target_product_id=int(target_product_id) if target_product_id else None
+            )
+
+            ctx.set_body(
+                ResponseBuilder.success(
+                    data={
+                        "id": prod.id,
+                        "name": prod.name,
+                        "category_id": prod.category_id.id,
+                        "sequence": prod.sequence,
+                    },
+                    message=_("Product reordered successfully")
+                )
+            )
 
         return ctx.response
