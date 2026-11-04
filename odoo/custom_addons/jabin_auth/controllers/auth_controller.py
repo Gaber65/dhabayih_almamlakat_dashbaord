@@ -86,7 +86,6 @@ class AuthController(BaseApiController):
                     "expires_in": result.get("expires_in"),
                     "channel": result.get("channel"),
                     "identifier": result.get("identifier"),
-                    "otp": result.get("otp"),
                 },
                 message=result.get("message", "Verification code sent."),
                 code=200
@@ -175,7 +174,6 @@ class AuthController(BaseApiController):
                         "action": "verify_account",
                         "channel": result.get("channel"),
                         "identifier": result.get("identifier"),
-                        "otp": result.get("otp"),
                     },
                     message=result.get('message', 'Account needs verification. A code has been sent.'),
                     code=202
@@ -186,7 +184,6 @@ class AuthController(BaseApiController):
                     "expires_in": result.get("expires_in"),
                     "channel": result.get("channel"),
                     "identifier": result.get("identifier"),
-                    "otp": result.get("otp"),
                 },
                 message=result.get("message", "Login OTP sent."),
             )
