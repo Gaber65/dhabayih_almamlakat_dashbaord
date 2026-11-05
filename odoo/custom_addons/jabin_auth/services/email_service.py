@@ -7,7 +7,7 @@ from typing import Optional
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.image import MIMEImage
-from email.utils import formataddr
+from email.utils import formataddr, make_msgid, formatdate
 
 from odoo import api, models
 from odoo.exceptions import ValidationError
@@ -277,7 +277,7 @@ Dhabayih Al-Mamlaka Team
             <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin: 0 auto 14px;">
               <tr>
                 <td align="center" valign="middle" style="width: 82px; height: 82px; background-color: #ffffff; border: 2px solid #e7d8be; border-radius: 20px; padding: 6px; box-shadow: 0 8px 18px rgba(116, 29, 48, 0.07);">
-                  <img src="cid:app_logo" alt="{brand_title}" width="68" height="68" style="width: 68px; height: 68px; display: block; border-radius: 14px; object-fit: contain;" />
+                  <img src="https://api.zbayhalmmlkh.network/jabin_auth/static/src/img/app_logo.png" alt="{brand_title}" width="68" height="68" style="width: 68px; height: 68px; display: block; border-radius: 14px; object-fit: contain;" />
                 </td>
               </tr>
             </table>
@@ -434,10 +434,10 @@ Dhabayih Al-Mamlaka Team
         """Send an email using SMTP configuration with Multipart (HTML + Plain + Inline Logo)."""
         smtp = self._smtp_config()
 
-        # If SMTP credentials are not configured, log in console instead of failing
-        if not smtp.get("username") or not smtp.get("password"):
+        # If SMTP server host is not configured, log in console instead of failing
+        if not smtp.get("host"):
             _logger.warning("==================================================")
-            _logger.warning("[DEV MODE - NO SMTP CREDENTIALS CONFIGURED]")
+            _logger.warning("[DEV MODE - NO SMTP SERVER CONFIGURED]")
             _logger.warning("To: %s | Subject: %s", to, subject)
             _logger.warning("Email Body:\n%s", body)
             _logger.warning("==================================================")
@@ -446,9 +446,13 @@ Dhabayih Al-Mamlaka Team
         try:
             # Root message is 'related' to allow inline images (CID)
             message = MIMEMultipart("related")
-            message["From"] = formataddr((self.APP_NAME_AR, smtp["username"]))
+            sender_email = smtp.get("from_email") or smtp["username"] or "noreply@zbayhalmmlkh.network"
+            message["From"] = formataddr((self.APP_NAME_AR, sender_email))
             message["To"] = to
             message["Subject"] = subject
+            message["Date"] = formatdate(localtime=True)
+            message["Message-ID"] = make_msgid(domain="zbayhalmmlkh.network")
+            message["Auto-Submitted"] = "auto-generated"
 
             # Alternative part for text vs html
             msg_alternative = MIMEMultipart("alternative")
@@ -460,22 +464,6 @@ Dhabayih Al-Mamlaka Team
             # HTML part (if provided)
             if html_body:
                 msg_alternative.attach(MIMEText(html_body, "html", "utf-8"))
-
-            # Attach inline logo with Content-ID: <app_logo>
-            logo_path = os.path.join(
-                os.path.dirname(os.path.dirname(__file__)),
-                "static", "src", "img", "app_logo.png"
-            )
-            if os.path.exists(logo_path):
-                try:
-                    with open(logo_path, "rb") as f:
-                        logo_data = f.read()
-                    logo_img = MIMEImage(logo_data, name="app_logo.png")
-                    logo_img.add_header("Content-ID", "<app_logo>")
-                    logo_img.add_header("Content-Disposition", "inline", filename="app_logo.png")
-                    message.attach(logo_img)
-                except Exception as img_err:
-                    _logger.warning("Failed to attach inline logo to email: %s", img_err)
 
             # Connect to SMTP server with a 10-second timeout
             if smtp["ssl"]:
@@ -504,7 +492,7 @@ Dhabayih Al-Mamlaka Team
 
             # Send the email
             server.sendmail(
-                smtp["username"],
+                sender_email or smtp["username"],
                 to,
                 message.as_string()
             )
@@ -551,6 +539,7 @@ Dhabayih Al-Mamlaka Team
         env_password = os.getenv("SMTP_PASSWORD")
         env_tls = os.getenv("SMTP_TLS")
         env_ssl = os.getenv("SMTP_SSL")
+        env_from = os.getenv("SMTP_FROM")
 
         tls_value = env_tls if env_tls is not None else config.get("smtp_tls", "True")
         ssl_value = env_ssl if env_ssl is not None else config.get("smtp_ssl", "False")
@@ -584,7 +573,9 @@ Dhabayih Al-Mamlaka Team
         except (ValueError, TypeError):
             port_num = 587
 
+        from_email_val = env_from if env_from is not None else config.get("smtp_from", "noreply@zbayhalmmlkh.network")
         return {
+            "from_email": str(from_email_val).strip(),
             "host": server_host,
             "port": port_num,
             "username": username,
