@@ -1,5 +1,5 @@
 from typing import Optional
-from odoo import api, models, _
+from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
 from odoo.addons.jabin_core import JabinLogger
 
@@ -9,6 +9,72 @@ _logger = JabinLogger.get("auth.service")
 class LoginService(models.AbstractModel):
     _name = 'jabin.auth.login.service'
     _description = 'Login Service'
+
+    @api.model
+    def _get_demo_account_config(self) -> dict:
+        """Fetch Apple Review / Demo account configuration from system parameters."""
+        ICP = self.env['ir.config_parameter'].sudo()
+        enabled_raw = ICP.get_param('jabin.auth.demo_enabled', default='True')
+        enabled = str(enabled_raw).strip().lower() in ('true', '1', 'yes')
+        phone_raw = (ICP.get_param('jabin.auth.demo_phone') or '+966500000000').strip()
+        otp_raw = (ICP.get_param('jabin.auth.demo_otp') or '123456').strip()
+
+        normalized_phone = phone_raw
+        if phone_raw:
+            try:
+                normalized_phone = self.env['jabin.authentica.service'].sudo().normalize_saudi_phone(phone_raw)
+            except Exception:
+                normalized_phone = phone_raw
+
+        return {
+            'enabled': enabled,
+            'phone': normalized_phone,
+            'otp': otp_raw,
+        }
+
+    @api.model
+    def _is_demo_phone(self, normalized_identifier: str) -> bool:
+        """Return True if demo mode is enabled and identifier matches the demo phone."""
+        config = self._get_demo_account_config()
+        return bool(config['enabled'] and config['phone'] and normalized_identifier == config['phone'])
+
+    @api.model
+    def _get_or_create_demo_user(self, normalized_phone: str):
+        """Fetch or provision an active customer user for the configured demo phone."""
+        User = self.env['res.users'].sudo()
+        user = User.find_by_phone(normalized_phone)
+        if not user:
+            user = User.create({
+                'login': normalized_phone,
+                'name': 'Apple Review Demo',
+                'phone': normalized_phone,
+                'status': 'active',
+                'user_type': 'customer',
+                'profile_completed': True,
+                'verified_at': fields.Datetime.now(),
+            })
+            _logger.audit('DEMO_USER_CREATED', f'Demo review user created: {normalized_phone}')
+        elif user.status == 'pending':
+            user.write({
+                'status': 'active',
+                'profile_completed': True,
+                'verified_at': fields.Datetime.now(),
+            })
+        return user
+
+    @api.model
+    def _build_login_response(self, user) -> dict:
+        """Generate auth tokens and serialize user payload for login responses."""
+        TokenService = self.env['jabin.auth.token.service']
+        tokens = TokenService.generate_tokens(user)
+        tokens['user'] = {
+            'id': user.id,
+            'email': user.email or user.login,
+            'phone': user.phone or (user.partner_id.phone if user.partner_id else None),
+            'status': user.status,
+            'profile_completed': user.profile_completed,
+        }
+        return tokens
 
     @api.model
     def initiate_login(self, identifier: str, channel: Optional[str] = None) -> dict:
@@ -33,8 +99,18 @@ class LoginService(models.AbstractModel):
         if is_phone:
             channel = 'sms'
             normalized_identifier = AuthenticaService.normalize_saudi_phone(identifier)
-            user = User.find_by_phone(normalized_identifier)
             msg = _("Verification code sent via SMS to your phone.")
+            if self._is_demo_phone(normalized_identifier):
+                self._get_or_create_demo_user(normalized_identifier)
+                _logger.audit('DEMO_LOGIN_OTP_BYPASSED', f'Demo login initiated for {normalized_identifier}')
+                return {
+                    'expires_in': OTPService.OTP_EXPIRY_MINUTES * 60,
+                    'requires_verification': False,
+                    'channel': channel,
+                    'identifier': normalized_identifier,
+                    'message': msg,
+                }
+            user = User.find_by_phone(normalized_identifier)
         else:
             channel = 'email'
             normalized_identifier = identifier.lower()
@@ -127,6 +203,15 @@ class LoginService(models.AbstractModel):
         identifier = str(identifier).strip()
         if '@' not in identifier:
             normalized_identifier = AuthenticaService.normalize_saudi_phone(identifier)
+            if self._is_demo_phone(normalized_identifier):
+                demo_config = self._get_demo_account_config()
+                if str(otp_code).strip() != demo_config['otp']:
+                    _logger.audit('DEMO_LOGIN_VERIFY_FAILED', f'Invalid demo OTP for {normalized_identifier}')
+                    raise ValidationError(_("Invalid or expired OTP."))
+                user = self._get_or_create_demo_user(normalized_identifier)
+                user.update_last_login()
+                _logger.audit('DEMO_LOGIN_SUCCESS', f'Demo user logged in: {normalized_identifier}')
+                return self._build_login_response(user)
             user = User.find_by_phone(normalized_identifier)
         else:
             normalized_identifier = identifier.lower()
@@ -145,15 +230,7 @@ class LoginService(models.AbstractModel):
             user.write({'status': 'active', 'verified_at': fields.Datetime.now()})
             _logger.audit('USER_ACTIVATED', f'User activated via login verification: {normalized_identifier}')
 
-            tokens = TokenService.generate_tokens(user)
-            tokens['user'] = {
-                'id': user.id,
-                'email': user.email or user.login,
-                'phone': user.phone or (user.partner_id.phone if user.partner_id else None),
-                'status': user.status,
-                'profile_completed': user.profile_completed
-            }
-            return tokens
+            return self._build_login_response(user)
 
         if user.status != 'active':
             _logger.audit('LOGIN_VERIFY_FAILED', f'Invalid account status for login: {normalized_identifier} ({user.status})')
@@ -168,15 +245,7 @@ class LoginService(models.AbstractModel):
         user.update_last_login()
         _logger.audit('LOGIN_SUCCESS', f'User logged in: {normalized_identifier}')
 
-        tokens = TokenService.generate_tokens(user)
-        tokens['user'] = {
-            'id': user.id,
-            'email': user.email or user.login,
-            'phone': user.phone or (user.partner_id.phone if user.partner_id else None),
-            'status': user.status,
-            'profile_completed': user.profile_completed
-        }
-        return tokens
+        return self._build_login_response(user)
 
     @api.model
     def resend_verification_for_pending(self, email: str) -> dict:
