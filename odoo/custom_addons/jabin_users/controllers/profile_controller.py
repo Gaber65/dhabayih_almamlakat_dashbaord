@@ -1,5 +1,6 @@
 import base64
 import json
+import time
 from odoo import http, _
 from odoo.http import request
 from odoo.exceptions import ValidationError
@@ -155,4 +156,94 @@ class ProfileController(BaseApiController):
                 "preferred_theme": getattr(user, "preferred_theme", "light"),
                 "push_notifications_enabled": getattr(user, "push_notifications_enabled", True),
             }, message=_("Profile updated successfully.")))
+        return ctx.response
+
+    @http.route(
+        "/api/v1/me",
+        type="http",
+        auth="public",
+        methods=["DELETE"],
+        csrf=False,
+        cors="*",
+    )
+    def delete_account(self, **kwargs):
+        """Permanently delete/anonymize the authenticated user's account and revoke sessions."""
+        denied = require_token()
+        if denied:
+            return denied
+
+        user_id = _get_auth_user_id()
+        with self.handle() as ctx:
+            user = request.env["res.users"].sudo().browse(user_id)
+            if not user.exists():
+                raise ValidationError(_("User profile not found."))
+
+            env = request.env
+            # 1. Revoke all refresh tokens
+            if "jabin.refresh.token" in env:
+                tokens = env["jabin.refresh.token"].sudo().search([
+                    ("user_id", "=", user.id),
+                    ("is_revoked", "=", False),
+                ])
+                if tokens:
+                    tokens.revoke()
+
+            # 2. Remove registered FCM devices
+            if "jabin.device" in env:
+                devices = env["jabin.device"].sudo().search([("user_id", "=", user.id)])
+                if devices:
+                    devices.unlink()
+
+            # 3. Remove saved addresses
+            if "res.users.address" in env:
+                addresses = env["res.users.address"].sudo().search([("user_id", "=", user.id)])
+                if addresses:
+                    addresses.unlink()
+
+            # 4. Remove pending OTPs for user's phone/email
+            if "jabin.otp" in env:
+                otp_domain = [("user_id", "=", user.id)]
+                if user.phone:
+                    otp_domain = ["|", ("phone", "=", user.phone)] + otp_domain
+                if user.email:
+                    otp_domain = ["|", ("email", "=", user.email)] + otp_domain
+                otps = env["jabin.otp"].sudo().search(otp_domain)
+                if otps:
+                    otps.unlink()
+
+            # 5. Anonymize PII and archive user + partner so account cannot be accessed again
+            ts = int(time.time())
+            deleted_login = f"deleted_{user.id}_{ts}"
+            deleted_name = f"Deleted User #{user.id}"
+
+            partner = user.partner_id
+            user_vals = {
+                "name": deleted_name,
+                "login": deleted_login,
+                "email": False,
+                "phone": False,
+                "image_1920": False,
+                "active": False,
+            }
+            if hasattr(user, "status"):
+                user_vals["status"] = "inactive"
+            if hasattr(user, "recipient_phone"):
+                user_vals["recipient_phone"] = False
+            user.write(user_vals)
+
+            if partner and partner.exists():
+                partner_vals = {
+                    "name": deleted_name,
+                    "email": False,
+                    "phone": False,
+                    "mobile": False,
+                    "image_1920": False,
+                    "active": False,
+                }
+                partner.sudo().write(partner_vals)
+
+            ctx.set_body(ResponseBuilder.success(
+                data={"deleted": True},
+                message=_("Account deleted successfully."),
+            ))
         return ctx.response

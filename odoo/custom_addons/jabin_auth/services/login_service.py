@@ -16,34 +16,53 @@ class LoginService(models.AbstractModel):
         ICP = self.env['ir.config_parameter'].sudo()
         enabled_raw = ICP.get_param('jabin.auth.demo_enabled', default='True')
         enabled = str(enabled_raw).strip().lower() in ('true', '1', 'yes')
-        phone_raw = (ICP.get_param('jabin.auth.demo_phone') or '+966500000000').strip()
+        phones_raw = (ICP.get_param('jabin.auth.demo_phone') or '+966500000000,+966500000001').strip()
         otp_raw = (ICP.get_param('jabin.auth.demo_otp') or '123456').strip()
 
-        normalized_phone = phone_raw
-        if phone_raw:
+        authentica = self.env['jabin.authentica.service'].sudo()
+        normalized_phones = []
+        for raw_item in phones_raw.split(','):
+            item = raw_item.strip()
+            if not item:
+                continue
             try:
-                normalized_phone = self.env['jabin.authentica.service'].sudo().normalize_saudi_phone(phone_raw)
+                norm = authentica.normalize_saudi_phone(item)
             except Exception:
-                normalized_phone = phone_raw
+                norm = item
+            if norm not in normalized_phones:
+                normalized_phones.append(norm)
 
         return {
             'enabled': enabled,
-            'phone': normalized_phone,
+            'phones': normalized_phones,
+            'primary_phone': normalized_phones[0] if normalized_phones else None,
             'otp': otp_raw,
         }
 
     @api.model
     def _is_demo_phone(self, normalized_identifier: str) -> bool:
-        """Return True if demo mode is enabled and identifier matches the demo phone."""
+        """Return True if demo mode is enabled and identifier matches a configured demo phone."""
         config = self._get_demo_account_config()
-        return bool(config['enabled'] and config['phone'] and normalized_identifier == config['phone'])
+        return bool(config['enabled'] and normalized_identifier in config['phones'])
 
     @api.model
     def _get_or_create_demo_user(self, normalized_phone: str):
-        """Fetch or provision an active customer user for the configured demo phone."""
+        """Fetch or provision an active customer user for the configured demo phone.
+
+        The primary demo phone is always auto-provisioned if missing.
+        Secondary demo phones (e.g. +966500000001) are provisioned once and
+        will not be recreated after account deletion.
+        """
         User = self.env['res.users'].sudo()
         user = User.find_by_phone(normalized_phone)
         if not user:
+            config = self._get_demo_account_config()
+            is_primary = normalized_phone == config.get('primary_phone')
+            ICP = self.env['ir.config_parameter'].sudo()
+            provisioned_key = f'jabin.auth.demo_provisioned.{normalized_phone}'
+            if not is_primary and ICP.get_param(provisioned_key):
+                return User.browse()
+
             user = User.create({
                 'login': normalized_phone,
                 'name': 'Apple Review Demo',
@@ -53,6 +72,8 @@ class LoginService(models.AbstractModel):
                 'profile_completed': True,
                 'verified_at': fields.Datetime.now(),
             })
+            if not is_primary:
+                ICP.set_param(provisioned_key, 'True')
             _logger.audit('DEMO_USER_CREATED', f'Demo review user created: {normalized_phone}')
         elif user.status == 'pending':
             user.write({
@@ -101,7 +122,10 @@ class LoginService(models.AbstractModel):
             normalized_identifier = AuthenticaService.normalize_saudi_phone(identifier)
             msg = _("Verification code sent via SMS to your phone.")
             if self._is_demo_phone(normalized_identifier):
-                self._get_or_create_demo_user(normalized_identifier)
+                user = self._get_or_create_demo_user(normalized_identifier)
+                if not user:
+                    _logger.audit('LOGIN_FAILED', f'Demo user was deleted: {normalized_identifier}')
+                    raise ValidationError(_("User not found."))
                 _logger.audit('DEMO_LOGIN_OTP_BYPASSED', f'Demo login initiated for {normalized_identifier}')
                 return {
                     'expires_in': OTPService.OTP_EXPIRY_MINUTES * 60,
@@ -209,6 +233,9 @@ class LoginService(models.AbstractModel):
                     _logger.audit('DEMO_LOGIN_VERIFY_FAILED', f'Invalid demo OTP for {normalized_identifier}')
                     raise ValidationError(_("Invalid or expired OTP."))
                 user = self._get_or_create_demo_user(normalized_identifier)
+                if not user:
+                    _logger.audit('LOGIN_VERIFY_FAILED', f'Demo user was deleted: {normalized_identifier}')
+                    raise ValidationError(_("User not found."))
                 user.update_last_login()
                 _logger.audit('DEMO_LOGIN_SUCCESS', f'Demo user logged in: {normalized_identifier}')
                 return self._build_login_response(user)
